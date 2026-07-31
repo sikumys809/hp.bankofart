@@ -276,6 +276,46 @@ function bankofart_csv_derive_artist_name_en( $row, $def ) {
 	);
 }
 
+/**
+ * テーマキーワードを「診断タグ」列から導出する。
+ *
+ * 診断タグとテーマキーワードは同じ語彙を使う運用のため、専用列が無ければ
+ * 診断タグの内容をそのままカンマ区切りで入れる（例：生命エネルギー,挑戦,格闘）。
+ * 表示側（single-artist.php）は explode(',') で分解して「# 挑戦」のように出す。
+ *
+ * @param array $row 1行分の連想配列。
+ * @param array $def 種別定義。
+ * @return array array( 'value' => string, 'note' => string )
+ */
+function bankofart_csv_derive_artist_theme_keywords( $row, $def ) {
+	$raw = bankofart_csv_pick( $row, $def['tax']['artist_diagnosis_tag'] );
+	if ( '' === $raw ) {
+		return array(
+			'value' => '',
+			'note'  => '',
+		);
+	}
+
+	// 区切り（; | 、 / 改行など）を吸収し、装飾（「」#等）を落としてカンマ区切りに揃える。
+	$tags = array_values(
+		array_filter(
+			array_map( 'bankofart_csv_normalize_term_name', bankofart_csv_split_multi( $raw ) ),
+			'strlen'
+		)
+	);
+	if ( empty( $tags ) ) {
+		return array(
+			'value' => '',
+			'note'  => '',
+		);
+	}
+
+	return array(
+		'value' => implode( ',', $tags ),
+		'note'  => '',
+	);
+}
+
 /* =========================================================
  * 列マッピング定義
  * ======================================================= */
@@ -338,7 +378,9 @@ function bankofart_csv_import_types() {
 			 * 該当する列がCSVにあればそちらが優先される。
 			 */
 			'derived'   => array(
-				'artist_name_en' => 'bankofart_csv_derive_artist_name_en',
+				'artist_name_en'        => 'bankofart_csv_derive_artist_name_en',
+				// テーマキーワードは診断タグと同じ語彙。専用列が無ければ診断タグから流用する。
+				'artist_theme_keywords' => 'bankofart_csv_derive_artist_theme_keywords',
 			),
 			/*
 			 * 意図的に取り込まない列（個人情報・契約情報）。
@@ -492,22 +534,75 @@ function bankofart_csv_resolve_terms( $taxonomy, $names ) {
 	$ids     = array();
 	$missing = array();
 
-	foreach ( (array) $names as $name ) {
-		$term = get_term_by( 'name', $name, $taxonomy );
-		if ( ! $term ) {
-			$term = get_term_by( 'slug', sanitize_title( $name ), $taxonomy );
-		}
-		if ( $term && ! is_wp_error( $term ) ) {
-			$ids[] = (int) $term->term_id;
-		} else {
-			$missing[] = $name;
+	/*
+	 * 登録済みターム名を「照合用に正規化した形」で引けるようにしておく。
+	 * 診断タグのように語彙が決まっている分類では、全角空白・カギ括弧・引用符・
+	 * 中黒・ハッシュなどの装飾が付いているだけで一致せず、まるごと落ちてしまう。
+	 */
+	static $index = array();
+	if ( ! isset( $index[ $taxonomy ] ) ) {
+		$index[ $taxonomy ] = array();
+		$all = get_terms(
+			array(
+				'taxonomy'   => $taxonomy,
+				'hide_empty' => false,
+			)
+		);
+		if ( ! is_wp_error( $all ) ) {
+			foreach ( $all as $t ) {
+				$index[ $taxonomy ][ bankofart_csv_normalize_term_name( $t->name ) ] = (int) $t->term_id;
+			}
 		}
 	}
 
+	foreach ( (array) $names as $name ) {
+		$term = get_term_by( 'name', $name, $taxonomy );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$ids[] = (int) $term->term_id;
+			continue;
+		}
+
+		// 装飾を落として再照合（「挑戦」→ 挑戦、#挑戦 → 挑戦 など）。
+		$norm = bankofart_csv_normalize_term_name( $name );
+		if ( '' !== $norm && isset( $index[ $taxonomy ][ $norm ] ) ) {
+			$ids[] = $index[ $taxonomy ][ $norm ];
+			continue;
+		}
+
+		$term = get_term_by( 'slug', sanitize_title( $name ), $taxonomy );
+		if ( $term && ! is_wp_error( $term ) ) {
+			$ids[] = (int) $term->term_id;
+			continue;
+		}
+
+		$missing[] = $name;
+	}
+
 	return array(
-		'ids'     => $ids,
+		'ids'     => array_values( array_unique( $ids ) ),
 		'missing' => $missing,
 	);
+}
+
+/**
+ * ターム名を照合用に正規化する。
+ *
+ * 前後の装飾（カギ括弧・引用符・#・中黒）と空白を落とし、全角英数字を半角へ。
+ *
+ * @param string $name ターム名。
+ * @return string
+ */
+function bankofart_csv_normalize_term_name( $name ) {
+	$name = (string) $name;
+	if ( function_exists( 'mb_convert_kana' ) ) {
+		$name = mb_convert_kana( $name, 'as', 'UTF-8' );
+	}
+	$name = str_replace( array( '　', "\xc2\xa0" ), ' ', $name );
+	$name = trim( $name );
+	// 前後の装飾記号を除去。
+	$name = preg_replace( '/^[\s#＃"\'「『（(【\[]+|[\s"\'」』）)】\]]+$/u', '', $name );
+	$name = preg_replace( '/\s+/u', '', $name );
+	return $name;
 }
 
 /**

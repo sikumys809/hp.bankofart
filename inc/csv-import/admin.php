@@ -247,6 +247,9 @@ function bankofart_csv_import_page() {
 									<?php if ( 'artist_name_en' === $field_id ) : ?>
 										専用列が無い場合、<strong>「アーティスト名」を英字大文字に変換</strong>して入れます（例：Taiki → TAIKI）。<br>
 										<span class="description">アーティスト名が日本語の場合は自動生成せず、結果画面でお知らせします（編集画面で手入力してください）。本名の読みである「フリガナ」列は使いません。</span>
+									<?php elseif ( 'artist_theme_keywords' === $field_id ) : ?>
+										専用列が無い場合、<strong>「診断タグ」列の内容をカンマ区切りで</strong>入れます（例：<code>生命エネルギー,挑戦,格闘</code>）。<br>
+										<span class="description">診断タグとテーマキーワードは同じ語彙を使う前提です。登録済みタグに無い語も、テーマキーワードにはそのまま入ります。</span>
 									<?php else : ?>
 										他の列から自動生成します。
 									<?php endif; ?>
