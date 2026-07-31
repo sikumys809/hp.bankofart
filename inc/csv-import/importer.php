@@ -219,7 +219,17 @@ function bankofart_csv_pick( $row, $aliases ) {
  * @return string[]
  */
 function bankofart_csv_split_multi( $value ) {
-	$parts = preg_split( '~[;|,、／/\r\n]+~u', (string) $value );
+	$value = (string) $value;
+
+	/*
+	 * ハッシュタグ形式（例：継ぎ接ぎ#再生#偶然）で書かれることがあるため # も区切りに含める。
+	 * ただしURL（画像列）にはフラグメントとして # が入りうるので、URLらしき値では使わない。
+	 */
+	$pattern = ( false !== strpos( $value, '://' ) )
+		? '~[;|,、／/\r\n]+~u'
+		: '~[;|,、／/#＃\r\n]+~u';
+
+	$parts = preg_split( $pattern, $value );
 	$parts = array_map( 'trim', (array) $parts );
 
 	return array_values( array_filter( $parts, static function ( $v ) {
@@ -277,6 +287,22 @@ function bankofart_csv_derive_artist_name_en( $row, $def ) {
 }
 
 /**
+ * テーマキーワードの値をカンマ区切りに整形する。
+ *
+ * 表示側（single-artist.php）は explode(',') で分解するため、カンマ以外の区切りで
+ * 書かれていると1個のチップにまとまってしまう。ハッシュタグ形式
+ * （継ぎ接ぎ#再生#偶然）や読点区切りも受け付けてカンマに揃える。
+ *
+ * @param string $value 元の値。
+ * @return string カンマ区切りの文字列。
+ */
+function bankofart_csv_normalize_keywords( $value ) {
+	$parts = array_map( 'bankofart_csv_normalize_term_name', bankofart_csv_split_multi( $value ) );
+	$parts = array_values( array_unique( array_filter( $parts, 'strlen' ) ) );
+	return implode( ',', $parts );
+}
+
+/**
  * テーマキーワードを「診断タグ」列から導出する。
  *
  * 診断タグとテーマキーワードは同じ語彙を使う運用のため、専用列が無ければ
@@ -296,22 +322,8 @@ function bankofart_csv_derive_artist_theme_keywords( $row, $def ) {
 		);
 	}
 
-	// 区切り（; | 、 / 改行など）を吸収し、装飾（「」#等）を落としてカンマ区切りに揃える。
-	$tags = array_values(
-		array_filter(
-			array_map( 'bankofart_csv_normalize_term_name', bankofart_csv_split_multi( $raw ) ),
-			'strlen'
-		)
-	);
-	if ( empty( $tags ) ) {
-		return array(
-			'value' => '',
-			'note'  => '',
-		);
-	}
-
 	return array(
-		'value' => implode( ',', $tags ),
+		'value' => bankofart_csv_normalize_keywords( $raw ),
 		'note'  => '',
 	);
 }
@@ -381,6 +393,14 @@ function bankofart_csv_import_types() {
 				'artist_name_en'        => 'bankofart_csv_derive_artist_name_en',
 				// テーマキーワードは診断タグと同じ語彙。専用列が無ければ診断タグから流用する。
 				'artist_theme_keywords' => 'bankofart_csv_derive_artist_theme_keywords',
+			),
+			/*
+			 * 専用列に値があっても書式を揃える項目。
+			 * テーマキーワードは表示側が explode(',') で分解するため、
+			 * ハッシュタグ区切り等で来てもカンマ区切りに直す。
+			 */
+			'normalize' => array(
+				'artist_theme_keywords' => 'bankofart_csv_normalize_keywords',
 			),
 			/*
 			 * 意図的に取り込まない列（個人情報・契約情報）。
@@ -856,10 +876,18 @@ function bankofart_csv_import_rows( $rows, $args ) {
 
 		// ---- メタフィールド ----
 		$set_from_csv = array();
+		$normalizers  = isset( $def['normalize'] ) ? $def['normalize'] : array();
 		foreach ( $def['meta'] as $field_id => $aliases ) {
 			$value = bankofart_csv_pick( $row, $aliases );
 			if ( '' === $value ) {
 				continue;
+			}
+			// 書式を揃える必要がある項目（テーマキーワード等）はここで整形する。
+			if ( isset( $normalizers[ $field_id ] ) && is_callable( $normalizers[ $field_id ] ) ) {
+				$value = call_user_func( $normalizers[ $field_id ], $value );
+				if ( '' === $value ) {
+					continue;
+				}
 			}
 			update_post_meta( $post_id, $field_id, wp_kses_post( $value ) );
 			$set_from_csv[ $field_id ] = true;

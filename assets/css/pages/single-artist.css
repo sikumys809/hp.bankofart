@@ -209,7 +209,9 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
    single-art の「この作品について」にあったマーキーを、制作風景写真を流す形でここへ移設。
    制作テーマ欄では1枚目しか使っていなかった artist_working_photos を全部活かす。 */
 @keyframes asProcessScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.as-process-marquee { overflow: hidden; position: relative; width: 100%; margin-top: 72px; }
+/* 上下の余白：起源の物語からは詰め気味に、GOAL とはしっかり離す
+   （近すぎると写真群が GOAL の枠にくっついて見える）。 */
+.as-process-marquee { overflow: hidden; position: relative; width: 100%; margin-top: 48px; margin-bottom: 96px; }
 .as-process-marquee-row { display: flex; align-items: center; width: max-content; animation: asProcessScroll 40s linear infinite; }
 .as-process-marquee-row.is-static { animation: none; width: auto; justify-content: center; }
 .as-process-marquee:hover .as-process-marquee-row { animation-play-state: paused; }
@@ -221,6 +223,6 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.as-process-marquee-row { animation: none; }
 }
 @media (max-width: 700px) {
-	.as-process-marquee { margin-top: 56px; }
+	.as-process-marquee { margin-top: 36px; margin-bottom: 64px; }
 	.as-process-shot { width: 190px; margin-right: 10px; }
 }
