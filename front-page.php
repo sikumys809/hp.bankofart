@@ -307,7 +307,7 @@ $front_top_size_map = array(
 								$type = 'type-square';
 							}
 							$art_num     = (string) rwmb_meta( 'art_number', '', $art_id2 );
-							$art_img     = bankofart_get_image( 'art_main_image', $art_id2, 'large' );
+							$art_img     = bankofart_get_art_top_image( $art_id2, 'large' );
 							$art_en      = (string) rwmb_meta( 'art_title_en', '', $art_id2 );
 							$art_disp    = '' !== trim( $art_en ) ? $art_en : get_the_title( $art_id2 );
 							$art_makers  = bankofart_get_connected( 'artist_to_art', 'to', $art_id2 );

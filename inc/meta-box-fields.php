@@ -606,6 +606,14 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'placeholder' => false,
 				'desc'        => 'コラージュ内での枠の形。未設定はモック既定の並び（横長→縦長→正方形…）にフォールバック。',
 			),
+			array(
+				'id'   => 'art_top_image',
+				'name' => 'TOP用画像（任意）',
+				'type' => 'single_image',
+				'tab'  => 'top_display',
+				'desc' => 'TOPのコラージュは枠いっぱいに絵を出すため、保存時に自動で「絵の部分だけ」を切り出した画像を作ります。'
+					. '自動トリミングの結果が気に入らないときだけ、ここに画像を入れてください（指定があれば自動処理より優先されます）。',
+			),
 		),
 	);
 
