@@ -52,6 +52,74 @@
 .sj-section-figs .sj-section-fig { display: block; width: 100%; height: auto; }
 .sj-section-figs:has(.sj-section-fig:nth-child(2)) { grid-template-columns: repeat(2, 1fr); }
 
+/* ═══════════════════════════════════════
+   INTERVIEW レイアウト（アイコン＋吹き出し）
+   カテゴリー「インタビュー」の記事だけに適用される。
+   コラム（.sj-section 系）とは完全に別系統の sj-iv- 名前空間。
+═══════════════════════════════════════ */
+
+/* ── 導入文（リード） */
+.sj-iv-intro { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
+.sj-iv-intro p + p { margin-top: 24px; }
+.sj-iv-intro img { display: block; width: 100%; height: auto; margin: 36px auto; }
+
+/* ── 話し手 × 聞き手の紹介 */
+.sj-iv-speakers { margin: 48px 0 64px; padding: 32px 24px; background: var(--paper); display: flex; align-items: flex-start; justify-content: center; gap: 32px; flex-wrap: wrap; }
+.sj-iv-speaker { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.sj-iv-speaker-role { font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-1); color: var(--mid); }
+.sj-iv-speakers-x { font-family: var(--f-deco); font-size: 20px; color: var(--border); align-self: center; }
+.sj-iv-speakers .sj-iv-avatar { flex-direction: column; gap: 10px; }
+.sj-iv-speakers .sj-iv-avatar-img,
+.sj-iv-speakers .sj-iv-avatar-initial { width: 76px; height: 76px; }
+.sj-iv-speakers .sj-iv-avatar-name { font-size: 15px; font-weight: var(--fw-bold); color: var(--ink); max-width: none; }
+
+/* ── アイコン（共通） */
+.sj-iv-avatar { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; width: 64px; text-decoration: none; }
+a.sj-iv-avatar { transition: opacity .2s; }
+a.sj-iv-avatar:hover { opacity: .72; }
+.sj-iv-avatar-img { display: block; width: 56px; height: 56px; border-radius: 50%; background-size: cover; background-position: center; background-color: var(--warm-gray); border: 1px solid var(--border-soft); }
+.sj-iv-avatar-initial { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: var(--brand-soft); border: 1px solid var(--border-soft); font-family: var(--f-jp); font-size: 20px; font-weight: var(--fw-bold); color: var(--brand-deep); }
+.sj-iv-avatar-name { font-family: var(--f-jp); font-size: 12px; font-weight: var(--fw-medium); letter-spacing: var(--ls-1); line-height: 1.4; color: var(--mid); text-align: center; word-break: break-word; }
+
+/* ── 章見出し */
+.sj-iv-chapter { margin: 72px 0 40px; font-family: var(--f-jp); font-size: 24px; font-weight: var(--fw-bold); letter-spacing: var(--ls-2); line-height: 1.5; color: var(--ink); padding-left: 16px; border-left: 3px solid var(--brand); }
+.sj-iv-chapter:first-child { margin-top: 0; }
+
+/* ── 発言（アイコン＋吹き出し） */
+.sj-iv-thread { display: flex; flex-direction: column; gap: 36px; }
+.sj-iv-turn { display: flex; align-items: flex-start; gap: 18px; }
+.sj-iv-turn--a { flex-direction: row-reverse; }
+
+.sj-iv-bubble { position: relative; flex: 1; min-width: 0; padding: 24px 28px; border: 1px solid var(--border-soft); }
+/* 吹き出しの三角（枠線付きなので外側＋内側の2枚重ね） */
+.sj-iv-bubble::before,
+.sj-iv-bubble::after { content: ''; position: absolute; top: 22px; width: 0; height: 0; border-style: solid; }
+
+/* 質問（聞き手・左） */
+.sj-iv-turn--q .sj-iv-bubble { background: var(--white); }
+.sj-iv-turn--q .sj-iv-bubble::before { left: -11px; border-width: 9px 11px 9px 0; border-color: transparent var(--border) transparent transparent; }
+.sj-iv-turn--q .sj-iv-bubble::after  { left: -10px; border-width: 9px 11px 9px 0; border-color: transparent var(--white) transparent transparent; }
+
+/* 回答（話し手・右） */
+.sj-iv-turn--a .sj-iv-bubble { background: var(--brand-tint); }
+.sj-iv-turn--a .sj-iv-bubble::before { right: -11px; border-width: 9px 0 9px 11px; border-color: transparent transparent transparent var(--border); }
+.sj-iv-turn--a .sj-iv-bubble::after  { right: -10px; border-width: 9px 0 9px 11px; border-color: transparent transparent transparent var(--brand-tint); }
+
+/* Q / A のマーク */
+.sj-iv-mark { display: block; font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-bold); letter-spacing: var(--ls-3); text-transform: uppercase; margin-bottom: 10px; }
+.sj-iv-turn--q .sj-iv-mark { color: var(--mid); }
+.sj-iv-turn--a .sj-iv-mark { color: var(--brand-deep); }
+
+.sj-iv-q-text { font-family: var(--f-jp); font-size: var(--fs-body); font-weight: var(--fw-bold); letter-spacing: var(--ls-1); line-height: 1.9; color: var(--ink); }
+.sj-iv-a-text { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
+.sj-iv-a-text p + p { margin-top: 22px; }
+.sj-iv-a-text a { color: var(--brand-deep); text-decoration: underline; }
+.sj-iv-a-text img { display: block; width: 100%; height: auto; margin: 28px auto; }
+
+.sj-iv-figs { margin-top: 24px; display: grid; grid-template-columns: 1fr; gap: 16px; }
+.sj-iv-figs .sj-iv-fig { display: block; width: 100%; height: auto; }
+.sj-iv-figs:has(.sj-iv-fig:nth-child(2)) { grid-template-columns: repeat(2, 1fr); }
+
 /* ═══ 著者（記事末）═══ */
 .sj-author-foot { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--border-soft); text-align: right; font-family: var(--f-jp); font-size: var(--fs-min); letter-spacing: var(--ls-1); color: var(--mid); }
 
@@ -85,6 +153,20 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.sj-related, .sj-more { padding: 72px 20px 0; }
 	.sj-back { padding: 72px 20px 72px; }
 	.sj-section-figs:has(.sj-section-fig:nth-child(2)) { grid-template-columns: 1fr; }
+
+	/* INTERVIEW：アイコンを小さくし、吹き出しの余白を詰める */
+	.sj-iv-thread { gap: 28px; }
+	.sj-iv-turn { gap: 12px; }
+	.sj-iv-avatar { width: 48px; }
+	.sj-iv-avatar-img, .sj-iv-avatar-initial { width: 44px; height: 44px; }
+	.sj-iv-avatar-initial { font-size: 17px; }
+	.sj-iv-avatar-name { font-size: 11px; }
+	.sj-iv-bubble { padding: 18px 20px; }
+	.sj-iv-chapter { margin: 56px 0 32px; font-size: 20px; }
+	.sj-iv-speakers { gap: 20px; padding: 24px 16px; margin: 40px 0 48px; }
+	.sj-iv-speakers .sj-iv-avatar-img, .sj-iv-speakers .sj-iv-avatar-initial { width: 64px; height: 64px; }
+	.sj-iv-q-text, .sj-iv-a-text { line-height: 1.9; }
+	.sj-iv-figs:has(.sj-iv-fig:nth-child(2)) { grid-template-columns: 1fr; }
 }
 @media (max-width: 430px) {
 	.sj-hero { padding: 28px 16px 0; }

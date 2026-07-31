@@ -70,7 +70,12 @@ function bankofart_send_doc_request_user_mail( $insert_id, $token ) {
 
 	$headers = bankofart_mail_headers();
 
-	return wp_mail( $req->email, $subject, $body, $headers );
+	// 【一時デバッグ】申込者宛（届く方）の返り値を記録。解決後に削除。
+	$sent = wp_mail( $req->email, $subject, $body, $headers );
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'doc:USER  called. to=' . var_export( $req->email, true ) . ' return=' . var_export( $sent, true ) );
+	}
+	return $sent;
 }
 
 /**
@@ -124,5 +129,13 @@ function bankofart_send_doc_request_admin_mail( $insert_id ) {
 
 	$headers = bankofart_mail_headers();
 
-	return wp_mail( $to, $subject, $body, $headers );
+	// 【一時デバッグ】管理者宛（届かない方）の実宛先・From・返り値を記録。解決後に削除。
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'doc:ADMIN called. to=' . var_export( $to, true ) . ' | is_array=' . ( is_array( $to ) ? 'yes' : 'no' ) . ' | headers=' . wp_json_encode( $headers, JSON_UNESCAPED_UNICODE ) );
+	}
+	$sent = wp_mail( $to, $subject, $body, $headers );
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'doc:ADMIN wp_mail return=' . var_export( $sent, true ) );
+	}
+	return $sent;
 }

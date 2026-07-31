@@ -24,6 +24,15 @@ if ( ! defined( 'BANKOFART_CONTACT_EMAIL' ) ) {
 if ( ! defined( 'BANKOFART_CONTACT_FROM_NAME' ) ) {
 	define( 'BANKOFART_CONTACT_FROM_NAME', 'BANK of ART' );
 }
+/*
+ * 送信元(From)アドレスは、送信サーバー(ConoHa: mail*.conoha.ne.jp)が送出する
+ * ドメインと一致する固定アドレスにする。SPF/DMARC を通すため必須。
+ * 宛先や Reply-To（＝BANKOFART_CONTACT_EMAIL）とは独立させ、From は常にこの値。
+ * ※ WP Mail SMTP の「送信元メール」設定とも一致させること（不一致だと強制上書きされる）。
+ */
+if ( ! defined( 'BANKOFART_MAIL_FROM_EMAIL' ) ) {
+	define( 'BANKOFART_MAIL_FROM_EMAIL', 'info@bankof-art.com' );
+}
 
 /**
  * フォーム送信メール共通ヘッダー（Content-Type / From / Reply-To）。
@@ -31,12 +40,63 @@ if ( ! defined( 'BANKOFART_CONTACT_FROM_NAME' ) ) {
  * @return string[] wp_mail() 用ヘッダー配列。
  */
 function bankofart_mail_headers() {
+	// From は SPF が通る固定アドレス（送信サーバーのドメインと一致）。宛先とは独立。
+	$from_email = ( defined( 'BANKOFART_MAIL_FROM_EMAIL' ) && BANKOFART_MAIL_FROM_EMAIL )
+		? BANKOFART_MAIL_FROM_EMAIL
+		: 'info@bankof-art.com';
+	// Reply-To は連絡先（返信はこちらへ）。From≠宛先でも Reply-To で受け側の返信先を担保。
+	$reply_to = ( defined( 'BANKOFART_CONTACT_EMAIL' ) && BANKOFART_CONTACT_EMAIL )
+		? BANKOFART_CONTACT_EMAIL
+		: $from_email;
 	return array(
 		'Content-Type: text/plain; charset=UTF-8',
-		'From: ' . BANKOFART_CONTACT_FROM_NAME . ' <' . BANKOFART_CONTACT_EMAIL . '>',
-		'Reply-To: ' . BANKOFART_CONTACT_EMAIL,
+		'From: ' . BANKOFART_CONTACT_FROM_NAME . ' <' . $from_email . '>',
+		'Reply-To: ' . $reply_to,
 	);
 }
+
+/* =========================================================
+ * 【一時デバッグ】管理者通知メール不達の切り分けログ
+ * uploads/boa-mail-debug.log に全 wp_mail 呼び出しの 宛先/From/件名/返り値 を記録。
+ * 原因特定後に、このブロックと各 mail.php / resale の bankofart_maildbg_log 呼び出しを削除する。
+ * ======================================================= */
+function bankofart_maildbg_log( $msg ) {
+	$line = '[' . gmdate( 'Y-m-d H:i:s' ) . ' UTC] ' . $msg . "\n";
+	error_log( $line ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+	if ( function_exists( 'wp_upload_dir' ) ) {
+		$up = wp_upload_dir();
+		if ( ! empty( $up['basedir'] ) && is_writable( $up['basedir'] ) ) {
+			error_log( $line, 3, $up['basedir'] . '/boa-mail-debug.log' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
+		}
+	}
+}
+
+// 全 wp_mail 呼び出しの 宛先・件名・From を記録（From==To の自己宛パターンを可視化）。
+add_filter(
+	'wp_mail',
+	function ( $atts ) {
+		$to   = isset( $atts['to'] ) ? $atts['to'] : '';
+		$from = '';
+		foreach ( (array) ( isset( $atts['headers'] ) ? $atts['headers'] : array() ) as $hl ) {
+			if ( is_string( $hl ) && 0 === stripos( $hl, 'From:' ) ) {
+				$from = $hl;
+			}
+		}
+		bankofart_maildbg_log( 'wp_mail() to=' . var_export( $to, true ) . ' | subject=' . ( isset( $atts['subject'] ) ? $atts['subject'] : '' ) . ' | ' . $from );
+		return $atts;
+	},
+	1
+);
+
+// 送信失敗（wp_mail_failed）を記録。
+add_action(
+	'wp_mail_failed',
+	function ( $e ) {
+		if ( is_wp_error( $e ) ) {
+			bankofart_maildbg_log( 'wp_mail_FAILED: ' . $e->get_error_message() . ' | data=' . wp_json_encode( $e->get_error_data(), JSON_UNESCAPED_UNICODE ) );
+		}
+	}
+);
 
 /**
  * セクション可視性の二段階チェック。
@@ -238,6 +298,177 @@ function bankofart_document_request_url() {
 function bankofart_briefing_url() {
 	// 自前のオンライン説明会予約ページ（/online-briefing/）へ。差し替えはフィルターで。
 	return apply_filters( 'bankofart_briefing_url', home_url( '/online-briefing/' ) );
+}
+
+/**
+ * JOURNAL 記事のデザイン形式を判定する。
+ *
+ * 管理画面の「記事デザイン」が auto（既定）なら、カテゴリー（journal_category）が
+ * 「インタビュー」のとき interview、それ以外は column を返す。
+ * auto 以外が選ばれていればその指定を優先する。
+ *
+ * @param int|null $post_id 投稿ID。省略時は現在の投稿。
+ * @return string 'interview' または 'column'。
+ */
+function bankofart_journal_layout( $post_id = null ) {
+	$post_id = $post_id ? (int) $post_id : get_the_ID();
+	if ( ! $post_id ) {
+		return 'column';
+	}
+
+	$layout = function_exists( 'rwmb_meta' ) ? rwmb_meta( 'journal_layout', array(), $post_id ) : '';
+	if ( 'interview' === $layout || 'column' === $layout ) {
+		return $layout;
+	}
+
+	// auto：カテゴリー名で判定する。
+	$terms = get_the_terms( $post_id, 'journal_category' );
+	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+		foreach ( $terms as $term ) {
+			if ( 'インタビュー' === $term->name || 'interview' === $term->slug ) {
+				return 'interview';
+			}
+		}
+	}
+
+	return 'column';
+}
+
+/**
+ * テキスト／wysiwyg の値を「1行1項目」の配列に正規化する。
+ *
+ * 個展・グループ展（textarea・改行区切り）と学歴（wysiwyg・HTML）を
+ * 同じリスト形式（.as-record-list）で描画するために使う。
+ *   - HTML の場合：</p> </li> <br> 等の区切りを改行に変換してからタグを除去
+ *   - プレーンテキストの場合：改行でそのまま分割
+ * 先頭の箇条書き記号（・- —）と空行は取り除く。
+ *
+ * @param string $value textarea または wysiwyg の値。
+ * @return string[] 行の配列（空なら空配列）。
+ */
+function bankofart_value_to_lines( $value ) {
+	$value = (string) $value;
+	if ( '' === trim( $value ) ) {
+		return array();
+	}
+
+	// ブロック／改行タグを改行へ。タグを含まない場合は素通りする。
+	if ( false !== strpos( $value, '<' ) ) {
+		$value = preg_replace( '~<(br|BR)\s*/?>~', "\n", $value );
+		$value = preg_replace( '~</(p|div|li|h[1-6]|tr)\s*>~i', "\n", $value );
+		$value = wp_strip_all_tags( $value );
+		$value = html_entity_decode( $value, ENT_QUOTES, 'UTF-8' );
+	}
+
+	$lines = preg_split( '/\r\n|\r|\n/', $value );
+	$out   = array();
+
+	foreach ( (array) $lines as $line ) {
+		// 全角スペース・ノーブレークスペースも空白として扱う。
+		$line = trim( preg_replace( '/^[\x{30FB}\x{FF65}\-\x{2014}\x{2013}\*\x{25CF}\x{25CB}]+\s*/u', '', trim( $line ) ) );
+		$line = trim( str_replace( array( "\xc2\xa0", "\xe3\x80\x80" ), ' ', $line ) );
+		if ( '' !== $line ) {
+			$out[] = $line;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * 学歴・経歴・展示歴などの「年月＋内容」を統一表記に整形する。
+ *
+ * 入力側（画家本人の申請フォーム／CSV）は書き方がバラバラになるため、表示時に
+ * 「年 / 月 / 内容」の3要素へ分解して揃える。DBの値は書き換えない（非破壊）。
+ *
+ * 吸収できる書き方：
+ *   1. 年が見出し行、内容が次行以降（年は次の年行まで引き継ぐ）
+ *        2024
+ *        ・IndependentTokyo2024
+ *        ・GINZA ART FESTA in 松屋銀座
+ *   2. 1行に年と内容
+ *        2022 個展「東樹生展」
+ *        2024年3月 グループ展
+ *        2024/3 グループ展
+ *   3. 年の範囲
+ *        2017〜2021
+ *        2021〜
+ *   4. 行頭の箇条書き記号（・ ー - — * ● ○）は除去
+ *
+ * 同じ年に複数行が続く場合、年は先頭行にだけ出し、続く行は空欄にして列を揃える
+ * （'year' が空文字で 'year_raw' に元の年が入る）。
+ *
+ * @param string $value textarea または wysiwyg の値。
+ * @return array[] array( array( 'year' => '2024', 'year_raw' => '2024', 'month' => '3月', 'text' => '…' ), … )
+ */
+function bankofart_parse_record_lines( $value ) {
+	$lines = bankofart_value_to_lines( $value );
+	if ( empty( $lines ) ) {
+		return array();
+	}
+
+	$entries      = array();
+	$current_year = '';
+	$last_printed = null; // 直前に年を出力した行の年（重複表示を避けるため）。
+
+	foreach ( $lines as $line ) {
+		$year  = '';
+		$month = '';
+		$text  = $line;
+
+		// 行頭の西暦4桁を取り出す。
+		if ( preg_match( '/^(\d{4})\s*年?\s*(.*)$/u', $line, $m ) ) {
+			$year = $m[1];
+			$rest = trim( $m[2] );
+
+			// 「2017〜2021」「2021〜」形式の範囲表記。
+			if ( preg_match( '/^[〜~ー－\-–—]\s*(\d{4})?\s*年?$/u', $rest, $rm ) ) {
+				$current_year = $year . '〜' . ( isset( $rm[1] ) ? $rm[1] : '' );
+				$last_printed = null; // 次の行で年を出力させる。
+				continue;
+			}
+
+			// 年だけの見出し行 → 以降の行に引き継ぐ。
+			if ( '' === $rest ) {
+				$current_year = $year;
+				$last_printed = null;
+				continue;
+			}
+
+			// 「3月」または「/3」「.3」「-3」形式の月。
+			if ( preg_match( '/^(\d{1,2})\s*月\s*(.*)$/u', $rest, $mm ) ) {
+				$month = $mm[1] . '月';
+				$rest  = trim( $mm[2] );
+			} elseif ( preg_match( '/^[\/.\-]\s*(\d{1,2})(?!\d)\s*(.*)$/u', $rest, $mm ) ) {
+				$month = (int) $mm[1] . '月';
+				$rest  = trim( $mm[2] );
+			}
+
+			// 年月と内容の間に残った区切り記号を落とす。
+			$text         = ltrim( $rest, " \t.,、:：/／-–—" );
+			$current_year = $year;
+		} elseif ( '' !== $current_year ) {
+			// 年行の配下にある内容行。
+			$year = $current_year;
+		}
+
+		if ( '' === trim( $text ) ) {
+			continue;
+		}
+
+		// 同じ年が連続する場合、2行目以降は年を空欄にして列を揃える。
+		$show_year    = ( '' !== $year && $year !== $last_printed ) ? $year : '';
+		$last_printed = ( '' !== $year ) ? $year : $last_printed;
+
+		$entries[] = array(
+			'year'     => $show_year,
+			'year_raw' => $year,
+			'month'    => $month,
+			'text'     => $text,
+		);
+	}
+
+	return $entries;
 }
 
 /**

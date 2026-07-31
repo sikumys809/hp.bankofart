@@ -244,21 +244,14 @@ while ( have_posts() ) :
 				</div>
 			</div>
 
-			<?php if ( ! empty( $gallery ) ) : ?>
-				<div class="aw-story-marquee rv">
-					<div class="aw-story-marquee-row">
-						<?php
-						// 連続スクロール用に2周分出力。
-						$loop = array_merge( $gallery, $gallery );
-						foreach ( $loop as $g ) :
-							?>
-							<div class="aw-story-shot boa-zoomable">
-								<span class="aw-story-shot-inner" style="background-image:url('<?php echo esc_url( $g['url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( $title ); ?>"></span>
-							</div>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			<?php endif; ?>
+			<?php
+			/*
+			 * 以前ここにギャラリー画像の横スクロール（マーキー）を置いていたが、
+			 * 同じ作品の写真が繰り返し流れるだけで見応えが無いため廃止した。
+			 * 横スクロール演出は single-artist.php の「起源の物語」下に、
+			 * 制作風景写真を流す形で移設している。
+			 */
+			?>
 		</section>
 	<?php endif; ?>
 
@@ -371,7 +364,7 @@ while ( have_posts() ) :
 					<div class="aw-other-en rv">MORE WORKS</div>
 					<div class="aw-other-ja rv d1"><?php echo esc_html( sprintf( '%s の他の作品', get_the_title( $artist_id ) ) ); ?></div>
 				</div>
-				<div class="aw-other-grid">
+				<div class="aw-other-grid" id="awOtherGrid">
 					<?php
 					foreach ( $other_works as $work ) :
 						get_template_part(
@@ -385,6 +378,19 @@ while ( have_posts() ) :
 					endforeach;
 					?>
 				</div>
+
+				<?php
+				/*
+				 * 作品数が多いアーティスト（KATHMIは25点）だと全件表示ではスクロールが長すぎるため、
+				 * 初期は3件（モバイル2件）だけ出し、残りは「もっと見る」で追加する。
+				 * 制御は assets/js/single-detail.js。JS無効時はCSSが効かず全件表示のままになる。
+				 */
+				if ( count( $other_works ) > 3 ) :
+					?>
+					<div class="aw-other-more" id="awOtherMore">
+						<button type="button" class="archive-loadmore-btn" id="awOtherMoreBtn"><?php echo esc_html__( 'もっと見る', 'bankofart' ); ?></button>
+					</div>
+				<?php endif; ?>
 			</div>
 		</section>
 	<?php endif; ?>

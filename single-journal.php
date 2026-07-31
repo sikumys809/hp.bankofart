@@ -33,8 +33,14 @@ while ( have_posts() ) :
 		$eyecatch['alt'] = $title;
 	}
 
+	// ---- 記事デザイン（コラム / インタビュー）----
+	// カテゴリー「インタビュー」＝アイコン＋吹き出し形式、それ以外＝従来のコラム形式。
+	// 管理画面の「記事デザイン」で個別に上書きもできる。
+	$layout = bankofart_journal_layout( $jid );
+
 	// ---- 本文セクション（リピーター）----
 	$sections = array_filter( (array) rwmb_meta( 'journal_sections' ) );
+	$qa_rows  = array_filter( (array) rwmb_meta( 'journal_interview_qa' ) );
 
 	// ---- リレーション ----
 	$rel_artists = bankofart_get_connected( 'journal_to_artist', 'from', $jid );
@@ -66,14 +72,16 @@ while ( have_posts() ) :
 	}
 
 	// ---- セクション可視性 ----
-	$show_body           = bankofart_should_show_section( '', $sections, $jid );
+	$show_body           = ( 'interview' === $layout )
+		? bankofart_should_show_section( '', $qa_rows, $jid )
+		: bankofart_should_show_section( '', $sections, $jid );
 	$show_related_artist = bankofart_should_show_section( 'journal_show_related_artist', $rel_artists, $jid );
 	$show_related_art    = bankofart_should_show_section( 'journal_show_related_art', $rel_arts, $jid );
 	$show_more           = bankofart_should_show_section( 'journal_show_more_journal', $more_journal, $jid );
 	$show_cta            = bankofart_should_show_section( 'journal_show_cta', true, $jid );
 	?>
 
-<main id="main" class="single-journal">
+<main id="main" class="single-journal single-journal--<?php echo esc_attr( $layout ); ?>">
 
 	<nav class="breadcrumb" aria-label="breadcrumb">
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>">HOME</a>
@@ -97,8 +105,12 @@ while ( have_posts() ) :
 			<?php endif; ?>
 		</div>
 		<h1 class="sj-hero-title rv d1"><?php echo esc_html( $title ); ?></h1>
-		<?php if ( ! empty( $author ) ) : ?>
-			<p class="sj-hero-byline rv d1">文 ／ <?php echo esc_html( $author ); ?></p>
+		<?php
+		// インタビューは「取材・文」、コラムは「文」。
+		$byline_label = ( 'interview' === $layout ) ? '取材・文' : '文';
+		if ( ! empty( $author ) ) :
+			?>
+			<p class="sj-hero-byline rv d1"><?php echo esc_html( $byline_label ); ?> ／ <?php echo esc_html( $author ); ?></p>
 		<?php endif; ?>
 	</header>
 
@@ -115,7 +127,19 @@ while ( have_posts() ) :
 			<p class="sj-lead rv"><?php echo esc_html( $summary ); ?></p>
 		<?php endif; ?>
 
-		<?php if ( $show_body ) : ?>
+		<?php if ( $show_body && 'interview' === $layout ) : ?>
+			<?php
+			// インタビュー：アイコン＋吹き出しのQ&A。
+			get_template_part(
+				'template-parts/journal/body',
+				'interview',
+				array(
+					'journal_id'  => $jid,
+					'rel_artists' => $rel_artists,
+				)
+			);
+			?>
+		<?php elseif ( $show_body ) : ?>
 			<?php
 			foreach ( $sections as $sec ) :
 				$heading = isset( $sec['section_heading'] ) ? $sec['section_heading'] : '';
@@ -160,7 +184,7 @@ while ( have_posts() ) :
 		<?php endif; ?>
 
 		<?php if ( ! empty( $author ) ) : ?>
-			<p class="sj-author-foot">文 ／ <?php echo esc_html( $author ); ?></p>
+			<p class="sj-author-foot"><?php echo esc_html( $byline_label ); ?> ／ <?php echo esc_html( $author ); ?></p>
 		<?php endif; ?>
 	</article>
 

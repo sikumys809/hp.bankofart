@@ -203,7 +203,14 @@ function bankofart_resale_send_mails( $data ) {
 			'※ WP管理画面「リセール待機リスト」からも確認できます。',
 		)
 	);
-	wp_mail( $admin_email, $admin_subject, $admin_body, $headers );
+	// 【一時デバッグ】管理者宛（届かない方）の実宛先・From・返り値を記録。解決後に削除。
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'resale:ADMIN called. to=' . var_export( $admin_email, true ) . ' | is_array=' . ( is_array( $admin_email ) ? 'yes' : 'no' ) . ' | headers=' . wp_json_encode( $headers, JSON_UNESCAPED_UNICODE ) );
+	}
+	$admin_sent = wp_mail( $admin_email, $admin_subject, $admin_body, $headers );
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'resale:ADMIN wp_mail return=' . var_export( $admin_sent, true ) );
+	}
 
 	// (B) 登録者宛 自動返信（※「購入確約ではない・対面契約」の注意書きを必ず含む）。
 	$reply_subject = '【バンク・オブ・アート】リセール待機リストご登録ありがとうございます';
@@ -230,7 +237,11 @@ function bankofart_resale_send_mails( $data ) {
 	);
 	// 空行（artwork_number 無し時の空要素）を除去。
 	$reply_body = preg_replace( "/\n{3,}/", "\n\n", $reply_body );
-	wp_mail( $data['email'], $reply_subject, $reply_body, $headers );
+	// 【一時デバッグ】登録者宛（届く方）の返り値を記録。解決後に削除。
+	$reply_sent = wp_mail( $data['email'], $reply_subject, $reply_body, $headers );
+	if ( function_exists( 'bankofart_maildbg_log' ) ) {
+		bankofart_maildbg_log( 'resale:USER(reply) to=' . var_export( $data['email'], true ) . ' return=' . var_export( $reply_sent, true ) );
+	}
 }
 
 /* =========================================================

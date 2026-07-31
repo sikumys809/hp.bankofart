@@ -38,9 +38,13 @@ while ( have_posts() ) :
 	$symbol_img  = bankofart_get_image( 'artist_symbol_image', $artist_id, 'large' );
 
 	// ---- 取得（経歴・テキスト） ----
-	$solo   = rwmb_meta( 'artist_solo_exhibitions' );
-	$group  = rwmb_meta( 'artist_group_exhibitions' );
-	$awards = rwmb_meta( 'artist_media_awards' );
+	// 学歴は wysiwyg、その他は textarea。bankofart_value_to_lines() で同じ行配列に揃え、
+	// 展示（個展・グループ展）と同一の .as-record-list 形式で表示する。
+	$education = rwmb_meta( 'artist_education' );
+	$solo      = rwmb_meta( 'artist_solo_exhibitions' );
+	$group     = rwmb_meta( 'artist_group_exhibitions' );
+	$awards    = rwmb_meta( 'artist_media_awards' );
+	$others    = rwmb_meta( 'artist_other_activities' );
 
 	// ---- 取得（タクソノミー） ----
 	$diag_terms = get_the_terms( $artist_id, 'artist_diagnosis_tag' );
@@ -193,41 +197,59 @@ while ( have_posts() ) :
 				</div>
 			<?php endif; ?>
 
-			<?php if ( ! empty( $solo ) || ! empty( $group ) || ! empty( $awards ) ) : ?>
-				<div class="as-record">
-					<?php
-					$record_groups = array(
-						array(
-							'ja'   => '個展',
-							'en'   => 'Solo Exhibitions',
-							'text' => $solo,
-						),
-						array(
-							'ja'   => 'グループ展',
-							'en'   => 'Group Exhibitions',
-							'text' => $group,
-						),
-						array(
-							'ja'   => 'メディア・受賞',
-							'en'   => 'Awards & Media',
-							'text' => $awards,
-						),
+			<?php
+			// 学歴 → 個展 → グループ展 → メディア・受賞 → その他活動 の順に、
+			// bankofart_parse_record_lines() で「年 / 月 / 内容」へ分解して統一表記で描画する。
+			// 入力側の書き方（年が見出し行・箇条書き記号・年月の区切り）の揺れはここで吸収する。
+			$record_groups = array();
+			foreach (
+				array(
+					array( '学歴・経歴', 'Education', $education ),
+					array( '個展', 'Solo Exhibitions', $solo ),
+					array( 'グループ展', 'Group Exhibitions', $group ),
+					array( 'メディア・受賞', 'Awards & Media', $awards ),
+					array( 'その他活動', 'Other Activities', $others ),
+				) as $rg_def
+			) {
+				$rg_entries = bankofart_parse_record_lines( $rg_def[2] );
+				if ( ! empty( $rg_entries ) ) {
+					$record_groups[] = array(
+						'ja'      => $rg_def[0],
+						'en'      => $rg_def[1],
+						'entries'  => $rg_entries,
+						// 1件でも年／月があるグループだけ列を確保する（無い場合に無駄な余白を作らない）。
+						'has_year'  => (bool) array_filter( wp_list_pluck( $rg_entries, 'year_raw' ) ),
+						'has_month' => (bool) array_filter( wp_list_pluck( $rg_entries, 'month' ) ),
 					);
-					foreach ( $record_groups as $rg ) :
-						if ( empty( trim( (string) $rg['text'] ) ) ) {
-							continue;
-						}
-						$lines = preg_split( '/\r\n|\r|\n/', trim( $rg['text'] ) );
-						?>
+				}
+			}
+
+			if ( ! empty( $record_groups ) ) :
+				?>
+				<div class="as-record">
+					<?php foreach ( $record_groups as $rg ) : ?>
 						<div class="as-record-group">
 							<div class="as-record-label">
 								<span class="ja"><?php echo esc_html( $rg['ja'] ); ?></span>
 								<span class="en"><?php echo esc_html( $rg['en'] ); ?></span>
 							</div>
-							<ul class="as-record-list">
-								<?php foreach ( $lines as $line ) : ?>
-									<?php if ( '' === trim( $line ) ) { continue; } ?>
-									<li><span><?php echo esc_html( trim( $line ) ); ?></span></li>
+							<?php
+							// has-year / has-month の有無でグリッドの列数を合わせる（CSS側と対応）。
+							$list_class = 'as-record-list';
+							$list_class .= $rg['has_year'] ? ' has-year' : '';
+							$list_class .= ( $rg['has_year'] && $rg['has_month'] ) ? ' has-month' : '';
+						?>
+						<ul class="<?php echo esc_attr( $list_class ); ?>">
+								<?php foreach ( $rg['entries'] as $entry ) : ?>
+									<li>
+										<?php if ( $rg['has_year'] ) : ?>
+											<span class="yr boa-num"><?php echo esc_html( $entry['year'] ); ?></span>
+										<?php endif; ?>
+										<?php if ( $rg['has_year'] && $rg['has_month'] ) : ?>
+											<span class="mo boa-num"><?php echo esc_html( $entry['month'] ); ?></span>
+										<?php endif; ?>
+										<span class="tx"><?php echo esc_html( $entry['text'] ); ?></span>
+									</li>
 								<?php endforeach; ?>
 							</ul>
 						</div>
@@ -309,6 +331,38 @@ while ( have_posts() ) :
 						</div>
 					<?php endif; ?>
 
+				</div>
+			<?php endif; ?>
+
+			<?php
+			/*
+			 * 制作風景写真の横スクロール（マーキー）。
+			 * 「制作テーマ」ブロックでは1枚目しか使っていなかったため、ここで
+			 * 2枚目以降も含めて全部流す。2枚以上あるときだけ動かす意味があるので、
+			 * 1枚のときは静止表示（CSS側でアニメーションを止める）。
+			 */
+			$marquee_shots = array_values(
+				array_filter(
+					$work_imgs,
+					static function ( $img ) {
+						return ! empty( $img['url'] );
+					}
+				)
+			);
+			if ( ! empty( $marquee_shots ) ) :
+				?>
+				<div class="as-process-marquee rv" aria-label="制作風景">
+					<div class="as-process-marquee-row<?php echo count( $marquee_shots ) < 2 ? ' is-static' : ''; ?>">
+						<?php
+						// 途切れないよう2周分出力する（CSSで -50% までスクロールさせる）。
+						$loop = count( $marquee_shots ) < 2 ? $marquee_shots : array_merge( $marquee_shots, $marquee_shots );
+						foreach ( $loop as $shot ) :
+							?>
+							<div class="as-process-shot boa-zoomable">
+								<span class="as-process-shot-inner" style="background-image:url('<?php echo esc_url( $shot['url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( sprintf( '%s の制作風景', $name ) ); ?>"></span>
+							</div>
+						<?php endforeach; ?>
+					</div>
 				</div>
 			<?php endif; ?>
 

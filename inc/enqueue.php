@@ -56,9 +56,15 @@ function bankofart_enqueue_assets() {
 	wp_enqueue_style( 'bankofart-footer', "{$theme_uri}/assets/css/footer.css", array( 'bankofart-base' ), $ver );
 	// 再利用コンポーネント（カード・CTA等）。
 	wp_enqueue_style( 'bankofart-components', "{$theme_uri}/assets/css/components.css", array( 'bankofart-base' ), $ver );
-
 	// 共通JS（フッターで読み込み）。
 	wp_enqueue_script( 'bankofart-header', "{$theme_uri}/assets/js/header.js", array(), $ver, true );
+
+	// ファーストビューのローディング画面（TOPページのみ。header.php の出力条件と揃える）。
+	if ( is_front_page() ) {
+		wp_enqueue_style( 'bankofart-preloader', "{$theme_uri}/assets/css/preloader.css", array( 'bankofart-base' ), $ver );
+		// #boaPreloader を参照するためフッター（body解析後）で読み込む。
+		wp_enqueue_script( 'bankofart-preloader', "{$theme_uri}/assets/js/preloader.js", array(), $ver, true );
+	}
 
 	// 単一ページ共通インタラクション（ヒーロー切替・リビール・ライトボックス）。
 	$single_detail_needed = ( is_singular( 'artist' ) || is_singular( 'art' ) || is_singular( 'collector' ) || is_singular( 'news' ) || is_singular( 'journal' )

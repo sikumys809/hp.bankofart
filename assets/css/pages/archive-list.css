@@ -20,7 +20,8 @@
 
 /* ═══ FILTER ═══ */
 .filter-section { background: var(--paper); padding: 40px 40px 24px; border-top: 1px solid var(--border-soft); }
-.filter-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: baseline; gap: 32px; flex-wrap: wrap; justify-content: flex-start; }
+/* 幅は下の .news-list / .pagination と必ず揃える（違うと一覧との左右端がズレる）。 */
+.filter-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: baseline; gap: 32px; flex-wrap: wrap; justify-content: flex-start; }
 .filter-label { font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); flex-shrink: 0; }
 .filter-tags { display: flex; gap: 8px 28px; flex-wrap: wrap; justify-content: flex-start; }
 .filter-tag { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); color: var(--mid); padding: 8px 0; position: relative; transition: color .25s; background: none; border: 0; cursor: pointer; }

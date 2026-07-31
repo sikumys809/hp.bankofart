@@ -50,7 +50,17 @@
 .as-record-label .en { font-family: var(--f-deco); font-size: 12px; font-weight: var(--fw-medium); letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--brand); }
 .as-record-list { list-style: none; display: flex; flex-direction: column; gap: 5px; margin: 0; padding: 0; }
 .as-record-list li { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: .5px; line-height: 1.7; color: var(--mid); display: flex; gap: 10px; }
-.as-record-list li .yr { font-family: var(--f-jp); color: var(--brand); flex-shrink: 0; min-width: 42px; }
+
+/* 年月付きリスト（学歴・展示歴）
+   入力の書き方が違っても表示は必ず「年 ／ 月 ／ 内容」に揃う（bankofart_parse_record_lines）。
+   グリッドにすることで、年の列幅は「2024」でも「2017〜2021」でも自動で揃う。
+   同じ年が続く行は年が空欄になり、列だけが保たれる。 */
+.as-record-list.has-year { display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; row-gap: 5px; }
+.as-record-list.has-year.has-month { grid-template-columns: max-content max-content 1fr; }
+.as-record-list.has-year li { display: contents; }
+.as-record-list.has-year .yr,
+.as-record-list.has-year .mo { font-family: var(--f-jp); color: var(--brand); white-space: nowrap; }
+.as-record-list.has-year .tx { min-width: 0; }
 
 /* ═══ MOVIE ═══ */
 .as-video-sec { background: var(--paper); padding: 0 40px 104px; }
@@ -172,6 +182,9 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.match-banner-sec { padding: 24px 20px 64px; }
 	.match-banner { padding: 36px 24px; }
 	.as-back { padding: 0 20px 72px; }
+	/* 経歴リスト：狭い画面では年月と内容の間隔を詰める（折り返しは内容側で受ける）。 */
+	.as-record-list li { gap: 8px; }
+	.as-record-list.has-year { column-gap: 10px; }
 }
 @media (max-width: 560px) {
 	.as-article-grid { grid-template-columns: repeat(2,1fr); gap: 28px 14px; }
@@ -190,4 +203,24 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.match-banner { padding: 32px 20px; }
 	.match-banner-title { font-size: 24px; }
 	.breadcrumb { padding: 96px 16px 0; }
+}
+
+/* ═══ 制作風景の横スクロール（起源の物語の下）═══
+   single-art の「この作品について」にあったマーキーを、制作風景写真を流す形でここへ移設。
+   制作テーマ欄では1枚目しか使っていなかった artist_working_photos を全部活かす。 */
+@keyframes asProcessScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.as-process-marquee { overflow: hidden; position: relative; width: 100%; margin-top: 72px; }
+.as-process-marquee-row { display: flex; align-items: center; width: max-content; animation: asProcessScroll 40s linear infinite; }
+.as-process-marquee-row.is-static { animation: none; width: auto; justify-content: center; }
+.as-process-marquee:hover .as-process-marquee-row { animation-play-state: paused; }
+.as-process-shot { flex-shrink: 0; width: 260px; aspect-ratio: 4/3; margin-right: 14px; background: var(--warm-gray); overflow: hidden; position: relative; cursor: zoom-in; }
+.as-process-shot-inner { position: absolute; inset: 0; background-size: cover; background-position: center; }
+
+/* アクセシビリティ：モーション低減設定では流さない */
+@media (prefers-reduced-motion: reduce) {
+	.as-process-marquee-row { animation: none; }
+}
+@media (max-width: 700px) {
+	.as-process-marquee { margin-top: 56px; }
+	.as-process-shot { width: 190px; margin-right: 10px; }
 }

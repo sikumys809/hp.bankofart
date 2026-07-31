@@ -86,6 +86,20 @@ function bankofart_taxonomy_picker( $id, $name, $taxonomy, $tab, $multiple = fal
 }
 
 /**
+ * 学歴・展示歴系フィールドの入力書式についての説明文。
+ *
+ * 表示側は bankofart_parse_record_lines() が「年 / 月 / 内容」に自動整形するため、
+ * 書き方が多少ばらついても表示は揃う。その旨を編集画面にも書いておく。
+ *
+ * @return string
+ */
+function bankofart_record_format_desc() {
+	return '表示は自動で「年 ／ 月 ／ 内容」に整形されます。'
+		. '「2024 個展○○」のように1行にまとめても、年だけの行の下に「・個展○○」と並べても構いません。'
+		. '「2017〜2021」のような期間表記、行頭の「・」「-」も自動で処理されます。';
+}
+
+/**
  * Meta Box のフィールドグループを登録する。
  *
  * @param array $meta_boxes 既存のメタボックス定義。
@@ -213,35 +227,35 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'name' => '学歴・経歴',
 				'type' => 'wysiwyg',
 				'tab'  => 'exhibition',
-				'desc' => '公開プロフィール用（出身校・主な経歴など）',
+				'desc' => '公開プロフィール用（出身校・主な経歴など）。' . bankofart_record_format_desc(),
 			),
 			array(
 				'id'   => 'artist_solo_exhibitions',
 				'name' => '個展',
 				'type' => 'textarea',
 				'tab'  => 'exhibition',
-				'desc' => '改行区切りで複数',
+				'desc' => '改行区切りで複数。' . bankofart_record_format_desc(),
 			),
 			array(
 				'id'   => 'artist_group_exhibitions',
 				'name' => 'グループ展',
 				'type' => 'textarea',
 				'tab'  => 'exhibition',
-				'desc' => '改行区切り',
+				'desc' => '改行区切り。' . bankofart_record_format_desc(),
 			),
 			array(
 				'id'   => 'artist_media_awards',
 				'name' => 'メディア・受賞',
 				'type' => 'textarea',
 				'tab'  => 'exhibition',
-				'desc' => '改行区切り',
+				'desc' => '改行区切り。' . bankofart_record_format_desc(),
 			),
 			array(
 				'id'   => 'artist_other_activities',
 				'name' => 'その他活動',
 				'type' => 'textarea',
 				'tab'  => 'exhibition',
-				'desc' => '改行区切り',
+				'desc' => '改行区切り。' . bankofart_record_format_desc(),
 			),
 			// --- 画像・動画 ---
 			array(
@@ -400,6 +414,12 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 		),
 		'fields'      => array(
 			// --- 基本情報 ---
+			/*
+			 * シリーズを選ぶと、そのシリーズに登録した共通項目（作品名ベース／英題／
+			 * 素材・支持体／ジャンル／技法／形態／作品説明／コンセプト）が空欄に自動入力される。
+			 * 差し込み処理は inc/art-series/admin.php ＋ assets/js/admin-art-series.js。
+			 */
+			bankofart_taxonomy_picker( 'art_series_picker', '作品シリーズ', 'art_series', 'basic', false, '選ぶとシリーズ共通の項目が自動入力されます（空欄のみ）。シリーズの内容は「作品 > 作品シリーズ」で編集します。' ),
 			array(
 				'id'   => 'art_title_en',
 				'name' => '作品英題',
@@ -925,8 +945,12 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 	);
 
 	/* =========================================================
-	 * JOURNAL — 3タブ
-	 * 基本 / 本文セクション / セクション表示
+	 * JOURNAL — 4タブ
+	 * 基本 / 本文セクション（コラム）/ インタビュー / セクション表示
+	 *
+	 * 表示デザインはカテゴリー（コラム / インタビュー）で自動的に切り替わる。
+	 * 「コラム」＝本文セクション（従来の記事レイアウト）
+	 * 「インタビュー」＝アイコン＋吹き出しのQ&Aレイアウト
 	 * ======================================================= */
 	$meta_boxes[] = array(
 		'title'       => 'JOURNAL情報',
@@ -941,8 +965,12 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'icon'  => 'dashicons-book-alt',
 			),
 			'body'            => array(
-				'label' => '本文セクション',
+				'label' => '本文セクション（コラム）',
 				'icon'  => 'dashicons-edit',
+			),
+			'interview'       => array(
+				'label' => 'インタビュー',
+				'icon'  => 'dashicons-format-chat',
 			),
 			'section_display' => array(
 				'label' => 'セクション表示設定',
@@ -979,7 +1007,20 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'tab'  => 'basic',
 				'desc' => 'カード・詳細冒頭',
 			),
-			bankofart_taxonomy_picker( 'journal_category_picker', 'カテゴリー', 'journal_category', 'basic', false, 'コラム / インタビュー' ),
+			bankofart_taxonomy_picker( 'journal_category_picker', 'カテゴリー', 'journal_category', 'basic', false, 'コラム / インタビュー（記事デザインが自動で切り替わります）' ),
+			array(
+				'id'      => 'journal_layout',
+				'name'    => '記事デザイン',
+				'type'    => 'select',
+				'tab'     => 'basic',
+				'std'     => 'auto',
+				'options' => array(
+					'auto'      => 'カテゴリーに従う（推奨）',
+					'column'    => 'コラム（本文セクション形式）',
+					'interview' => 'インタビュー（アイコン＋吹き出し形式）',
+				),
+				'desc'    => '通常は「カテゴリーに従う」でOK。カテゴリーが「インタビュー」なら吹き出し形式、それ以外はコラム形式で表示されます。',
+			),
 			// --- 本文セクション（Repeater）---
 			array(
 				'id'          => 'journal_sections',
@@ -1005,6 +1046,86 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 					array(
 						'id'               => 'section_images',
 						'name'             => 'サブ写真',
+						'type'             => 'image_advanced',
+						'max_file_uploads' => 10,
+					),
+				),
+			),
+			// --- インタビュー（話し手・聞き手 ＋ Q&A リピーター）---
+			array(
+				'id'   => 'journal_interview_intro',
+				'name' => '導入文（リード）',
+				'type' => 'wysiwyg',
+				'tab'  => 'interview',
+				'desc' => 'Q&Aの前に置く前書き。未入力なら表示されません。',
+			),
+			array(
+				'id'   => 'journal_speaker_name',
+				'name' => '話し手の名前',
+				'type' => 'text',
+				'tab'  => 'interview',
+				'desc' => '未入力の場合、「関連アーティスト」に設定した1人目の名前を自動で使います。',
+			),
+			array(
+				'id'   => 'journal_speaker_role',
+				'name' => '話し手の肩書き',
+				'type' => 'text',
+				'tab'  => 'interview',
+				'desc' => '例：画家 / 代表取締役。任意。',
+			),
+			array(
+				'id'   => 'journal_speaker_icon',
+				'name' => '話し手のアイコン',
+				'type' => 'single_image',
+				'tab'  => 'interview',
+				'desc' => '未設定の場合、「関連アーティスト」1人目のメイン写真を自動で使います。正方形推奨。',
+			),
+			array(
+				'id'   => 'journal_interviewer_name',
+				'name' => '聞き手の名前',
+				'type' => 'text',
+				'tab'  => 'interview',
+				'std'  => 'BOA',
+				'desc' => '未入力なら「BOA」。',
+			),
+			array(
+				'id'   => 'journal_interviewer_icon',
+				'name' => '聞き手のアイコン',
+				'type' => 'single_image',
+				'tab'  => 'interview',
+				'desc' => '未設定ならBOAのロゴマークを使います。正方形推奨。',
+			),
+			array(
+				'id'          => 'journal_interview_qa',
+				'name'        => 'Q&A（質問と回答）',
+				'type'        => 'group',
+				'tab'         => 'interview',
+				'clone'       => true,
+				'sort_clone'  => true,
+				'collapsible' => true,
+				'add_button'  => 'Q&Aを追加',
+				'group_title' => array( 'field' => 'qa_question' ),
+				'fields'      => array(
+					array(
+						'id'   => 'qa_chapter',
+						'name' => '章見出し（任意）',
+						'type' => 'text',
+						'desc' => 'このQ&Aの手前に大見出しを入れたいときだけ入力。',
+					),
+					array(
+						'id'   => 'qa_question',
+						'name' => '質問（聞き手）',
+						'type' => 'textarea',
+						'rows' => 3,
+					),
+					array(
+						'id'   => 'qa_answer',
+						'name' => '回答（話し手）',
+						'type' => 'wysiwyg',
+					),
+					array(
+						'id'               => 'qa_images',
+						'name'             => '回答に添える写真',
 						'type'             => 'image_advanced',
 						'max_file_uploads' => 10,
 					),

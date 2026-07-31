@@ -34,3 +34,9 @@ wp-config.php
 *.key
 *license-key*
 meta-box-aio-license*
+
+# ===== Google サービスアカウント鍵（絶対にコミットしない） =====
+gcal-service-account.json
+*service-account*.json
+/boa-secrets/
+boa-private/

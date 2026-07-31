@@ -147,6 +147,48 @@ bankofart/
 | 診断バナー（課題） | `template-parts/matching-banner-issue.php` |
 | 画家募集バナー | `template-parts/for-artists-banner.php` |
 | CTA（資料請求＋説明会） | `template-parts/cta-contact.php` |
+| ローディング画面（プリローダー） | `header.php`（`.boa-preloader`）＋ `assets/css/preloader.css` / `assets/js/preloader.js` |
+| JOURNAL インタビュー本文 | `template-parts/journal/body-interview.php` |
+
+### ローディング画面（プリローダー）
+
+**TOPページ（`is_front_page()`）のみ**。下層ページにも出すと遷移のたびに挟まってくどいため、
+`header.php` の出力条件と `inc/enqueue.php` の読み込み条件を両方 `is_front_page()` に揃えている。
+`<body>` 直後に `.boa-preloader` を出力し、`body` に `boa-loading` クラスを付けてスクロールを止める。
+解除は `assets/js/preloader.js` が行い、次のうち最も早く成立した条件で消える。
+
+1. ファーストビューの重要画像（`.hero-slide` / `.hero-bg` / `.as-hero-visual-inner` と1画面目の `<img>`）の読み込み完了
+2. `window` の `load` イベント
+3. 安全弁のタイムアウト（6秒）
+
+JS 無効環境では `header.php` 内の `<noscript>` で `.boa-preloader` ごと非表示にするため、
+画面が固まることはない。
+
+### 管理画面（CSV取込）
+
+| 画面 | ファイル |
+|---|---|
+| 管理メニュー「BOA CSV取込」 | `inc/csv-import/admin.php` |
+| 読み込み・マッピング・取り込み処理 | `inc/csv-import/importer.php` |
+
+`functions.php` の `is_admin()` ブロックから読み込む（フロントでは読み込まない）。
+ARTIST / ART のCSVを取り込む。行の一意キーは「タイムスタンプ」列で、投稿メタ
+`_bankofart_import_key` に記録するため、同じスプレッドシートを何度アップロードしても
+取り込み済みの行はスキップされる。既定は「テスト実行」＋「下書きで作成」。
+
+- 投稿タイトルは必ず**「アーティスト名」列**を使う（本名の「苗字」「名前」は使わない）
+- 本名・フリガナ・連絡先・住所・性別・生年月日・振込先は `'ignored'` として**取り込まない**
+  （`inc/meta-box-fields.php` の「個人情報はWPで管理しない」方針に合わせる）
+- 対応先が見つからなかった列は取り込み結果に列挙し、入れ漏れに気付けるようにする
+- Googleドライブの共有リンクはダウンロードURLに変換して取得し、
+  中身が画像かを検証する（非公開ファイルはHTMLが返るためエラーとして報告）
+
+### 学歴・展示歴の表記統一
+
+`bankofart_parse_record_lines()`（`inc/helpers.php`）が、入力の書き方の揺れを表示時に
+「年 ／ 月 ／ 内容」へ正規化する（DBの値は書き換えない）。吸収できる書き方は同関数の
+docblock を参照。`single-artist.php` の `.as-record-list.has-year` はCSSグリッドで、
+`2024` でも `2017〜2021` でも年カラムの幅が自動で揃う。同じ年が連続する行は年を空欄にする。
 
 ---
 
@@ -270,10 +312,11 @@ Meta Box の MB Builder で UI から作成し、エクスポートした PHP �
 | `artist_origin_story` | 起源の物語 | wysiwyg | 🌐 | |
 | `artist_birthday` | 生年月日 | date | 🔒 | 非公開（管理用） |
 | `artist_birthplace` | 出身地 | text | 🌐 | |
-| `artist_education` | 学歴・経歴 | wysiwyg | 🌐 | |
+| `artist_education` | 学歴・経歴 | wysiwyg | 🌐 | ヒーロー右の経歴リストに「学歴・経歴 / Education」として表示 |
 | `artist_solo_exhibitions` | 個展 | textarea | 🌐 | 改行区切り |
 | `artist_group_exhibitions` | グループ展 | textarea | 🌐 | 改行区切り |
 | `artist_media_awards` | メディア・受賞 | textarea | 🌐 | 改行区切り |
+| `artist_other_activities` | その他活動 | textarea | 🌐 | 改行区切り |
 | `artist_tags` | キーワードタグ | text | 🌐 | カンマ区切り例：生命エネルギー,挑戦,格闘 |
 | `artist_sns_instagram` | Instagram URL | url | 🌐 | |
 | `artist_sns_x` | X (Twitter) URL | url | 🌐 | |
@@ -339,6 +382,21 @@ Meta Box の MB Builder で UI から作成し、エクスポートした PHP �
 | `journal_summary` | 要約 | textarea | カード表示用 |
 | `journal_author` | 著者 | text | |
 | `journal_reading_time` | 読了時間（分） | number | |
+| `journal_main_image` | メイン写真 | single_image | カード・詳細冒頭 |
+| `journal_layout` | 記事デザイン | select | `auto`(既定) / `column` / `interview` |
+| `journal_sections` | 本文セクション | group（clone） | コラム形式の本文 |
+| `journal_interview_intro` | 導入文（リード） | wysiwyg | インタビュー形式 |
+| `journal_speaker_name` | 話し手の名前 | text | 空なら関連アーティスト1人目から補完 |
+| `journal_speaker_role` | 話し手の肩書き | text | |
+| `journal_speaker_icon` | 話し手のアイコン | single_image | 空なら関連アーティストの `artist_main_photo` |
+| `journal_interviewer_name` | 聞き手の名前 | text | 既定 `BOA` |
+| `journal_interviewer_icon` | 聞き手のアイコン | single_image | 空ならテーマ同梱の `boa-11.png` |
+| `journal_interview_qa` | Q&A | group（clone） | `qa_chapter` / `qa_question` / `qa_answer` / `qa_images` |
+
+**記事デザインの切り替え**：`journal_layout` が `auto`（既定）のとき、タクソノミー
+`journal_category` が「インタビュー」なら吹き出し形式、それ以外はコラム形式で表示する。
+判定は `bankofart_journal_layout()`（`inc/helpers.php`）、
+描画は `template-parts/journal/body-interview.php` と `single-journal.php`。
 
 詳細は `docs/meta-box-fields.md` を参照（別途生成）。
 
