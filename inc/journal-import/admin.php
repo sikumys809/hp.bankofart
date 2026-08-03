@@ -151,10 +151,39 @@ function bankofart_journal_import_page() {
 				<tr><td><code>type</code></td><td><strong>必須</strong>。interview / column / news / collector</td></tr>
 				<tr><td><code>timestamp</code></td><td><strong>必須</strong>。重複判定に使う一意の文字列（例：<code>2026-07-31T10:00:00+09:00</code>）</td></tr>
 				<tr><td><code>title</code></td><td><strong>必須</strong>。記事タイトル</td></tr>
-				<tr><td><code>slug</code></td><td>任意。URLスラッグ</td></tr>
+				<tr><td><code>slug</code></td><td>任意。URLスラッグ（新規作成時のみ）</td></tr>
 				<tr><td><code>summary</code></td><td>要約（カード表示用）</td></tr>
+				<tr>
+					<td><code>target</code></td>
+					<td>
+						任意。<strong>既にある投稿に本文を追記したいとき</strong>に、そのタイトルを完全一致で書く。<br>
+						<span class="description">
+							指定すると<strong>新規作成しません</strong>。見つからない／複数見つかる場合はエラーで中止します（同じ会社を二重に作る事故を防ぐため）。<br>
+							既存の写真・URL・移行情報などには触れず、本文とJSONで指定した項目だけを書き込みます。<br>
+							すでに本文が入っている投稿はスキップします。上書きしたいときだけ <code>"overwrite": true</code> を付けてください。
+						</span>
+					</td>
+				</tr>
 			</tbody>
 		</table>
+
+		<h4>既存の投稿に本文だけ入れる例</h4>
+		<textarea readonly rows="10" style="width:100%;max-width:960px;font-family:monospace;" onclick="this.select();"><?php
+		echo esc_textarea(
+			"{\n"
+			. "  \"type\": \"collector\",\n"
+			. "  \"target\": \"株式会社B・Cインベスターズ\",\n"
+			. "  \"timestamp\": \"2026-08-03T12:00:00+09:00\",\n"
+			. "  \"title\": \"株式会社B・Cインベスターズ\",\n"
+			. "  \"body\": {\n"
+			. "    \"qa\": [\n"
+			. "      { \"question\": \"……\", \"answer\": \"<p>……</p>\" }\n"
+			. "    ]\n"
+			. "  }\n"
+			. "}"
+		);
+		?></textarea>
+		<p class="description"><code>target</code> を書かなければ、これまで通り新しい投稿が作られます（新規の企業を追加する場合はそちら）。</p>
 
 		<h3>interview / column（JOURNAL）</h3>
 		<table class="widefat striped" style="max-width:960px;">
@@ -397,21 +426,73 @@ function bankofart_journal_import_one( $item ) {
 		);
 	}
 
-	// 投稿本体（本文はメタに入れるので post_content は空のまま）。
-	$postarr = array(
-		'post_type'   => $post_type,
-		'post_title'  => $title,
-		'post_status' => 'draft',
-	);
-	if ( ! empty( $item['slug'] ) ) {
-		$postarr['post_name'] = sanitize_title( $item['slug'] );
+	/*
+	 * target が指定されていれば、既存投稿に中身を追記する（＝新規作成しない）。
+	 * 既に写真やURLが入っている投稿を空の新規で二重に作ってしまう事故を防ぐため、
+	 * 見つからない・複数見つかる場合は作らずにエラーを返す。
+	 */
+	$target   = isset( $item['target'] ) ? trim( (string) $item['target'] ) : '';
+	$is_update = false;
+
+	if ( '' !== $target ) {
+		$found = get_posts(
+			array(
+				'post_type'      => $post_type,
+				'post_status'    => array( 'publish', 'draft', 'pending', 'private', 'future' ),
+				'posts_per_page' => 2, // 2件取って重複を検出する。
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'title'          => $target,
+			)
+		);
+
+		if ( empty( $found ) ) {
+			return $fail( '「' . $target . '」に一致する' . $post_type . '投稿が見つかりません（target 指定時は新規作成しません）。タイトルの完全一致で探しています。' );
+		}
+		if ( count( $found ) > 1 ) {
+			return $fail( '「' . $target . '」に一致する投稿が複数あります（ID ' . implode( ', ', $found ) . '）。取り違えを避けるため中止しました。' );
+		}
+
+		$post_id   = (int) $found[0];
+		$is_update = true;
+	} else {
+		// 投稿本体（本文はメタに入れるので post_content は空のまま）。
+		$postarr = array(
+			'post_type'   => $post_type,
+			'post_title'  => $title,
+			'post_status' => 'draft',
+		);
+		if ( ! empty( $item['slug'] ) ) {
+			$postarr['post_name'] = sanitize_title( $item['slug'] );
+		}
+
+		$post_id = wp_insert_post( $postarr, true );
+		if ( is_wp_error( $post_id ) ) {
+			return $fail( 'wp_insert_post に失敗：' . $post_id->get_error_message() );
+		}
+		$post_id = (int) $post_id;
 	}
 
-	$post_id = wp_insert_post( $postarr, true );
-	if ( is_wp_error( $post_id ) ) {
-		return $fail( 'wp_insert_post に失敗：' . $post_id->get_error_message() );
+	/*
+	 * 既存投稿に追記するとき、すでに本文が入っていれば黙って上書きしない。
+	 * 上書きしたいときだけ JSON に "overwrite": true を書く。
+	 */
+	if ( $is_update && empty( $item['overwrite'] ) ) {
+		$body_keys = array(
+			'collector' => 'collector_interview_qa',
+			'interview' => 'journal_interview_qa',
+			'column'    => 'journal_sections',
+			'news'      => 'news_sections',
+		);
+		$key      = isset( $body_keys[ $type ] ) ? $body_keys[ $type ] : '';
+		$existing_body = $key ? array_filter( (array) get_post_meta( $post_id, $key, true ) ) : array();
+		if ( ! empty( $existing_body ) ) {
+			return array(
+				'status'  => 'skipped',
+				'message' => '「' . $target . '」には既に本文が入っているためスキップ（投稿ID ' . $post_id . '）。上書きするには "overwrite": true を付けてください。',
+			);
+		}
 	}
-	$post_id = (int) $post_id;
 
 	// type 別の中身挿入。$notes には「取り込めなかった値」等の注意書きが入る。
 	$notes = array();
@@ -439,12 +520,15 @@ function bankofart_journal_import_one( $item ) {
 		)
 	);
 
+	$label = $is_update
+		? '「' . $target . '」に本文を追記（投稿ID ' . $post_id . '）。既存の写真・URL等はそのままです。'
+		: '「' . $title . '」を下書き作成（投稿ID ' . $post_id . '）。';
+
 	return array(
 		'status'  => 'created',
-		'message' => '「' . $title . '」を下書き作成（投稿ID ' . $post_id . '）。'
-			. ( $notes ? ' ／ ' . implode( ' ／ ', $notes ) : '' ),
+		'message' => $label . ( $notes ? ' ／ ' . implode( ' ／ ', $notes ) : '' ),
 		'link'    => array(
-			'title' => $title,
+			'title' => $is_update ? $target : $title,
 			'edit'  => get_edit_post_link( $post_id, 'raw' ),
 		),
 	);
