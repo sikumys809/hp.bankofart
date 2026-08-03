@@ -108,11 +108,12 @@
 			} );
 		}
 
-		/* ===== MORE WORKS：初期3件（モバイル2件）＋「もっと見る」で追加 ===== */
-		( function () {
-			var grid = document.getElementById( 'awOtherGrid' );
-			var btn  = document.getElementById( 'awOtherMoreBtn' );
-			var wrap = document.getElementById( 'awOtherMore' );
+		/* ===== 作品一覧：初期3件（モバイル2件）＋「もっと見る」で追加 =====
+		 * 作品ページの MORE WORKS と、アーティストページの WORKS の両方で使う。 */
+		function setupWorksLoadMore( gridId, btnId, wrapId ) {
+			var grid = document.getElementById( gridId );
+			var btn  = document.getElementById( btnId );
+			var wrap = document.getElementById( wrapId );
 			if ( ! grid || ! btn ) { return; }
 
 			var cards = Array.prototype.slice.call( grid.querySelectorAll( '.art-card' ) );
@@ -149,6 +150,9 @@
 			}
 
 			reset();
-		} )();
+		}
+
+		setupWorksLoadMore( 'awOtherGrid', 'awOtherMoreBtn', 'awOtherMore' ); // 作品ページ：MORE WORKS
+		setupWorksLoadMore( 'asWorksGrid', 'asWorksMoreBtn', 'asWorksMore' ); // アーティストページ：WORKS
 	} );
 } )();

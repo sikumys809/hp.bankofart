@@ -383,7 +383,7 @@ while ( have_posts() ) :
 					<div class="as-works-en rv">WORKS</div>
 					<div class="as-works-ja rv d1"><?php echo esc_html( sprintf( '%s の作品', $name ) ); ?></div>
 				</div>
-				<div class="as-works-grid">
+				<div class="as-works-grid" id="asWorksGrid">
 					<?php
 					foreach ( $works as $work ) :
 						get_template_part(
@@ -397,6 +397,19 @@ while ( have_posts() ) :
 					endforeach;
 					?>
 				</div>
+
+				<?php
+				/*
+				 * 作品数が多い作家（KATHMIは25点）だと全件表示ではスクロールが長すぎるため、
+				 * 初期は3件（モバイル2件）だけ出し、残りは「もっと見る」で追加する。
+				 * 制御は assets/js/single-detail.js。
+				 */
+				if ( count( $works ) > 3 ) :
+					?>
+					<div class="as-works-more" id="asWorksMore">
+						<button type="button" class="archive-loadmore-btn" id="asWorksMoreBtn"><?php echo esc_html__( 'もっと見る', 'bankofart' ); ?></button>
+					</div>
+				<?php endif; ?>
 			</div>
 		</section>
 	<?php endif; ?>

@@ -226,3 +226,8 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.as-process-marquee { margin-top: 36px; margin-bottom: 64px; }
 	.as-process-shot { width: 190px; margin-right: 10px; }
 }
+
+/* ═══ WORKS：もっと見る（ダーク背景のためボタンを白抜きに）═══ */
+.as-works-more { margin-top: 40px; padding-bottom: 24px; text-align: center; }
+.as-works-more .archive-loadmore-btn { color: var(--white); border-color: rgba(255,255,255,.4); }
+.as-works-more .archive-loadmore-btn:hover { background: var(--brand); border-color: var(--brand); color: var(--white); }
