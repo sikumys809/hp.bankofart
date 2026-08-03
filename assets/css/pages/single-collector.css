@@ -50,6 +50,24 @@
 .cs-iv-q-bubble::before { content: ''; position: absolute; left: -9px; top: 18px; width: 15px; height: 15px; background: var(--white); border-left: 1.5px solid var(--brand); border-bottom: 1.5px solid var(--brand); transform: rotate(45deg); }
 .cs-iv-a { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
 .cs-iv-a p + p { margin-top: 22px; }
+.cs-iv-a a { color: var(--brand-deep); text-decoration: underline; }
+
+/* 回答本文に挿入した画像・リスト（JOURNALのコラム本文と同じ見せ方に揃える）。
+   エディタで「中サイズ」を選んで挿入すると width/height 属性が付いて小さく出るため、
+   幅いっぱいに広げる（srcの差し替えは bankofart_enlarge_content_images）。 */
+.cs-iv-a img { display: block; width: 100%; height: auto; margin: 28px auto; }
+.cs-iv-a figure { margin: 28px auto; }
+.cs-iv-a figure img { margin: 0 auto; }
+.cs-iv-a figcaption { margin-top: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-1); color: var(--mid); text-align: center; }
+/* 回り込みで小さく置きたい場合は左右寄せを指定（原寸で float）。 */
+.cs-iv-a img.alignleft  { float: left;  width: auto; max-width: 46%; margin: 6px 28px 18px 0; }
+.cs-iv-a img.alignright { float: right; width: auto; max-width: 46%; margin: 6px 0 18px 28px; }
+
+/* reset.css の全称リセットで消える箇条書きを、本文スコープ内だけで戻す。 */
+.cs-iv-a ul { list-style: disc; padding-left: 1.5em; margin: 1em 0; }
+.cs-iv-a ol { list-style: decimal; padding-left: 1.5em; margin: 1em 0; }
+.cs-iv-a li { margin: .4em 0; line-height: 2.15; }
+.cs-iv-a ul ul, .cs-iv-a ul ol, .cs-iv-a ol ol, .cs-iv-a ol ul { margin: .3em 0; }
 .cs-iv-photo { margin-top: 28px; width: 100%; aspect-ratio: 16/9; background: var(--warm-gray); overflow: hidden; position: relative; }
 .cs-iv-photo-inner { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
