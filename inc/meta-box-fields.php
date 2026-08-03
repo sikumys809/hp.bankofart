@@ -781,8 +781,8 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 			 * --- インタビュー（自由記述・件数無制限）---
 			 * 下の Q1〜Q5 は定番の質問セット。取材内容がそれに収まらないことも多いため、
 			 * 質問文ごと自由に足せるリピーターを用意した。
-			 * 1行でも入っていればこちらが本文として使われ、Q1〜Q5 は表示されない
-			 * （single-collector.php で切り替え）。
+			 * 表示順は「Q1〜Q5 → ここで足した分」（single-collector.php）。
+			 * どちらか一方だけでも、両方入れても成立する。
 			 */
 			array(
 				'id'          => 'collector_interview_qa',
@@ -794,7 +794,7 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'collapsible' => true,
 				'add_button'  => '質問を追加',
 				'group_title' => array( 'field' => 'qa_question' ),
-				'desc'        => 'ここに1件でも入力すると、下の「定番の質問（Q1〜Q5）」ではなくこちらが記事本文になります。',
+				'desc'        => '下の「定番の質問（Q1〜Q5）」の<strong>あとに続けて</strong>表示されます。定番を使わず、ここだけで記事を組み立てても構いません（回答が空の質問は表示されません）。',
 				'fields'      => array(
 					array(
 						'id'   => 'qa_question',
