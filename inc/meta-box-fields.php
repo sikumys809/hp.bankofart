@@ -777,7 +777,45 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'tab'  => 'media',
 				'desc' => 'Q5付近',
 			),
-			// --- インタビュー（Q&A 5問）---
+			/*
+			 * --- インタビュー（自由記述・件数無制限）---
+			 * 下の Q1〜Q5 は定番の質問セット。取材内容がそれに収まらないことも多いため、
+			 * 質問文ごと自由に足せるリピーターを用意した。
+			 * 1行でも入っていればこちらが本文として使われ、Q1〜Q5 は表示されない
+			 * （single-collector.php で切り替え）。
+			 */
+			array(
+				'id'          => 'collector_interview_qa',
+				'name'        => 'インタビュー（自由記述）',
+				'type'        => 'group',
+				'tab'         => 'interview',
+				'clone'       => true,
+				'sort_clone'  => true,
+				'collapsible' => true,
+				'add_button'  => '質問を追加',
+				'group_title' => array( 'field' => 'qa_question' ),
+				'desc'        => 'ここに1件でも入力すると、下の「定番の質問（Q1〜Q5）」ではなくこちらが記事本文になります。',
+				'fields'      => array(
+					array(
+						'id'   => 'qa_question',
+						'name' => '質問',
+						'type' => 'textarea',
+						'rows' => 2,
+					),
+					array(
+						'id'   => 'qa_answer',
+						'name' => '回答',
+						'type' => 'wysiwyg',
+					),
+					array(
+						'id'   => 'qa_image',
+						'name' => 'この回答に添える写真',
+						'type' => 'single_image',
+						'desc' => '任意。未設定なら写真なしで表示します。',
+					),
+				),
+			),
+			// --- インタビュー（定番の質問 Q&A 5問。上のリピーターが空のときに使われる）---
 			array(
 				'id'   => 'collector_q1_values',
 				'name' => 'Q1：理念や価値観について',

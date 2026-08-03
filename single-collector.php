@@ -98,7 +98,41 @@ while ( have_posts() ) :
 		wp_reset_postdata();
 	}
 
-	// ---- インタビューQ&A（回答あり = 表示。写真は未入力なら枠を出さない）----
+	/*
+	 * ---- インタビューQ&A（回答あり = 表示。写真は未入力なら枠を出さない）----
+	 * 「インタビュー（自由記述）」リピーターに1行でも入っていればそちらを本文に使う。
+	 * 空のときだけ、従来の定番5問（Q1〜Q5）にフォールバックする。
+	 */
+	$qa_free   = array_filter( (array) rwmb_meta( 'collector_interview_qa' ) );
+	$qa_blocks = array();
+
+	foreach ( $qa_free as $row ) {
+		$answer = isset( $row['qa_answer'] ) ? (string) $row['qa_answer'] : '';
+		if ( '' === trim( wp_strip_all_tags( $answer ) ) ) {
+			continue; // 回答が空の行は出さない。
+		}
+
+		$img = array(
+			'url' => '',
+			'alt' => '',
+		);
+		if ( ! empty( $row['qa_image'] ) ) {
+			$att = wp_get_attachment_image_src( (int) $row['qa_image'], 'large' );
+			if ( $att ) {
+				$img['url'] = $att[0];
+				$img['alt'] = get_post_meta( (int) $row['qa_image'], '_wp_attachment_image_alt', true );
+			}
+		}
+
+		$qa_blocks[] = array(
+			'q'   => isset( $row['qa_question'] ) ? (string) $row['qa_question'] : '',
+			'a'   => $answer,
+			'img' => $img,
+		);
+	}
+
+	// 自由記述が空なら従来の定番5問。
+	if ( empty( $qa_blocks ) ) :
 	$qa_blocks = array(
 		array(
 			'q'   => '御社が大切にされている理念や価値観について教えてください。',
@@ -126,6 +160,8 @@ while ( have_posts() ) :
 			'img' => $iv3,
 		),
 	);
+	endif;
+
 	$has_any_answer = false;
 	foreach ( $qa_blocks as $blk ) {
 		if ( '' !== trim( wp_strip_all_tags( (string) $blk['a'] ) ) ) {

@@ -55,8 +55,8 @@ if ( ! defined( 'BANKOFART_JSON_IMPORT_MAX' ) ) {
  */
 function bankofart_journal_import_menu() {
 	add_menu_page(
-		'JOURNAL取込',
-		'JOURNAL取込',
+		'記事取込',
+		'記事取込',
 		'manage_options',
 		'bankofart-journal-import',
 		'bankofart_journal_import_page',
@@ -102,7 +102,7 @@ function bankofart_journal_import_page() {
 	}
 	?>
 	<div class="wrap">
-		<h1>JOURNAL / NEWS 取込（JSON貼り付け）</h1>
+		<h1>記事取込（JOURNAL / NEWS / 画家応援企業）</h1>
 		<p>
 			生成AIが出力したJSONを貼り付けて実行します。すべて<strong>下書き</strong>で作成されます。<br>
 			画像と関連アーティスト・関連作品は取り込みません（取込後に編集画面で設定してください）。<br>
@@ -142,13 +142,13 @@ function bankofart_journal_import_page() {
 
 		<hr>
 		<h2>JSONの書式</h2>
-		<p><code>type</code> は <code>interview</code> / <code>column</code> / <code>news</code> のいずれか。単体オブジェクトでも配列でも可。1回の上限は <?php echo esc_html( (string) BANKOFART_JSON_IMPORT_MAX ); ?> 件。</p>
+		<p><code>type</code> は <code>interview</code> / <code>column</code> / <code>news</code> / <code>collector</code> のいずれか。単体オブジェクトでも配列でも可。1回の上限は <?php echo esc_html( (string) BANKOFART_JSON_IMPORT_MAX ); ?> 件。</p>
 
 		<h3>共通（必須）</h3>
 		<table class="widefat striped" style="max-width:960px;">
 			<thead><tr><th style="width:24%;">キー</th><th>内容</th></tr></thead>
 			<tbody>
-				<tr><td><code>type</code></td><td><strong>必須</strong>。interview / column / news</td></tr>
+				<tr><td><code>type</code></td><td><strong>必須</strong>。interview / column / news / collector</td></tr>
 				<tr><td><code>timestamp</code></td><td><strong>必須</strong>。重複判定に使う一意の文字列（例：<code>2026-07-31T10:00:00+09:00</code>）</td></tr>
 				<tr><td><code>title</code></td><td><strong>必須</strong>。記事タイトル</td></tr>
 				<tr><td><code>slug</code></td><td>任意。URLスラッグ</td></tr>
@@ -181,6 +181,80 @@ function bankofart_journal_import_page() {
 				<tr><td><code>body.sections[]</code></td><td><code>news_sections</code>（<code>heading</code>/<code>body</code>）</td></tr>
 			</tbody>
 		</table>
+
+		<h3>collector（画家応援企業インタビュー）</h3>
+		<table class="widefat striped" style="max-width:960px;">
+			<thead><tr><th style="width:24%;">キー</th><th>取り込み先</th></tr></thead>
+			<tbody>
+				<tr>
+					<td><code>body.qa[]</code></td>
+					<td>
+						<code>collector_interview_qa</code>（<code>question</code>/<code>answer</code>）<br>
+						<span class="description"><strong>質問数は自由</strong>です。何問でも並べられます。定番のQ1〜Q5には触れません（1件でも入れば自由記述側が本文になります）。</span>
+					</td>
+				</tr>
+				<tr><td><code>company_name</code></td><td><code>collector_company_name</code></td></tr>
+				<tr><td><code>url</code> / <code>external_url</code> / <code>video_url</code></td><td>企業サイト／外部記事／動画のURL</td></tr>
+				<tr><td><code>introduced_work</code></td><td><code>collector_introduced_artwork_text</code></td></tr>
+				<tr><td><code>change_summary</code></td><td><code>collector_change_summary</code></td></tr>
+				<tr><td><code>implementation_date</code></td><td>導入時期（例：<code>2025-04-01</code>）</td></tr>
+				<tr><td><code>industry</code> / <code>issue</code> / <code>placement</code></td><td>業種 / 課題 / 設置場所。文字列または配列。登録済みターム名と<strong>完全一致</strong>するものだけ紐付け、一致しない値は取込結果に表示します</td></tr>
+			</tbody>
+		</table>
+
+		<h4>指定できる分類の値</h4>
+		<table class="widefat striped" style="max-width:960px;">
+			<tbody>
+			<?php
+			foreach ( array(
+				'industry'  => array( 'collector_industry', '業種' ),
+				'issue'     => array( 'collector_issue', '課題' ),
+				'placement' => array( 'collector_placement', '設置場所' ),
+			) as $key => $conf ) :
+				$terms = get_terms(
+					array(
+						'taxonomy'   => $conf[0],
+						'hide_empty' => false,
+					)
+				);
+				if ( is_wp_error( $terms ) ) {
+					continue;
+				}
+				?>
+				<tr>
+					<td style="width:24%;"><code><?php echo esc_html( $key ); ?></code>（<?php echo esc_html( $conf[1] ); ?>）</td>
+					<td><?php echo esc_html( implode( ' / ', wp_list_pluck( $terms, 'name' ) ) ); ?></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+
+		<h4>collector の記入例</h4>
+		<textarea readonly rows="18" style="width:100%;max-width:960px;font-family:monospace;" onclick="this.select();"><?php
+		echo esc_textarea(
+			"{\n"
+			. "  \"type\": \"collector\",\n"
+			. "  \"timestamp\": \"2026-08-01T10:00:00+09:00\",\n"
+			. "  \"title\": \"株式会社サンプル\",\n"
+			. "  \"slug\": \"sample-inc\",\n"
+			. "  \"company_name\": \"株式会社サンプル\",\n"
+			. "  \"url\": \"https://example.com/\",\n"
+			. "  \"implementation_date\": \"2025-04-01\",\n"
+			. "  \"industry\": \"IT・通信\",\n"
+			. "  \"issue\": [\"モチベーション\", \"企業理念浸透\"],\n"
+			. "  \"placement\": \"エントランス\",\n"
+			. "  \"change_summary\": \"社員同士の会話が増えた\",\n"
+			. "  \"body\": {\n"
+			. "    \"qa\": [\n"
+			. "      { \"question\": \"御社が大切にされている理念を教えてください。\",\n"
+			. "        \"answer\": \"<p>……</p>\" },\n"
+			. "      { \"question\": \"アートを導入したきっかけは？\",\n"
+			. "        \"answer\": \"<p>……</p>\" }\n"
+			. "    ]\n"
+			. "  }\n"
+			. "}"
+		);
+		?></textarea>
 	</div>
 	<?php
 }
@@ -278,9 +352,9 @@ function bankofart_journal_import_one( $item ) {
 	}
 
 	$type = isset( $item['type'] ) ? (string) $item['type'] : '';
-	if ( ! in_array( $type, array( 'interview', 'column', 'news' ), true ) ) {
+	if ( ! in_array( $type, array( 'interview', 'column', 'news', 'collector' ), true ) ) {
 		// 表示側で esc_html するため、ここではエスケープしない（二重エスケープ防止）。
-		return $fail( 'type が不正（' . $type . '）。interview / column / news のいずれかにしてください。' );
+		return $fail( 'type が不正（' . $type . '）。interview / column / news / collector のいずれかにしてください。' );
 	}
 
 	$title = isset( $item['title'] ) ? trim( (string) $item['title'] ) : '';
@@ -293,7 +367,11 @@ function bankofart_journal_import_one( $item ) {
 		return $fail( 'timestamp が空です（重複判定に必須）。' );
 	}
 
-	$post_type = ( 'news' === $type ) ? 'news' : 'journal';
+	$post_type_map = array(
+		'news'      => 'news',
+		'collector' => 'collector',
+	);
+	$post_type     = isset( $post_type_map[ $type ] ) ? $post_type_map[ $type ] : 'journal';
 
 	/*
 	 * 重複チェック（新規ONLY）。
@@ -335,9 +413,12 @@ function bankofart_journal_import_one( $item ) {
 	}
 	$post_id = (int) $post_id;
 
-	// type 別の中身挿入。
+	// type 別の中身挿入。$notes には「取り込めなかった値」等の注意書きが入る。
+	$notes = array();
 	if ( 'news' === $type ) {
 		bankofart_journal_import_fill_news( $post_id, $item );
+	} elseif ( 'collector' === $type ) {
+		$notes = (array) bankofart_journal_import_fill_collector( $post_id, $item );
 	} else {
 		bankofart_journal_import_fill_journal( $post_id, $type, $item );
 	}
@@ -360,7 +441,8 @@ function bankofart_journal_import_one( $item ) {
 
 	return array(
 		'status'  => 'created',
-		'message' => '「' . $title . '」を下書き作成（投稿ID ' . $post_id . '）。',
+		'message' => '「' . $title . '」を下書き作成（投稿ID ' . $post_id . '）。'
+			. ( $notes ? ' ／ ' . implode( ' ／ ', $notes ) : '' ),
 		'link'    => array(
 			'title' => $title,
 			'edit'  => get_edit_post_link( $post_id, 'raw' ),
@@ -527,6 +609,117 @@ function bankofart_journal_import_fill_news( $post_id, $item ) {
 	foreach ( array( 'news_show_related_artist', 'news_show_related_art', 'news_show_more_news', 'news_show_cta' ) as $sw ) {
 		update_post_meta( $post_id, $sw, '1' );
 	}
+}
+
+/* ---- collector（画家応援企業インタビュー） ---------------- */
+
+/**
+ * COLLECTOR の各フィールドを埋める。
+ *
+ * インタビューは質問文ごと自由に持てる collector_interview_qa（group/clone）に入れる。
+ * 固定のQ1〜Q5には触れない（自由記述が1件でもあればテンプレート側がそちらを使う）。
+ *
+ * @param int   $post_id 投稿ID。
+ * @param array $item    JSONの1要素。
+ * @return void
+ */
+function bankofart_journal_import_fill_collector( $post_id, $item ) {
+	$body = ( isset( $item['body'] ) && is_array( $item['body'] ) ) ? $item['body'] : array();
+
+	// 基本情報。
+	$text_map = array(
+		'company_name'    => 'collector_company_name',
+		'url'             => 'collector_url',
+		'external_url'    => 'collector_external_url',
+		'video_url'       => 'collector_video_url',
+		'introduced_work' => 'collector_introduced_artwork_text',
+		'change_summary'  => 'collector_change_summary',
+	);
+	foreach ( $text_map as $key => $field ) {
+		if ( ! isset( $item[ $key ] ) || '' === trim( (string) $item[ $key ] ) ) {
+			continue;
+		}
+		$value = ( false !== strpos( $field, '_url' ) )
+			? esc_url_raw( $item[ $key ] )
+			: sanitize_text_field( $item[ $key ] );
+		update_post_meta( $post_id, $field, $value );
+	}
+
+	// 導入時期（YYYY-MM-DD 等で受ける）。
+	if ( ! empty( $item['implementation_date'] ) ) {
+		$ts = strtotime( (string) $item['implementation_date'] );
+		if ( $ts ) {
+			update_post_meta( $post_id, 'collector_implementation_date', gmdate( 'Y-m-d', $ts ) );
+		}
+	}
+
+	/*
+	 * インタビュー本文（質問数は自由）。
+	 * group/clone なので PHP配列をそのまま渡せば serialize されて1行で保存される。
+	 */
+	$qa_rows = array();
+	if ( ! empty( $body['qa'] ) && is_array( $body['qa'] ) ) {
+		foreach ( $body['qa'] as $qa ) {
+			if ( ! is_array( $qa ) ) {
+				continue;
+			}
+			$question = isset( $qa['question'] ) ? sanitize_textarea_field( $qa['question'] ) : '';
+			$answer   = isset( $qa['answer'] ) ? wp_kses_post( bankofart_journal_import_prepare_richtext( $qa['answer'] ) ) : '';
+
+			if ( '' === $question && '' === trim( wp_strip_all_tags( $answer ) ) ) {
+				continue;
+			}
+
+			$row = array();
+			if ( '' !== $question ) {
+				$row['qa_question'] = $question;
+			}
+			if ( '' !== $answer ) {
+				$row['qa_answer'] = $answer;
+			}
+			$qa_rows[] = $row;
+		}
+	}
+	if ( ! empty( $qa_rows ) ) {
+		update_post_meta( $post_id, 'collector_interview_qa', $qa_rows );
+	}
+
+	// タクソノミー（登録済みターム名と完全一致するものだけ。表記ゆれで新タームは作らない）。
+	$notes = array();
+	foreach ( array(
+		'industry'  => 'collector_industry',
+		'issue'     => 'collector_issue',
+		'placement' => 'collector_placement',
+	) as $key => $taxonomy ) {
+		if ( empty( $item[ $key ] ) ) {
+			continue;
+		}
+		$names   = is_array( $item[ $key ] ) ? $item[ $key ] : array( $item[ $key ] );
+		$ids     = array();
+		$missing = array();
+		foreach ( $names as $name ) {
+			$name = trim( (string) $name );
+			$term = get_term_by( 'name', $name, $taxonomy );
+			if ( $term && ! is_wp_error( $term ) ) {
+				$ids[] = (int) $term->term_id;
+			} else {
+				$missing[] = $name;
+			}
+		}
+		if ( $ids ) {
+			wp_set_object_terms( $post_id, $ids, $taxonomy, false );
+		}
+		if ( $missing ) {
+			// 黙って捨てると気付けないため、未登録の値は必ず報告する。
+			$notes[] = sprintf( '%s に未登録の値：%s', $taxonomy, implode( '・', $missing ) );
+		}
+	}
+
+	foreach ( array( 'collector_show_interview', 'collector_show_introduced_work', 'collector_show_same_issue', 'collector_show_matching', 'collector_show_cta' ) as $sw ) {
+		update_post_meta( $post_id, $sw, '1' );
+	}
+
+	return $notes;
 }
 
 /* ---- sections配列の組み立て（column / news 共通） ---------- */

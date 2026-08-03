@@ -49,6 +49,32 @@
 .sn-section-body figure { margin: 36px auto; }
 .sn-section-body figure img { margin: 0 auto; }
 .sn-section-body figcaption { margin-top: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-1); color: var(--mid); text-align: center; }
+
+/* ═══ 本文中の箇条書き ═══
+   reset.css の全称リセット（margin/padding: 0）と ul/ol の list-style: none で
+   記事本文のリストからマーカーとインデントが消えるため、本文スコープの中だけで戻す。
+   reset 自体は他UIが依存しているので触らない。
+   ※ single-journal.css にも同じ意図の指定がある。CSSは投稿タイプごとに
+     読み分けられるため（inc/enqueue.php）、1ファイルにまとめると片方で効かない。 */
+.sn-section-body ul {
+	list-style: disc;
+	padding-left: 1.5em;
+	margin: 1em 0;
+}
+.sn-section-body ol {
+	list-style: decimal;
+	padding-left: 1.5em;
+	margin: 1em 0;
+}
+.sn-section-body li {
+	margin: .4em 0;
+	line-height: 2.15; /* 本文（.sn-section-body）と同じ行間に揃える */
+}
+/* ネストしたリストは外側と間隔が二重にならないよう詰める */
+.sn-section-body ul ul, .sn-section-body ul ol,
+.sn-section-body ol ol, .sn-section-body ol ul {
+	margin: .3em 0;
+}
 /* 回り込みで小さく置きたい場合（任意）：左右寄せは原寸で float。 */
 .sn-section-body img.alignleft  { float: left;  width: auto; max-width: 46%; margin: 6px 28px 18px 0; }
 .sn-section-body img.alignright { float: right; width: auto; max-width: 46%; margin: 6px 0 18px 28px; }
