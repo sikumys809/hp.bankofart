@@ -98,7 +98,12 @@ while ( have_posts() ) :
 		wp_reset_postdata();
 	}
 
-	// ---- インタビューQ&A（回答あり = 表示。写真は未入力なら枠を出さない）----
+	/*
+	 * ---- インタビューQ&A（回答あり = 表示。写真は未入力なら枠を出さない）----
+	 * 定番の5問（Q1〜Q5）を先に並べ、そのあとに「インタビュー（自由記述）」の行を続ける。
+	 * どちらか一方だけでも、両方入れても成立する（回答が空の行は自動で落ちる）。
+	 * 質問文はそのまま表示され、Q1・Q2 のような番号は付けない。
+	 */
 	$qa_blocks = array(
 		array(
 			'q'   => '御社が大切にされている理念や価値観について教えてください。',
@@ -126,6 +131,33 @@ while ( have_posts() ) :
 			'img' => $iv3,
 		),
 	);
+
+	// 定番のあとに自由記述を追加する。
+	foreach ( array_filter( (array) rwmb_meta( 'collector_interview_qa' ) ) as $row ) {
+		$answer = isset( $row['qa_answer'] ) ? (string) $row['qa_answer'] : '';
+		if ( '' === trim( wp_strip_all_tags( $answer ) ) ) {
+			continue; // 回答が空の行は出さない。
+		}
+
+		$img = array(
+			'url' => '',
+			'alt' => '',
+		);
+		if ( ! empty( $row['qa_image'] ) ) {
+			$att = wp_get_attachment_image_src( (int) $row['qa_image'], 'large' );
+			if ( $att ) {
+				$img['url'] = $att[0];
+				$img['alt'] = get_post_meta( (int) $row['qa_image'], '_wp_attachment_image_alt', true );
+			}
+		}
+
+		$qa_blocks[] = array(
+			'q'   => isset( $row['qa_question'] ) ? (string) $row['qa_question'] : '',
+			'a'   => $answer,
+			'img' => $img,
+		);
+	}
+
 	$has_any_answer = false;
 	foreach ( $qa_blocks as $blk ) {
 		if ( '' !== trim( wp_strip_all_tags( (string) $blk['a'] ) ) ) {
@@ -242,7 +274,8 @@ while ( have_posts() ) :
 							<span class="cs-iv-q-avatar" aria-hidden="true"><img src="<?php echo esc_url( $interview_avatar ); ?>" alt=""></span>
 							<span class="cs-iv-q-bubble"><?php echo esc_html( $blk['q'] ); ?></span>
 						</div>
-						<div class="cs-iv-a"><?php echo wp_kses_post( $blk['a'] ); ?></div>
+						<?php // 本文に挿入した画像は縮小版srcのまま入るため、large/full に差し替えて大きく出す（JOURNALと同じ扱い）。 ?>
+						<div class="cs-iv-a"><?php echo wp_kses_post( bankofart_enlarge_content_images( $blk['a'] ) ); ?></div>
 						<?php if ( ! empty( $blk['img']['url'] ) ) : ?>
 							<div class="cs-iv-photo">
 								<span class="cs-iv-photo-inner" style="background-image:url('<?php echo esc_url( $blk['img']['url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( $blk['img']['alt'] ? $blk['img']['alt'] : $title ); ?>"></span>

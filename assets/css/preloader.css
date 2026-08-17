@@ -1,0 +1,83 @@
+/*
+ * preloader.css
+ * ファーストビューのローディング画面（mockups/index.html の #preloader を移植）。
+ *
+ * - TOPページのみ。ロゴ（boa-11）が画面中央で回転し、読み込み完了でフェードアウト。
+ * - ヒーロー画像が読み込まれる前に生の状態が見えてしまう事故を防ぐのが主目的。
+ * - JS 無効時は header.php の <noscript> で丸ごと非表示にする（画面が固まらないように）。
+ * - カラー・フォントは tokens.css の変数のみを使用（ハードコード禁止）。
+ */
+
+@keyframes boaLogoSpin {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+@keyframes boaLoadingDots {
+	0%   { width: 0; }
+	100% { width: 1.2em; }
+}
+
+.boa-preloader {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	background: var(--white);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 28px;
+	transition: opacity .8s ease, visibility .8s ease;
+}
+
+.boa-preloader.is-hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.boa-preloader-logo {
+	width: clamp(90px, 10vw, 130px);
+	height: auto;
+	animation: boaLogoSpin 6s linear infinite;
+}
+
+.boa-preloader-text {
+	font-family: var(--f-deco);
+	font-size: 11px;
+	font-weight: var(--fw-medium);
+	letter-spacing: var(--ls-3);
+	color: var(--ink);
+	text-transform: lowercase;
+	opacity: .6;
+}
+
+.boa-preloader-text::after {
+	content: '';
+	display: inline-block;
+	width: 0;
+	overflow: hidden;
+	vertical-align: bottom;
+	animation: boaLoadingDots 1.4s steps(4, end) infinite;
+}
+
+/*
+ * 読み込み中は背後のスクロールを止める（フェードアウト後に JS が解除）。
+ * scrollbar-gutter でスクロールバー分の幅を常に確保し、
+ * ロック解除の瞬間に横方向のガタつきが出ないようにする。
+ */
+html {
+	scrollbar-gutter: stable;
+}
+
+body.boa-loading {
+	overflow: hidden;
+}
+
+/* アクセシビリティ：モーション低減設定ではロゴを回転させない。 */
+@media (prefers-reduced-motion: reduce) {
+	.boa-preloader-logo { animation: none; }
+	.boa-preloader-text::after { animation: none; width: 1.2em; }
+	.boa-preloader { transition: opacity .2s ease, visibility .2s ease; }
+}

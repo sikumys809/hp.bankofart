@@ -125,14 +125,30 @@ function bankofart_handle_booking_reserve() {
 
 	/**
 	 * ▼▼▼ フェーズ2 Google連携 差し込み口 ▼▼▼
-	 * ここで Google Calendar にイベント作成（Meet URL発行）し、結果を保存する：
-	 *   $result = bankofart_booking_gcal_create_event( $booking_id );
-	 *   if ( $result ) { $wpdb->update( $table, array('gcal_event_id'=>$result['event_id'], 'meet_link'=>$result['meet_link']), array('id'=>$booking_id) ); }
-	 * API障害時は DB予約は維持し gcal_event_id/meet_link は NULL のまま（仕様§3 フォールバック）。
+	 * Google Calendar にイベント作成（Meet URL発行）し、結果を保存する。
+	 * メール送信より前に実行することで、確認メールに Meet URL が載る
+	 * （mail.php は meet_link があれば自動でURL表示する実装済み）。
+	 * API障害時は false が返り gcal_event_id/meet_link は NULL のまま＝DB予約は維持
+	 * （仕様§3 フォールバック）。
 	 * ▲▲▲ フェーズ2 Google連携 差し込み口 ▲▲▲
 	 */
+	if ( function_exists( 'bankofart_booking_gcal_create_event' ) ) {
+		$gc = bankofart_booking_gcal_create_event( $booking_id );
+		if ( $gc ) {
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$table,
+				array(
+					'gcal_event_id' => $gc['event_id'],
+					'meet_link'     => $gc['meet_link'],
+				),
+				array( 'id' => $booking_id ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+		}
+	}
 
-	// メール2通（フェーズ1：Meet URL はプレースホルダ）。
+	// メール2通（連携成功時は Meet URL 入り、失敗時はプレースホルダ）。
 	bankofart_send_booking_user_mail( $booking_id );
 	bankofart_send_booking_admin_mail( $booking_id );
 

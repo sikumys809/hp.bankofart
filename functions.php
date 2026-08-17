@@ -45,6 +45,7 @@ $bankofart_includes = array(
 	'inc/resale-waitlist.php',  // リセール待機リスト（テーブル/フォーム送信/管理画面）
 	'inc/diagnosis-data.php',   // マッチング診断データ（PHP配列）
 	'inc/helpers.php',          // テンプレート用ヘルパー（セクション可視性判定等）
+	'inc/art-top-crop.php',     // TOPコラージュ用：作品写真から絵だけを自動トリミング
 	'inc/document-request/setup.php',        // 資料請求：テーブル/定数
 	'inc/document-request/helpers.php',      // 資料請求：トークン/レート/検証/挿入
 	'inc/document-request/form-handler.php', // 資料請求：送信処理・PDF配信
@@ -53,6 +54,7 @@ $bankofart_includes = array(
 	'inc/online-booking/availability.php',   // 説明会予約：空きスロット（admin-ajax）
 	'inc/online-booking/form-handler.php',   // 説明会予約：予約確定（admin-post）
 	'inc/online-booking/mail.php',           // 説明会予約：メール送信
+	'inc/online-booking/gcal.php',           // 説明会予約：Google Calendar/Meet連携（フェーズ2）
 	'inc/artist-application/setup.php',      // 公認画家申請：定数/選択肢/共通ヘルパー
 	'inc/artist-application/form-handler.php', // 公認画家申請：送信処理（GAS連携＋バックアップメール）
 	'inc/artist-entry/setup.php',            // 画家応募（選考用）：定数/選択肢/共通ヘルパー
@@ -86,9 +88,18 @@ foreach ( $bankofart_includes as $bankofart_file ) {
 
 unset( $bankofart_includes, $bankofart_file, $bankofart_path );
 
-// 資料請求：管理画面・CSV出力は管理画面でのみ読み込む。
+// 管理画面でのみ読み込むファイル（資料請求の管理画面／CSV出力・CSVインポート）。
 if ( is_admin() ) {
-	$bankofart_admin_only = array( 'inc/document-request/admin.php', 'inc/document-request/csv-export.php' );
+	$bankofart_admin_only = array(
+		'inc/document-request/admin.php',
+		'inc/document-request/csv-export.php',
+		'inc/csv-import/importer.php', // CSV取込：読み込み・マッピング・取り込み処理。
+		'inc/csv-import/admin.php',    // CSV取込：管理メニュー（importer.php の後に読む）。
+		// JOURNAL/NEWS のJSON取込。重複キー定数を csv-import/importer.php の const から
+		// 流用するため、必ず importer.php より「後」に読み込む（定数の二重定義を避ける）。
+		'inc/journal-import/admin.php',
+		'inc/art-series/admin.php',    // 作品シリーズ：編集画面での共通項目の自動入力。
+	);
 	foreach ( $bankofart_admin_only as $bankofart_admin_file ) {
 		$bankofart_admin_path = get_theme_file_path( $bankofart_admin_file );
 		if ( is_readable( $bankofart_admin_path ) ) {

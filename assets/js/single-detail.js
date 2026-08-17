@@ -107,5 +107,52 @@
 				}
 			} );
 		}
+
+		/* ===== 作品一覧：初期3件（モバイル2件）＋「もっと見る」で追加 =====
+		 * 作品ページの MORE WORKS と、アーティストページの WORKS の両方で使う。 */
+		function setupWorksLoadMore( gridId, btnId, wrapId ) {
+			var grid = document.getElementById( gridId );
+			var btn  = document.getElementById( btnId );
+			var wrap = document.getElementById( wrapId );
+			if ( ! grid || ! btn ) { return; }
+
+			var cards = Array.prototype.slice.call( grid.querySelectorAll( '.art-card' ) );
+			if ( cards.length <= 3 ) { return; }
+
+			var mq = window.matchMedia( '(max-width: 760px)' );
+			var shown = 0;
+
+			function step() { return mq.matches ? 2 : 3; }
+
+			function render() {
+				cards.forEach( function ( el, i ) {
+					el.style.display = i < shown ? '' : 'none';
+				} );
+				var hasMore = cards.length > shown;
+				if ( wrap ) { wrap.style.display = hasMore ? '' : 'none'; }
+			}
+
+			function reset() {
+				shown = Math.min( step(), cards.length );
+				render();
+			}
+
+			btn.addEventListener( 'click', function () {
+				shown = Math.min( shown + step(), cards.length );
+				render();
+			} );
+
+			// 画面幅が変わったら初期件数を取り直す。
+			if ( mq.addEventListener ) {
+				mq.addEventListener( 'change', reset );
+			} else if ( mq.addListener ) {
+				mq.addListener( reset ); // 旧Safari互換.
+			}
+
+			reset();
+		}
+
+		setupWorksLoadMore( 'awOtherGrid', 'awOtherMoreBtn', 'awOtherMore' ); // 作品ページ：MORE WORKS
+		setupWorksLoadMore( 'asWorksGrid', 'asWorksMoreBtn', 'asWorksMore' ); // アーティストページ：WORKS
 	} );
 } )();

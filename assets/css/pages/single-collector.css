@@ -26,8 +26,11 @@
 
 /* ═══ HERO VISUAL ═══ */
 .cs-visual { max-width: 1100px; margin: 0 auto 100px; padding: 0 40px; }
-.cs-visual-inner { width: 100%; aspect-ratio: 16/9; background: var(--warm-gray); overflow: hidden; position: relative; }
-.cs-visual-img { position: absolute; inset: 0; background-size: cover; background-position: center; transition: background .35s ease; }
+/* オフィス写真は縦横比がばらばら（実データ100枚：横長71/縦長19/正方形10、中央値4:3）。
+   16:9 + cover だと89枚が切れてしまうため、枠を4:3にして contain で全体を見せる。
+   余白は写真の背景になじむ淡いグレーにして、額装のように見せる。 */
+.cs-visual-inner { width: 100%; aspect-ratio: 4/3; background: var(--warm-gray); overflow: hidden; position: relative; }
+.cs-visual-img { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; transition: background .35s ease; }
 .cs-visual-thumbs { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 12px; }
 .cs-visual-thumb { position: relative; aspect-ratio: 4/3; background: var(--warm-gray); overflow: hidden; opacity: .55; outline: 2px solid transparent; outline-offset: -2px; transition: opacity .25s, outline-color .25s; padding: 0; border: 0; cursor: pointer; }
 .cs-visual-thumb.is-active { opacity: 1; outline-color: var(--brand); }
@@ -50,8 +53,27 @@
 .cs-iv-q-bubble::before { content: ''; position: absolute; left: -9px; top: 18px; width: 15px; height: 15px; background: var(--white); border-left: 1.5px solid var(--brand); border-bottom: 1.5px solid var(--brand); transform: rotate(45deg); }
 .cs-iv-a { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
 .cs-iv-a p + p { margin-top: 22px; }
-.cs-iv-photo { margin-top: 28px; width: 100%; aspect-ratio: 16/9; background: var(--warm-gray); overflow: hidden; position: relative; }
-.cs-iv-photo-inner { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.cs-iv-a a { color: var(--brand-deep); text-decoration: underline; }
+
+/* 回答本文に挿入した画像・リスト（JOURNALのコラム本文と同じ見せ方に揃える）。
+   エディタで「中サイズ」を選んで挿入すると width/height 属性が付いて小さく出るため、
+   幅いっぱいに広げる（srcの差し替えは bankofart_enlarge_content_images）。 */
+.cs-iv-a img { display: block; width: 100%; height: auto; margin: 28px auto; }
+.cs-iv-a figure { margin: 28px auto; }
+.cs-iv-a figure img { margin: 0 auto; }
+.cs-iv-a figcaption { margin-top: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-1); color: var(--mid); text-align: center; }
+/* 回り込みで小さく置きたい場合は左右寄せを指定（原寸で float）。 */
+.cs-iv-a img.alignleft  { float: left;  width: auto; max-width: 46%; margin: 6px 28px 18px 0; }
+.cs-iv-a img.alignright { float: right; width: auto; max-width: 46%; margin: 6px 0 18px 28px; }
+
+/* reset.css の全称リセットで消える箇条書きを、本文スコープ内だけで戻す。 */
+.cs-iv-a ul { list-style: disc; padding-left: 1.5em; margin: 1em 0; }
+.cs-iv-a ol { list-style: decimal; padding-left: 1.5em; margin: 1em 0; }
+.cs-iv-a li { margin: .4em 0; line-height: 2.15; }
+.cs-iv-a ul ul, .cs-iv-a ul ol, .cs-iv-a ol ol, .cs-iv-a ol ul { margin: .3em 0; }
+/* インタビュー中の写真も切り抜かず全体を見せる（枠は上のビジュアルと同じ4:3）。 */
+.cs-iv-photo { margin-top: 28px; width: 100%; aspect-ratio: 4/3; background: var(--warm-gray); overflow: hidden; position: relative; }
+.cs-iv-photo-inner { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; }
 
 /* ═══ PROFILE TABLE ═══ */
 .cs-profile { max-width: 780px; margin: 64px auto 0; border-top: 1px solid var(--border); }
@@ -66,8 +88,10 @@
 .cs-work-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .cs-work-card { max-width: 880px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 44px; align-items: center; }
 .cs-work-card + .cs-work-card { margin-top: 56px; }
+/* 迎えた作品は「作品そのもの」を見せる場所なので、切り抜かず全体を出す。
+   黒背景なので余白は額のマットのように見える。 */
 .cs-work-image { width: 100%; aspect-ratio: 1/1; background: #000; overflow: hidden; position: relative; }
-.cs-work-image-inner { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.cs-work-image-inner { position: absolute; inset: 0; background-size: contain; background-repeat: no-repeat; background-position: center; }
 .cs-work-info { text-align: left; }
 .cs-work-artist { font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 10px; }
 .cs-work-title { font-family: var(--f-jp); font-size: 24px; font-weight: var(--fw-bold); letter-spacing: var(--ls-1); color: var(--white); margin-bottom: 16px; }

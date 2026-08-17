@@ -133,17 +133,19 @@
 .aw-other-head { text-align: center; margin-bottom: 52px; }
 .aw-other-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--white); margin-bottom: 8px; }
 .aw-other-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
-.aw-other-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 48px 32px; }
+.aw-other-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
 .aw-other-sec .art-title { color: var(--white); }
 .aw-other-sec .art-artist { color: rgba(255,255,255,.55); }
 .aw-other-sec .art-meta { color: rgba(255,255,255,.55); }
 .aw-other-sec .art-meta span + span::before { color: rgba(255,255,255,.25); }
 
 /* ═══ BACK LINK ═══ */
-.aw-back { background: var(--paper); padding: 0 40px 100px; text-align: center; }
+/* 直前の MORE WORKS がダーク背景のため、戻るリンクまで黒を continue させる
+   （途中で背景が切り替わると帯が途切れて見える）。 */
+.aw-back { background: var(--ink); padding: 0 40px 100px; text-align: center; }
 .aw-back-inner { max-width: 1280px; margin: 0 auto; }
-.aw-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--border); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
-.aw-back a:hover { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.aw-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--white); border: 1px solid rgba(255,255,255,.4); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
+.aw-back a:hover { background: var(--white); color: var(--ink); border-color: var(--white); }
 .aw-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 
 /* ═══ REVEAL（JS有効時のみ隠す）═══ */
@@ -163,7 +165,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 /* ═══ レスポンシブ ═══ */
 @media (max-width: 900px) {
 	.aw-hero { grid-template-columns: 1fr; gap: 44px; padding: 36px 40px 72px; }
-	.aw-other-grid { grid-template-columns: repeat(2,1fr); gap: 40px 24px; }
+	.aw-other-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 24px; }
 }
 @media (max-width: 760px) {
 	.aw-color-inner { grid-template-columns: 1fr; gap: 28px; }
@@ -189,10 +191,10 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.aw-artist-info { text-align: center; }
 }
 @media (max-width: 560px) {
-	.aw-other-grid { grid-template-columns: repeat(2,1fr); gap: 28px 14px; }
+	.aw-other-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
 }
 @media (max-width: 430px) {
-	.aw-other-grid { grid-template-columns: repeat(2,1fr); gap: 24px 12px; }
+	.aw-other-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
 	.aw-hero { grid-template-columns: 1fr; padding: 28px 16px 48px; }
 	.aw-info-title { font-size: 28px; }
 	.aw-color-sec, .aw-owner-sec, .aw-history-sec, .aw-story, .aw-artist-sec, .aw-other { padding: 56px 16px; }
@@ -200,3 +202,8 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.aw-back { padding: 0 16px 56px; }
 	.breadcrumb { padding: 96px 16px 0; }
 }
+
+/* ═══ MORE WORKS：もっと見る（ダーク背景のためボタンを白抜きに）═══ */
+.aw-other-more { margin-top: 48px; text-align: center; }
+.aw-other-more .archive-loadmore-btn { color: var(--white); border-color: rgba(255,255,255,.4); }
+.aw-other-more .archive-loadmore-btn:hover { background: var(--brand); border-color: var(--brand); color: var(--white); }

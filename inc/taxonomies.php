@@ -83,6 +83,18 @@ function bankofart_get_taxonomy_config() {
 			'post_type' => 'art',
 			'terms'     => array( '赤', '橙', '黄', '緑', '青', '紫', '茶', '白', '黒', '金', '銀', 'その他' ),
 		),
+		/*
+		 * 作品シリーズ。
+		 * 同じシリーズで共通する項目（素材・支持体／ジャンル／技法／作品説明／
+		 * コンセプト等）をタームのメタに持たせ、作品編集画面でシリーズを選ぶと
+		 * 自動入力する（inc/art-series/admin.php）。
+		 * タームは運用しながら追加するため、初期タームは持たない。
+		 */
+		'art_series' => array(
+			'label'     => '作品シリーズ',
+			'post_type' => 'art',
+			'terms'     => array(),
+		),
 		// collector 用.
 		// 課題：診断仕様（課題逆引き診断）と値を統一。旧値（モチベーション 等）は廃止。
 		'collector_issue' => array(
