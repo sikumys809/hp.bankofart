@@ -1345,13 +1345,29 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
   .how-row.right .how-num-wrap, .how-row.left .how-num-wrap { justify-self:center; padding: 0; }
   .how-row.right .how-txt-wrap, .how-row.left .how-txt-wrap { text-align: center; padding: 0; }
   .how-row.right .how-step-desc, .how-row.left .how-step-desc { margin: 0 auto; }
-  /* ART モバイル */
+  /* ART モバイル: 2列×3段=6点のみ（PCの大小コラージュは変えない）
+     .art-row を display:contents にして、7枚のフレームを直接グリッドに並べる。
+     枠の大小（type-wide/tall/square）はモバイルでは崩れるので正方形に統一。
+     7枚目は data-order="6"（通し番号）で確実に隠す。 */
   .art-collage {
-    --art-unit: 38vw;
     --art-gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--art-gap);
+    align-items: start;
     padding: 16px;
+    max-width: 520px;
   }
-  .art-row { flex-wrap: wrap; }
+  .art-row { display: contents; }
+  .art-collage .frame,
+  .art-collage .frame.type-wide,
+  .art-collage .frame.type-tall,
+  .art-collage .frame.type-square {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+  .art-collage .frame[data-order="6"] { display: none; }
   /* COLLECTOR モバイル: 2列×3行=6社のみ */
   .collector-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .collector-card:nth-child(n+7) { display: none; }
