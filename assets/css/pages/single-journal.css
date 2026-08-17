@@ -11,14 +11,20 @@
 
 .boa-num { font-family: var(--f-jp); font-weight: var(--fw-medium); }
 
+/* 記事カラムの横幅。パンくず・ヒーロー・本文で共有する。
+   インタビューは左右のアイコン（64px＋余白18px）が幅を食うので、
+   吹き出し内の1行文字数がコラムと揃うよう、その分だけ広く取る。 */
+.single-journal { --sj-col: 900px; }
+.single-journal--interview { --sj-col: 1000px; }
+
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: 820px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
+.breadcrumb { max-width: var(--sj-col); margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
 
 /* ═══ HERO ═══ */
-.sj-hero { max-width: 820px; margin: 0 auto; padding: 40px 40px 0; text-align: center; }
+.sj-hero { max-width: var(--sj-col); margin: 0 auto; padding: 40px 40px 0; text-align: center; }
 .sj-hero-meta { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
 .sj-hero-cat { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-bold); letter-spacing: var(--ls-1); color: var(--white); background: var(--brand); padding: 5px 16px; }
 .sj-hero-date { font-family: var(--f-deco); font-size: 14px; letter-spacing: var(--ls-2); color: var(--mid); }
@@ -27,11 +33,12 @@
 .sj-hero-byline { margin-top: 18px; font-family: var(--f-jp); font-size: var(--fs-min); letter-spacing: var(--ls-1); color: var(--mid); }
 
 /* ═══ EYECATCH ═══ */
-.sj-eyecatch { max-width: 1000px; margin: 56px auto 0; padding: 0 40px; }
+/* 本文カラムより一回り広く見せる（最低1000px、本文が広い場合はそれに追従）。 */
+.sj-eyecatch { max-width: max(1000px, var(--sj-col)); margin: 56px auto 0; padding: 0 40px; }
 .sj-eyecatch img { display: block; width: 100%; height: auto; }
 
 /* ═══ ARTICLE BODY ═══ */
-.sj-article { max-width: 820px; margin: 0 auto; padding: 64px 40px 0; }
+.sj-article { max-width: var(--sj-col); margin: 0 auto; padding: 64px 40px 0; }
 .sj-lead { font-family: var(--f-jp); font-size: 20px; font-weight: var(--fw-bold); letter-spacing: var(--ls-1); line-height: 2; color: var(--ink); margin-bottom: 48px; padding-bottom: 40px; border-bottom: 1px solid var(--border-soft); }
 .sj-section { margin-bottom: 56px; }
 .sj-section:last-child { margin-bottom: 0; }
