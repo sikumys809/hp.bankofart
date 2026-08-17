@@ -292,7 +292,9 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
   display: flex;
   align-items: center;
   width: max-content;
-  animation: logoScroll 40s linear infinite;
+  /* 8社×2周＝16枚を -50%（＝1周ぶん）動かす。所要時間は幅で変わるので変数にしておく。 */
+  --logo-scroll-duration: 40s;
+  animation: logoScroll var(--logo-scroll-duration) linear infinite;
 }
 .logo-item {
   flex-shrink: 0;
@@ -324,6 +326,19 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .logo-item img[src$="MOOOVE.png"]     { width: 80%; }
 .logo-item img[src$="SBS.png"]        { height: 100%; width: auto; }
 .logo-item img[src$="STBELIEF.png"]   { width: 86%; }
+
+/* ── モバイル（≤430px）のマーキー
+   枠は 160px 幅（高さ・余白・角丸はPCと共通）。一度 120px まで詰めたが、
+   画像の表示領域が 92px しか残らず、DES（シグマ総合法律事務所）のような
+   細い文字のロゴが潰れて読めなくなるため戻した。
+
+   速度：1周＝8枚を 8s で回す＝ロゴ1枚がちょうど1秒で通り過ぎる。
+   モバイルは画面に2枚しか映らないので、PCと同じテンポ（1枚5秒）だと
+   止まって見える。ここだけ大きく速くしている。 */
+@media (max-width: 430px) {
+  .logo-marquee-row { --logo-scroll-duration: 8s; }
+  .logo-item { width: 160px; }
+}
 
 /* ══════════════════════════════════
    3 STEPS（横一列ベン図型）
@@ -1118,7 +1133,8 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
   }
   .node-right { width: auto !important; }
   .cycle-node-char { width: 60px !important; height: 60px !important; margin-bottom: 6px !important; }
-  .logo-item { width: 160px !important; }
+  /* .logo-item のモバイル指定は「導入会社ロゴマーキー」のブロックへ集約した
+     （幅だけでなく高さ・余白・角丸もまとめて調整するため）。 */
   *, *::before, *::after { max-width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
   img { height: auto; }
   html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; }
