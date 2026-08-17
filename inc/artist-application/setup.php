@@ -20,12 +20,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * GAS Web App 連携（サーバー側のみで使用。フロントには出力しない）。
  * 値の差し替えは wp-config.php 等で同名定数を先に define すれば上書き可能。
+ *
+ * シークレットはリポジトリに置かない。以前はここに直書きしていたが、
+ * リポジトリを見られると誰でも正規のリクエストを GAS へ投げられるため、
+ * wp-config.php（git 管理外）で定義する方式へ移した。
+ *
+ *   define( 'BANKOFART_ARTIST_APP_GAS_SECRET', '……' );
+ *
+ * 未定義／空のときは GAS へは送らず、バックアップメールのみで受け付ける
+ * （bankofart_artist_app_post_to_gas() が false を返す）。フォーム自体は動く。
  */
 if ( ! defined( 'BANKOFART_ARTIST_APP_GAS_URL' ) ) {
 	define( 'BANKOFART_ARTIST_APP_GAS_URL', 'https://script.google.com/macros/s/AKfycbzaBVzgYmX2c5N83jiztvge0iTjnz_3ChCWp2Ya7FjYm9xu9JY1q2WK8VTNGovwQdDX/exec' );
 }
 if ( ! defined( 'BANKOFART_ARTIST_APP_GAS_SECRET' ) ) {
-	define( 'BANKOFART_ARTIST_APP_GAS_SECRET', 'boa-artist-2026-k7m9qx3p' );
+	define( 'BANKOFART_ARTIST_APP_GAS_SECRET', '' );
 }
 
 /* 画像制限（GASへ Base64 で送るため過大にならないよう制御）。 */

@@ -20,12 +20,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * 応募用 GAS Web App 連携（サーバー側のみで使用。フロントには出力しない）。
  * 申請フォームとは別エンドポイント。wp-config.php 等で同名定数を先に define すれば上書き可能。
+ *
+ * シークレットはリポジトリに置かない（理由は inc/artist-application/setup.php を参照）。
+ *
+ *   define( 'BANKOFART_ARTIST_ENTRY_GAS_SECRET', '……' );
+ *
+ * 未定義／空のときは GAS へは送らず、バックアップメールのみで受け付ける。
  */
 if ( ! defined( 'BANKOFART_ARTIST_ENTRY_GAS_URL' ) ) {
 	define( 'BANKOFART_ARTIST_ENTRY_GAS_URL', 'https://script.google.com/macros/s/AKfycbxnwV40z8A-GSLIzQZpb2Z-d7SceOoeF6cvjGQWGVOh8_gjbHdpUTeRipyS_-31uu3v/exec' );
 }
 if ( ! defined( 'BANKOFART_ARTIST_ENTRY_GAS_SECRET' ) ) {
-	define( 'BANKOFART_ARTIST_ENTRY_GAS_SECRET', 'boa-artist-2026-k7m9qx3p' );
+	define( 'BANKOFART_ARTIST_ENTRY_GAS_SECRET', '' );
 }
 
 /* ポートフォリオPDFの制限。 */

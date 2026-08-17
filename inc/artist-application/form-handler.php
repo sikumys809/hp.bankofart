@@ -364,6 +364,12 @@ function bankofart_artist_app_handle_single_file( $file, $label ) {
  * @return bool 送信成功なら true。
  */
 function bankofart_artist_app_post_to_gas( $text, $images ) {
+	// シークレット未設定（wp-config.php で define されていない）なら送らない。
+	// 呼び出し側は false を受けてもバックアップメールを必ず送るので、申請は取りこぼさない。
+	if ( '' === (string) BANKOFART_ARTIST_APP_GAS_SECRET ) {
+		return false;
+	}
+
 	$work_b64   = array();
 	$work_names = array();
 	foreach ( $images['work'] as $w ) {

@@ -270,6 +270,11 @@ function bankofart_artist_entry_process_pdf( &$pdf, &$errors ) {
  * @return bool 送信成功（{"ok":true}）なら true。
  */
 function bankofart_artist_entry_post_to_gas( $text, $pdf ) {
+	// シークレット未設定なら送らない（呼び出し側がバックアップメールで担保する）。
+	if ( '' === (string) BANKOFART_ARTIST_ENTRY_GAS_SECRET ) {
+		return false;
+	}
+
 	$body = array_merge(
 		$text,
 		array(
