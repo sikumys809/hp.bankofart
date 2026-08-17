@@ -52,7 +52,7 @@
 .cs-iv-q-bubble { position: relative; background: var(--white); border: 1.5px solid var(--brand); border-radius: 14px; padding: 16px 20px; font-family: var(--f-jp); font-size: 17px; font-weight: var(--fw-heavy); letter-spacing: var(--ls-1); line-height: 1.65; color: var(--ink); }
 .cs-iv-q-bubble::before { content: ''; position: absolute; left: -9px; top: 18px; width: 15px; height: 15px; background: var(--white); border-left: 1.5px solid var(--brand); border-bottom: 1.5px solid var(--brand); transform: rotate(45deg); }
 .cs-iv-a { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
-.cs-iv-a p + p { margin-top: 22px; }
+.cs-iv-a p + p { margin-top: 1.6em; }
 .cs-iv-a a { color: var(--brand-deep); text-decoration: underline; }
 
 /* 回答本文に挿入した画像・リスト（JOURNALのコラム本文と同じ見せ方に揃える）。
@@ -67,9 +67,11 @@
 .cs-iv-a img.alignright { float: right; width: auto; max-width: 46%; margin: 6px 0 18px 28px; }
 
 /* reset.css の全称リセットで消える箇条書きを、本文スコープ内だけで戻す。 */
-.cs-iv-a ul { list-style: disc; padding-left: 1.5em; margin: 1em 0; }
-.cs-iv-a ol { list-style: decimal; padding-left: 1.5em; margin: 1em 0; }
+.cs-iv-a ul { list-style: disc; padding-left: 1.5em; margin: 1.6em 0; }
+.cs-iv-a ol { list-style: decimal; padding-left: 1.5em; margin: 1.6em 0; }
 .cs-iv-a li { margin: .4em 0; line-height: 2.15; }
+/* リスト直後の段落。p + p が効かない（直前の兄弟が ul/ol）ため個別に指定する。 */
+.cs-iv-a ul + p, .cs-iv-a ol + p { margin-top: 1.6em; }
 .cs-iv-a ul ul, .cs-iv-a ul ol, .cs-iv-a ol ol, .cs-iv-a ol ul { margin: .3em 0; }
 /* インタビュー中の写真も切り抜かず全体を見せる（枠は上のビジュアルと同じ4:3）。 */
 .cs-iv-photo { margin-top: 28px; width: 100%; aspect-ratio: 4/3; background: var(--warm-gray); overflow: hidden; position: relative; }

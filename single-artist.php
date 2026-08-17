@@ -313,7 +313,7 @@ while ( have_posts() ) :
 						<div class="as-block rv" style="margin-top:72px;">
 							<div class="as-block-label">Philosophy</div>
 							<h2 class="as-block-title">なぜ描くか</h2>
-							<div class="as-block-text"><?php echo wp_kses_post( $reason ); ?></div>
+							<div class="as-block-text"><?php echo wp_kses_post( bankofart_richtext( $reason ) ); ?></div>
 
 							<?php if ( ! empty( $symbol_img['url'] ) ) : ?>
 								<div class="as-process-photo boa-zoomable">
@@ -327,7 +327,7 @@ while ( have_posts() ) :
 						<div class="as-block rv" style="margin-top:72px;">
 							<div class="as-block-label">History</div>
 							<h2 class="as-block-title">起源の物語</h2>
-							<div class="as-block-text"><?php echo wp_kses_post( $origin ); ?></div>
+							<div class="as-block-text"><?php echo wp_kses_post( bankofart_richtext( $origin ) ); ?></div>
 						</div>
 					<?php endif; ?>
 

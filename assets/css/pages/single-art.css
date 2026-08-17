@@ -74,7 +74,7 @@
 .aw-story-label { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 18px; }
 .aw-story-title { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 36px; }
 .aw-story-text { font-family: var(--f-jp); font-size: var(--fs-body); line-height: 2.2; letter-spacing: var(--ls-1); color: var(--ink); text-align: left; }
-.aw-story-text p + p { margin-top: 24px; }
+.aw-story-text p + p { margin-top: 1.6em; }
 .aw-story-marquee { overflow: hidden; position: relative; width: 100%; padding-bottom: 100px; }
 @keyframes awStoryScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .aw-story-marquee-row { display: flex; align-items: center; width: max-content; animation: awStoryScroll 36s linear infinite; }

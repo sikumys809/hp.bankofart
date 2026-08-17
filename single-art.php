@@ -237,9 +237,9 @@ while ( have_posts() ) :
 				<div class="aw-story-label rv">About the Work</div>
 				<h2 class="aw-story-title rv d1">この作品について</h2>
 				<div class="aw-story-text rv d2">
-					<?php echo wp_kses_post( $description ); ?>
+					<?php echo wp_kses_post( bankofart_richtext( $description ) ); ?>
 					<?php if ( ! empty( trim( wp_strip_all_tags( (string) $concept ) ) ) ) : ?>
-						<?php echo wp_kses_post( $concept ); ?>
+						<?php echo wp_kses_post( bankofart_richtext( $concept ) ); ?>
 					<?php endif; ?>
 				</div>
 			</div>

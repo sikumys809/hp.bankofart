@@ -44,7 +44,7 @@
 .sj-section:last-child { margin-bottom: 0; }
 .sj-section-title { font-family: var(--f-jp); font-size: 24px; font-weight: var(--fw-bold); letter-spacing: var(--ls-2); line-height: 1.5; color: var(--ink); margin-bottom: 24px; padding-left: 16px; border-left: 3px solid var(--brand); }
 .sj-section-body { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
-.sj-section-body p + p { margin-top: 24px; }
+.sj-section-body p + p { margin-top: 1.6em; }
 .sj-section-body a { color: var(--brand-deep); text-decoration: underline; }
 /* 本文に挿入したメイン画像は本文幅いっぱいに大きく表示（中央）。
    src は large/full に差し替え済み（bankofart_enlarge_content_images）なので鮮明。 */
@@ -67,20 +67,27 @@
 .sj-iv-intro ul {
 	list-style: disc;
 	padding-left: 1.5em;
-	margin: 1em 0;
+	margin: 1.6em 0;
 }
 .sj-section-body ol,
 .sj-iv-a-text ol,
 .sj-iv-intro ol {
 	list-style: decimal;
 	padding-left: 1.5em;
-	margin: 1em 0;
+	margin: 1.6em 0;
 }
 .sj-section-body li,
 .sj-iv-a-text li,
 .sj-iv-intro li {
 	margin: .4em 0;
 	line-height: 2.15; /* 本文（.sj-section-body）と同じ行間に揃える */
+}
+/* リスト直後の段落。p + p が効かない（直前の兄弟が ul/ol）ため個別に指定し、
+   リストの上下が段落間（1.6em）と同じ余白になるようにする。 */
+.sj-section-body ul + p, .sj-section-body ol + p,
+.sj-iv-a-text ul + p, .sj-iv-a-text ol + p,
+.sj-iv-intro ul + p, .sj-iv-intro ol + p {
+	margin-top: 1.6em;
 }
 /* ネストしたリストは外側と間隔が二重にならないよう詰める */
 .sj-section-body ul ul, .sj-section-body ul ol,
@@ -103,7 +110,7 @@
 
 /* ── 導入文（リード） */
 .sj-iv-intro { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
-.sj-iv-intro p + p { margin-top: 24px; }
+.sj-iv-intro p + p { margin-top: 1.6em; }
 .sj-iv-intro img { display: block; width: 100%; height: auto; margin: 36px auto; }
 
 /* ── 話し手プロフィール（導入文の直後）
@@ -162,7 +169,7 @@ a.sj-iv-avatar:hover { opacity: .72; }
 
 .sj-iv-q-text { font-family: var(--f-jp); font-size: var(--fs-body); font-weight: var(--fw-bold); letter-spacing: var(--ls-1); line-height: 1.9; color: var(--ink); }
 .sj-iv-a-text { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
-.sj-iv-a-text p + p { margin-top: 22px; }
+.sj-iv-a-text p + p { margin-top: 1.6em; }
 .sj-iv-a-text a { color: var(--brand-deep); text-decoration: underline; }
 .sj-iv-a-text img { display: block; width: 100%; height: auto; margin: 28px auto; }
 
