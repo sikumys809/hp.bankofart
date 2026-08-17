@@ -275,7 +275,7 @@ while ( have_posts() ) :
 							<span class="cs-iv-q-bubble"><?php echo esc_html( $blk['q'] ); ?></span>
 						</div>
 						<?php // 本文に挿入した画像は縮小版srcのまま入るため、large/full に差し替えて大きく出す（JOURNALと同じ扱い）。 ?>
-						<div class="cs-iv-a"><?php echo wp_kses_post( bankofart_enlarge_content_images( $blk['a'] ) ); ?></div>
+						<div class="cs-iv-a"><?php echo wp_kses_post( bankofart_richtext( $blk['a'] ) ); ?></div>
 						<?php if ( ! empty( $blk['img']['url'] ) ) : ?>
 							<div class="cs-iv-photo">
 								<span class="cs-iv-photo-inner" style="background-image:url('<?php echo esc_url( $blk['img']['url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( $blk['img']['alt'] ? $blk['img']['alt'] : $title ); ?>"></span>

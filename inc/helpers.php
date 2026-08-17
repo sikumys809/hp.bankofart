@@ -472,6 +472,39 @@ function bankofart_parse_record_lines( $value ) {
 }
 
 /**
+ * Meta Box の wysiwyg フィールドを本文として出力する共通ルール。
+ *
+ * wysiwyg の保存値は WordPress の post_content と同じ「素のテキスト＋改行」で、
+ * <p> は入っていない。post_content なら the_content フィルタが wpautop を
+ * かけてくれるが、カスタムフィールドは自前で通す必要がある。通していないと
+ * 段落の空行（\r\n\r\n）が単なる空白に潰れ、長い回答が一続きの塊になって読めない。
+ *
+ * 適用順は the_content と同じ：
+ *   1. wpautop        … 空行→段落 <p> ／ 単独の改行→<br>
+ *   2. shortcode_unautop … ショートコードが <p> に包まれるのを戻す
+ *   3. do_shortcode
+ *   4. 画像の拡大（bankofart_enlarge_content_images）
+ *
+ * wpautop は既に <p> や <ul> 等のブロック要素で組まれた HTML には
+ * 二重に段落を付けないので、JSON取込などで整形済みの値を渡しても安全。
+ *
+ * @param string $html wysiwyg の保存値。
+ * @return string 出力用HTML。
+ */
+function bankofart_richtext( $html ) {
+	$html = (string) $html;
+	if ( '' === trim( $html ) ) {
+		return '';
+	}
+
+	$html = wpautop( $html );
+	$html = shortcode_unautop( $html );
+	$html = do_shortcode( $html );
+
+	return bankofart_enlarge_content_images( $html );
+}
+
+/**
  * 本文（wysiwyg）に挿入された画像を「大きく・鮮明に」表示できるよう整える。
  *
  * クラシックエディタで「中サイズ」等を選んで挿入すると、src が縮小版（例 -300x216）に

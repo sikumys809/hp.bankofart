@@ -160,7 +160,7 @@ while ( have_posts() ) :
 					<?php endif; ?>
 
 					<?php if ( '' !== trim( wp_strip_all_tags( (string) $body ) ) ) : ?>
-						<div class="sj-section-body"><?php echo wp_kses_post( bankofart_enlarge_content_images( $body ) ); ?></div>
+						<div class="sj-section-body"><?php echo wp_kses_post( bankofart_richtext( $body ) ); ?></div>
 					<?php endif; ?>
 
 					<?php if ( ! empty( $img_ids ) ) : ?>

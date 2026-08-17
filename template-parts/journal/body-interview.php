@@ -105,7 +105,7 @@ $bankofart_render_avatar = static function ( $img, $name, $link = '' ) {
 ?>
 
 <?php if ( ! empty( $intro ) ) : ?>
-	<div class="sj-iv-intro rv"><?php echo wp_kses_post( bankofart_enlarge_content_images( $intro ) ); ?></div>
+	<div class="sj-iv-intro rv"><?php echo wp_kses_post( bankofart_richtext( $intro ) ); ?></div>
 <?php endif; ?>
 
 <?php
@@ -198,7 +198,7 @@ if ( '' !== $speaker_name ) :
 				<?php $bankofart_render_avatar( $speaker_icon, $speaker_name, $speaker_link ); ?>
 				<div class="sj-iv-bubble">
 					<?php if ( $has_a ) : ?>
-						<div class="sj-iv-a-text"><?php echo wp_kses_post( bankofart_enlarge_content_images( $answer ) ); ?></div>
+						<div class="sj-iv-a-text"><?php echo wp_kses_post( bankofart_richtext( $answer ) ); ?></div>
 					<?php endif; ?>
 
 					<?php if ( ! empty( $img_ids ) ) : ?>
