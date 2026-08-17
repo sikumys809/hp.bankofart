@@ -1345,27 +1345,40 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
   .how-row.right .how-num-wrap, .how-row.left .how-num-wrap { justify-self:center; padding: 0; }
   .how-row.right .how-txt-wrap, .how-row.left .how-txt-wrap { text-align: center; padding: 0; }
   .how-row.right .how-step-desc, .how-row.left .how-step-desc { margin: 0 auto; }
-  /* ART モバイル: 2列×3段=6点のみ（PCの大小コラージュは変えない）
-     .art-row を display:contents にして、7枚のフレームを直接グリッドに並べる。
-     枠の大小（type-wide/tall/square）はモバイルでは崩れるので正方形に統一。
-     7枚目は data-order="6"（通し番号）で確実に隠す。 */
+  /* ART モバイル: 2列×3段=6点（PCの大小コラージュは変えない）
+     .art-row を display:contents にしてフレームを直接グリッドに並べる。
+     PCと同じ3種の比率（縦長/正方形/横長）をそのまま使い、
+     さらに右列を少し下げて「バラバラだけど揃ってる」並びにする。
+     7枚目は data-order="6"（通し番号）で隠し、6点ちょうどに収める。 */
   .art-collage {
     --art-gap: 10px;
+    --art-offset: 7vw; /* 右列を下げる量。全タイル同じ量ずらすので固定長にする */
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--art-gap);
     align-items: start;
-    padding: 16px;
+    padding: 16px 16px calc(16px + var(--art-offset));
     max-width: 520px;
   }
   .art-row { display: contents; }
+  /* 幅は列いっぱい。高さは型ごとの比率で決める（PCの --art-unit 基準をやめる）。 */
   .art-collage .frame,
   .art-collage .frame.type-wide,
   .art-collage .frame.type-tall,
   .art-collage .frame.type-square {
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1;
+  }
+  .art-collage .frame.type-square { aspect-ratio: 1 / 1; }
+  .art-collage .frame.type-tall   { aspect-ratio: 1 / 1.236; }
+  .art-collage .frame.type-wide   { aspect-ratio: 1.236 / 1; }
+  /* 右列（通し番号が奇数）を下げる。
+     transform はリビール演出（.frame.flipped）が使っていて競合するため、
+     position:relative + top で見た目だけずらす（段の高さは動かない）。 */
+  .art-collage .frame[data-order="1"],
+  .art-collage .frame[data-order="3"],
+  .art-collage .frame[data-order="5"] {
+    top: var(--art-offset);
   }
   .art-collage .frame[data-order="6"] { display: none; }
   /* COLLECTOR モバイル: 2列×3行=6社のみ */
@@ -1405,7 +1418,8 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
   .founder-portraits { gap: 14px !important; }
   .founder-portrait { aspect-ratio: 3/4 !important; }
   .stats-row { flex-direction: column !important; }
-  .art-collage { --art-unit: 26vw !important; --art-gap: 8px !important; padding: 12px !important; }
+  /* 下の余白は右列を下げたぶんを残す（打ち消すと最後のタイルがはみ出す）。 */
+  .art-collage { --art-gap: 8px !important; padding: 12px 12px calc(12px + var(--art-offset)) !important; }
   .carousel-wrap { padding: 0 16px !important; }
   .ticker-item { padding-left: 18px !important; padding-right: 18px !important; }
   .contact-menu { min-width: 200px !important; }
