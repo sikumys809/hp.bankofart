@@ -75,7 +75,12 @@ while ( have_posts() ) :
 	$show_body           = ( 'interview' === $layout )
 		? bankofart_should_show_section( '', $qa_rows, $jid )
 		: bankofart_should_show_section( '', $sections, $jid );
-	$show_related_artist = bankofart_should_show_section( 'journal_show_related_artist', $rel_artists, $jid );
+	// インタビューでは1人目を導入文の直下にプロフィール付きで出すので、
+	// ページ下部の RELATED ARTIST は2人目以降だけにする（同じ人が2回出るのを防ぐ）。
+	$is_interview_body = ( $show_body && 'interview' === $layout );
+	$bottom_artists    = ( $is_interview_body && ! empty( $rel_artists ) ) ? array_slice( $rel_artists, 1 ) : $rel_artists;
+
+	$show_related_artist = bankofart_should_show_section( 'journal_show_related_artist', $bottom_artists, $jid );
 	$show_related_art    = bankofart_should_show_section( 'journal_show_related_art', $rel_arts, $jid );
 	$show_more           = bankofart_should_show_section( 'journal_show_more_journal', $more_journal, $jid );
 	$show_cta            = bankofart_should_show_section( 'journal_show_cta', true, $jid );
@@ -197,7 +202,7 @@ while ( have_posts() ) :
 			</div>
 			<div class="artist-grid">
 				<?php
-				foreach ( $rel_artists as $artist ) :
+				foreach ( $bottom_artists as $artist ) :
 					get_template_part(
 						'template-parts/cards/card-artist',
 						null,

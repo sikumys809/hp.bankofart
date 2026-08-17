@@ -48,6 +48,21 @@ if ( empty( $speaker_icon['url'] ) && $lead_artist ) {
 
 $speaker_link = $lead_artist ? get_permalink( $lead_artist->ID ) : '';
 
+// プロフィール枠（200px角）は thumbnail だと荒れるので、同じ絵柄を large で取り直す。
+$speaker_photo = bankofart_get_image( 'journal_speaker_icon', $jid, 'large' );
+if ( empty( $speaker_photo['url'] ) && $lead_artist ) {
+	$speaker_photo = bankofart_get_image( 'artist_main_photo', $lead_artist->ID, 'large' );
+	if ( empty( $speaker_photo['url'] ) && has_post_thumbnail( $lead_artist->ID ) ) {
+		$speaker_photo = array(
+			'url' => get_the_post_thumbnail_url( $lead_artist->ID, 'large' ),
+			'alt' => $speaker_name,
+		);
+	}
+}
+if ( empty( $speaker_photo['url'] ) ) {
+	$speaker_photo = $speaker_icon;
+}
+
 // ---- 聞き手 ----
 $interviewer_name = trim( (string) rwmb_meta( 'journal_interviewer_name', array(), $jid ) );
 if ( '' === $interviewer_name ) {
@@ -93,19 +108,60 @@ $bankofart_render_avatar = static function ( $img, $name, $link = '' ) {
 	<div class="sj-iv-intro rv"><?php echo wp_kses_post( bankofart_enlarge_content_images( $intro ) ); ?></div>
 <?php endif; ?>
 
-<?php if ( '' !== $speaker_name ) : ?>
-	<div class="sj-iv-speakers rv">
-		<div class="sj-iv-speaker">
-			<?php $bankofart_render_avatar( $speaker_icon, $speaker_name, $speaker_link ); ?>
-			<?php if ( '' !== $speaker_role ) : ?>
-				<span class="sj-iv-speaker-role"><?php echo esc_html( $speaker_role ); ?></span>
-			<?php endif; ?>
+<?php
+/*
+ * 話し手のプロフィール（導入文の直後）。
+ * 記事の冒頭で「誰の話なのか」が分かるよう、関連アーティストの写真・名前・
+ * 制作テーマを添える。single-art.php の「この作品を手がけたアーティスト」と
+ * 同じ作りで、リンク先はアーティストの詳細ページ。
+ * 関連アーティストが未設定でも、話し手名だけで最低限の紹介として出す。
+ */
+if ( '' !== $speaker_name ) :
+	$profile_theme = $lead_artist ? (string) rwmb_meta( 'artist_theme_long', '', $lead_artist->ID ) : '';
+	$profile_catch = $lead_artist ? (string) rwmb_meta( 'artist_catch_phrase', '', $lead_artist->ID ) : '';
+	$profile_en    = $lead_artist ? (string) rwmb_meta( 'artist_name_en', '', $lead_artist->ID ) : '';
+	$profile_tag   = $speaker_link ? 'a' : 'div';
+
+	// 英字名が表示名と同じ（TAIKI 等）なら二重表示になるので出さない。
+	if ( 0 === strcasecmp( trim( $profile_en ), trim( $speaker_name ) ) ) {
+		$profile_en = '';
+	}
+	?>
+	<div class="sj-iv-profile rv">
+		<div class="sj-iv-profile-head">
+			<div class="sj-iv-profile-en">RELATED ARTIST</div>
+			<div class="sj-iv-profile-ja">お話を伺ったアーティスト</div>
 		</div>
-		<span class="sj-iv-speakers-x" aria-hidden="true">×</span>
-		<div class="sj-iv-speaker">
-			<?php $bankofart_render_avatar( $interviewer_icon, $interviewer_name ); ?>
-			<span class="sj-iv-speaker-role"><?php esc_html_e( '聞き手', 'bankofart' ); ?></span>
-		</div>
+
+		<<?php echo esc_attr( $profile_tag ); ?> class="sj-iv-profile-card"<?php echo $speaker_link ? ' href="' . esc_url( $speaker_link ) . '"' : ''; ?>>
+			<div class="sj-iv-profile-photo">
+				<span class="sj-iv-profile-photo-inner"<?php if ( ! empty( $speaker_photo['url'] ) ) : ?> style="background-image:url('<?php echo esc_url( $speaker_photo['url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( $speaker_name ); ?>"<?php endif; ?>></span>
+			</div>
+
+			<div class="sj-iv-profile-info">
+				<?php if ( '' !== $profile_en ) : ?>
+					<p class="sj-iv-profile-name-en"><?php echo esc_html( $profile_en ); ?></p>
+				<?php endif; ?>
+
+				<h3 class="sj-iv-profile-name"><?php echo esc_html( $speaker_name ); ?></h3>
+
+				<?php if ( '' !== $speaker_role ) : ?>
+					<p class="sj-iv-profile-role"><?php echo esc_html( $speaker_role ); ?></p>
+				<?php endif; ?>
+
+				<?php if ( '' !== trim( $profile_catch ) ) : ?>
+					<p class="sj-iv-profile-catch"><?php echo esc_html( $profile_catch ); ?></p>
+				<?php endif; ?>
+
+				<?php if ( '' !== trim( wp_strip_all_tags( $profile_theme ) ) ) : ?>
+					<p class="sj-iv-profile-bio"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $profile_theme ), 90, '…' ) ); ?></p>
+				<?php endif; ?>
+
+				<?php if ( $speaker_link ) : ?>
+					<span class="sj-iv-profile-link">プロフィールを見る</span>
+				<?php endif; ?>
+			</div>
+		</<?php echo esc_attr( $profile_tag ); ?>>
 	</div>
 <?php endif; ?>
 
@@ -132,7 +188,6 @@ $bankofart_render_avatar = static function ( $img, $name, $link = '' ) {
 			<div class="sj-iv-turn sj-iv-turn--q rv">
 				<?php $bankofart_render_avatar( $interviewer_icon, $interviewer_name ); ?>
 				<div class="sj-iv-bubble">
-					<span class="sj-iv-mark" aria-hidden="true">Q</span>
 					<p class="sj-iv-q-text"><?php echo nl2br( esc_html( trim( $question ) ) ); ?></p>
 				</div>
 			</div>
@@ -142,7 +197,6 @@ $bankofart_render_avatar = static function ( $img, $name, $link = '' ) {
 			<div class="sj-iv-turn sj-iv-turn--a rv">
 				<?php $bankofart_render_avatar( $speaker_icon, $speaker_name, $speaker_link ); ?>
 				<div class="sj-iv-bubble">
-					<span class="sj-iv-mark" aria-hidden="true">A</span>
 					<?php if ( $has_a ) : ?>
 						<div class="sj-iv-a-text"><?php echo wp_kses_post( bankofart_enlarge_content_images( $answer ) ); ?></div>
 					<?php endif; ?>
