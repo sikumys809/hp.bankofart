@@ -1352,11 +1352,15 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
      余りが出て隙間がバラつく）。
      PCと同じ3種の比率（縦長/正方形/横長）はそのまま使い、
      右カラム全体を少し下げて「バラバラだけど揃ってる」並びにする。
-     左カラム＝1〜3点目 / 右カラム＝4〜6点目、7点目は隠す。 */
+     左カラム＝1〜3点目 / 右カラム＝4〜6点目、7点目は隠す。
+     注意：PC側の .art-collage は縦並び（flex-direction: column）なので、
+     ここで必ず横並びに戻すこと。戻し忘れると .art-row の flex-basis:0 が
+     「高さ0」と解釈され、.art-section の overflow:hidden で丸ごと消える。 */
   .art-collage {
     --art-gap: 10px;
-    --art-offset: 7vw; /* 右カラムを下げる量 */
+    --art-offset: 7vw;
     display: flex;
+    flex-direction: row;
     align-items: flex-start;
     gap: var(--art-gap);
     padding: 16px;
