@@ -14,7 +14,7 @@
 /* ═══ PAGE HERO ═══ */
 .page-hero { padding: 184px 40px 84px; background: var(--paper); text-align: center; }
 .page-hero-title { font-family: var(--f-display); font-size: 96px; font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1; text-transform: uppercase; color: var(--ink); margin-bottom: 16px; }
-.page-hero-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 36px; }
+.page-hero-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 36px; }
 .page-hero-rule { width: 1px; height: 64px; background: var(--border); margin: 0 auto 36px; }
 .page-statement { max-width: 720px; margin: 0 auto; font-family: var(--f-jp); font-size: var(--fs-body); line-height: 2.2; letter-spacing: var(--ls-1); color: var(--ink); }
 
@@ -116,11 +116,11 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .resale-section { padding: 120px 40px; background: var(--ink); color: var(--white); text-align: center; }
 .resale-inner { max-width: 720px; margin: 0 auto; }
 .resale-eyebrow { font-family: var(--f-deco); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--brand); margin-bottom: 28px; }
-.resale-title { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: 400; letter-spacing: 3px; line-height: 1.2; margin-bottom: 36px; color: var(--white); text-transform: uppercase; }
+.resale-title { font-family: var(--f-jp); font-size: var(--fs-heading); font-weight: 400; letter-spacing: 3px; line-height: 1.2; margin-bottom: 36px; color: var(--white); text-transform: uppercase; }
 .resale-body { font-family: var(--f-jp); font-size: var(--fs-body); line-height: 2.1; color: rgba(255,255,255,.8); letter-spacing: 1px; margin-bottom: 48px; }
 /* リセール本文の強調フレーズをブランドカラーに（PC・モバイル共通） */
 .resale-body .rs-em { color: var(--brand); }
-.resale-waitlist-btn { display: inline-block; font-family: var(--f-deco); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); background: var(--brand); border: 1px solid var(--brand); padding: 18px 48px; text-decoration: none; transition: background .3s, border-color .3s; cursor: pointer; }
+.resale-waitlist-btn { display: inline-block; font-family: var(--f-jp); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); background: var(--brand); border: 1px solid var(--brand); padding: 18px 48px; text-decoration: none; transition: background .3s, border-color .3s; cursor: pointer; }
 .resale-waitlist-btn:hover { background: var(--brand-deep); border-color: var(--brand-deep); color: var(--white); }
 @media (max-width: 700px) {
   .resale-section { padding: 72px 20px; }

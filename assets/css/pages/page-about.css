@@ -1165,7 +1165,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 /* 入力エリア */
 .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
 .sim-form { background: #fff; padding: 40px; border: 1px solid var(--border-soft); }
-.sim-form-h { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; color: var(--brand); margin-bottom: 28px; text-transform: uppercase; }
+.sim-form-h { font-family: var(--f-jp); font-size: 13px; letter-spacing: 3px; color: var(--brand); margin-bottom: 28px; text-transform: uppercase; }
 .sim-field { margin-bottom: 24px; }
 .sim-field-label { display: block; font-family: 'Shippori Mincho B1', serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--ink); margin-bottom: 10px; }
 .sim-field-hint { font-family: 'Shippori Mincho B1', serif; font-size: 11px; line-height: 1.6; color: var(--mid); margin-top: 6px; }
@@ -1176,7 +1176,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .sim-slider { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; }
 .sim-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--brand); border-radius: 50%; cursor: pointer; }
 .sim-slider::-moz-range-thumb { width: 18px; height: 18px; background: var(--brand); border-radius: 50%; border: none; cursor: pointer; }
-.sim-slider-value { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--brand); min-width: 60px; text-align: right; }
+.sim-slider-value { font-family: var(--f-jp); font-size: 14px; font-weight: 700; color: var(--brand); min-width: 60px; text-align: right; }
 .sim-toggle-wrap { display: flex; align-items: center; gap: 12px; }
 .sim-toggle { position: relative; width: 44px; height: 24px; background: var(--border); border-radius: 12px; cursor: pointer; transition: background .25s; flex-shrink: 0; }
 .sim-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform .25s; }
@@ -1184,12 +1184,12 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .sim-toggle.is-on::after { transform: translateX(20px); }
 .sim-toggle-label { font-family: 'Shippori Mincho B1', serif; font-size: 13px; color: var(--ink); }
 
-.sim-btn { width: 100%; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 18px; margin-top: 12px; cursor: pointer; transition: background .3s; }
+.sim-btn { width: 100%; font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 18px; margin-top: 12px; cursor: pointer; transition: background .3s; }
 .sim-btn:hover { background: var(--brand-deep); }
 
 /* 結果エリア */
 .sim-result { background: #fff; padding: 40px; border: 1px solid var(--border-soft); }
-.sim-result-h { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; color: var(--brand); margin-bottom: 28px; text-transform: uppercase; }
+.sim-result-h { font-family: var(--f-jp); font-size: 13px; letter-spacing: 3px; color: var(--brand); margin-bottom: 28px; text-transform: uppercase; }
 .sim-result-empty { font-family: 'Shippori Mincho B1', serif; font-size: 14px; line-height: 1.95; color: var(--mid); text-align: center; padding: 60px 0; }
 .sim-result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--border-soft); }
 .sim-result-row:last-of-type { border-bottom: none; }
@@ -1224,7 +1224,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 
 /* ARTを探すCTAボタン */
 .sim-cta-wrap { text-align: center; margin-top: 60px; }
-.sim-cta-btn { display: inline-block; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 18px 56px; text-decoration: none; transition: background .3s, color .3s, border-color .3s; cursor: pointer; }
+.sim-cta-btn { display: inline-block; font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 18px 56px; text-decoration: none; transition: background .3s, color .3s, border-color .3s; cursor: pointer; }
 .sim-cta-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
 @media(max-width:700px){
   .sim-cta-wrap { margin-top: 40px; }

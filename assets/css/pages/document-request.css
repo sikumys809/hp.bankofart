@@ -9,7 +9,7 @@
 .dr-hero-inner { max-width: 920px; margin: 0 auto; display: flex; gap: 48px; align-items: center; justify-content: center; flex-wrap: wrap; }
 .dr-hero-text { flex: 1 1 360px; }
 .dr-hero-eyebrow { font-family: var(--f-deco); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--brand); margin-bottom: 14px; }
-.dr-hero-title { font-family: var(--f-display); font-size: clamp(40px, 6vw, 64px); font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); line-height: 1; margin-bottom: 22px; }
+.dr-hero-title { font-family: var(--f-jp); font-size: clamp(40px, 6vw, 64px); font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); line-height: 1; margin-bottom: 22px; }
 .dr-hero-lead { font-family: var(--f-jp); font-size: var(--fs-body); line-height: 1.95; letter-spacing: 1px; color: var(--mid); }
 
 /* 資料表紙サムネ（A4縦比） */

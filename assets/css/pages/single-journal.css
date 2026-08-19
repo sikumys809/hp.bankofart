@@ -18,7 +18,7 @@
 .single-journal--interview { --sj-col: 1000px; }
 
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: var(--sj-col); margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
+.breadcrumb { max-width: var(--sj-col); margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
@@ -131,7 +131,7 @@ a.sj-iv-profile-card:hover { transform: translateY(-4px); }
 .sj-iv-profile-role { margin-top: 6px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-1); color: var(--mid); }
 .sj-iv-profile-catch { margin-top: 14px; font-family: var(--f-jp); font-size: 15px; font-weight: var(--fw-medium); letter-spacing: var(--ls-1); line-height: 1.7; color: var(--brand-deep); }
 .sj-iv-profile-bio { margin-top: 12px; font-family: var(--f-jp); font-size: var(--fs-min); letter-spacing: var(--ls-1); line-height: 1.95; color: var(--mid); }
-.sj-iv-profile-link { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); }
+.sj-iv-profile-link { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); }
 .sj-iv-profile-link::after { content: ''; width: 18px; height: 1px; background: currentColor; transition: width .25s; }
 a.sj-iv-profile-card:hover .sj-iv-profile-link::after { width: 32px; }
 
@@ -184,12 +184,12 @@ a.sj-iv-avatar:hover { opacity: .72; }
 .sj-related, .sj-more { max-width: 1280px; margin: 0 auto; padding: 96px 40px 0; }
 .sj-related-head { text-align: center; margin-bottom: 48px; }
 .sj-related-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.sj-related-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.sj-related-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .sj-more .news-list { max-width: 1000px; margin: 0 auto; }
 
 /* ═══ BACK LINK ═══ */
 .sj-back { max-width: 1280px; margin: 0 auto; padding: 96px 40px 100px; text-align: center; }
-.sj-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
+.sj-back a { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
 .sj-back a:hover { background: var(--ink); color: var(--white); }
 .sj-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 

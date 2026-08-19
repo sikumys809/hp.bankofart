@@ -12,7 +12,7 @@
 /* .br-pc は base.css に一元化（PC表示・モバイル非表示） */
 
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: 1100px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
+.breadcrumb { max-width: 1100px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
@@ -20,8 +20,8 @@
 /* ═══ HERO ═══ */
 .cs-hero { max-width: 1100px; margin: 0 auto; padding: 44px 40px 88px; text-align: center; }
 .cs-hero-tag { display: inline-block; font-family: var(--f-jp); font-size: var(--fs-body); font-weight: var(--fw-bold); letter-spacing: var(--ls-1); color: var(--white); background: var(--brand); padding: 7px 20px; margin-bottom: 28px; }
-.cs-hero-industry { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 18px; }
-.cs-hero-name { font-family: var(--f-display); font-size: 56px; font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.2; color: var(--ink); margin-bottom: 28px; }
+.cs-hero-industry { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 18px; }
+.cs-hero-name { font-family: var(--f-jp); font-size: 56px; font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.2; color: var(--ink); margin-bottom: 28px; }
 .cs-hero-lead { max-width: 680px; margin: 0 auto; font-family: var(--f-jp); font-size: 22px; font-weight: var(--fw-bold); letter-spacing: var(--ls-1); line-height: 1.85; color: var(--brand); }
 
 /* ═══ HERO VISUAL ═══ */
@@ -43,7 +43,7 @@
 .cs-interview { max-width: 780px; margin: 0 auto; padding: 0 40px 100px; }
 .cs-iv-head { text-align: center; margin-bottom: 56px; }
 .cs-iv-head-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.cs-iv-head-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.cs-iv-head-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .cs-iv-block { margin-bottom: 56px; }
 .cs-iv-block:last-child { margin-bottom: 0; }
 .cs-iv-q { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
@@ -87,7 +87,7 @@
 .cs-work-sec { background: var(--ink); color: var(--white); padding: 100px 40px; }
 .cs-work-head { text-align: center; margin-bottom: 52px; }
 .cs-work-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--white); margin-bottom: 8px; }
-.cs-work-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.cs-work-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .cs-work-card { max-width: 880px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 44px; align-items: center; }
 .cs-work-card + .cs-work-card { margin-top: 56px; }
 /* 迎えた作品は「作品そのもの」を見せる場所なので、切り抜かず全体を出す。
@@ -105,7 +105,7 @@
 .cs-related { max-width: 1200px; margin: 0 auto; padding: 100px 40px; }
 .cs-related-head { text-align: center; margin-bottom: 52px; }
 .cs-related-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.cs-related-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.cs-related-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .cs-related-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 48px 40px; }
 .cs-related-card { display: block; text-align: left; text-decoration: none; transition: transform .4s ease; }
 .cs-related-card:hover { transform: translateY(-6px); }
@@ -122,12 +122,12 @@
 .match-banner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 48px; padding: 54px 64px; position: relative; overflow: hidden; background: var(--dark); text-align: left; }
 .match-banner-left { position: relative; z-index: 2; }
 .match-banner-label { font-family: var(--f-deco); font-size: 12px; font-weight: var(--fw-bold); letter-spacing: var(--ls-3); text-transform: uppercase; display: inline-block; padding: 7px 16px; margin-bottom: 22px; background: var(--brand); color: var(--white); }
-.match-banner-title { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.15; color: var(--white); margin-bottom: 14px; }
+.match-banner-title { font-family: var(--f-jp); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.15; color: var(--white); margin-bottom: 14px; }
 .match-banner-title .accent { color: var(--brand); }
 .match-banner-sub { font-family: var(--f-jp); font-size: 22px; font-weight: var(--fw-bold); letter-spacing: var(--ls-2); line-height: 1.6; color: var(--white); margin-bottom: 14px; }
 .match-banner-body { font-family: var(--f-jp); font-size: var(--fs-body); font-weight: var(--fw-medium); letter-spacing: var(--ls-1); line-height: 1.9; color: rgba(255,255,255,.7); }
 .match-banner-right { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.match-banner-btn { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; padding: 20px 44px; display: inline-flex; align-items: center; gap: 14px; white-space: nowrap; transition: all .3s; background: var(--brand); color: var(--white); }
+.match-banner-btn { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; padding: 20px 44px; display: inline-flex; align-items: center; gap: 14px; white-space: nowrap; transition: all .3s; background: var(--brand); color: var(--white); }
 .match-banner-btn:hover { background: var(--white); color: var(--dark); }
 .match-banner-btn::after { content: ''; width: 8px; height: 8px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: rotate(45deg); }
 .match-banner-meta { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-2); text-transform: uppercase; color: rgba(255,255,255,.55); }
@@ -135,7 +135,7 @@
 
 /* ═══ BACK LINK ═══ */
 .cs-back { max-width: 1200px; margin: 0 auto; padding: 80px 40px 100px; text-align: center; }
-.cs-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
+.cs-back a { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
 .cs-back a:hover { background: var(--ink); color: var(--white); }
 .cs-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 

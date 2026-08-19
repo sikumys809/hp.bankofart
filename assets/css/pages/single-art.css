@@ -14,7 +14,7 @@
 /* .br-pc は base.css に一元化（PC表示・モバイル非表示） */
 
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: 1280px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
+.breadcrumb { max-width: 1280px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
@@ -85,7 +85,7 @@
 .aw-artist-sec { background: var(--paper); padding: 100px 40px; }
 .aw-artist-head { text-align: center; margin-bottom: 48px; }
 .aw-artist-head-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.aw-artist-head-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.aw-artist-head-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .aw-artist-card { max-width: 880px; margin: 0 auto; display: grid; grid-template-columns: 200px 1fr; gap: 40px; align-items: center; background: var(--white); padding: 40px; text-decoration: none; transition: transform .4s ease; }
 .aw-artist-card:hover { transform: translateY(-4px); }
 .aw-artist-photo { width: 100%; aspect-ratio: 1/1; background: var(--warm-gray); overflow: hidden; position: relative; }
@@ -103,7 +103,7 @@
 .aw-owner-inner { max-width: 1000px; margin: 0 auto; }
 .aw-owner-head { text-align: center; margin-bottom: 44px; }
 .aw-owner-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.aw-owner-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.aw-owner-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .aw-owner-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
 .aw-owner-card { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 200px; text-decoration: none; transition: transform .4s ease; }
 .aw-owner-card:hover { transform: translateY(-4px); }
@@ -144,7 +144,7 @@
    （途中で背景が切り替わると帯が途切れて見える）。 */
 .aw-back { background: var(--ink); padding: 0 40px 100px; text-align: center; }
 .aw-back-inner { max-width: 1280px; margin: 0 auto; }
-.aw-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--white); border: 1px solid rgba(255,255,255,.4); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
+.aw-back a { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--white); border: 1px solid rgba(255,255,255,.4); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
 .aw-back a:hover { background: var(--white); color: var(--ink); border-color: var(--white); }
 .aw-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 

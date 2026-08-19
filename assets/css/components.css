@@ -253,7 +253,7 @@
 }
 
 .art-artist {
-	font-family: var(--f-deco);
+	font-family: var(--f-jp);
 	font-size: 12px;
 	letter-spacing: var(--ls-3);
 	text-transform: uppercase;
@@ -614,7 +614,7 @@
 
 .news-card .news-cat {
 	display: block;
-	font-family: var(--f-deco);
+	font-family: var(--f-jp);
 	font-size: 10px;
 	font-weight: var(--fw-bold);
 	letter-spacing: var(--ls-3);
@@ -843,13 +843,13 @@
 .boa-form-errors li { line-height: 1.8; }
 
 .boa-target { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; background: var(--brand-soft); border: 1px solid var(--border-soft); padding: 18px 22px; margin-bottom: 28px; }
-.boa-target-label { font-family: var(--f-deco); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--brand); }
+.boa-target-label { font-family: var(--f-jp); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--brand); }
 .boa-target-value { font-family: var(--f-jp); font-size: var(--fs-body); font-weight: 700; letter-spacing: 1px; color: var(--ink); }
 
 .boa-field { margin-bottom: 26px; }
 .boa-label { display: block; font-family: var(--f-jp); font-size: var(--fs-body); font-weight: 700; letter-spacing: 1px; color: var(--ink); margin-bottom: 10px; }
-.boa-required { display: inline-block; font-family: var(--f-deco); font-size: 11px; letter-spacing: 1px; color: #fff; background: var(--brand); padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
-.boa-optional { display: inline-block; font-family: var(--f-deco); font-size: 11px; letter-spacing: 1px; color: var(--mid); border: 1px solid var(--border); padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+.boa-required { display: inline-block; font-family: var(--f-jp); font-size: 11px; letter-spacing: 1px; color: #fff; background: var(--brand); padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+.boa-optional { display: inline-block; font-family: var(--f-jp); font-size: 11px; letter-spacing: 1px; color: var(--mid); border: 1px solid var(--border); padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
 .boa-input, .boa-textarea { width: 100%; font-family: var(--f-jp); font-size: var(--fs-body); line-height: 1.7; color: var(--ink); background: var(--white); border: 1px solid var(--border); border-radius: 0; padding: 14px 16px; letter-spacing: .5px; transition: border-color .2s; }
 .boa-input:focus, .boa-textarea:focus { outline: none; border-color: var(--brand); }
 .boa-textarea { resize: vertical; min-height: 130px; }
@@ -862,9 +862,9 @@
 .boa-note { font-family: var(--f-jp); font-size: 14px; line-height: 1.85; letter-spacing: .5px; color: var(--mid); margin: 28px 0; }
 
 .boa-form-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-.boa-submit { font-family: var(--f-deco); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 18px 56px; cursor: pointer; transition: background .3s, border-color .3s; }
+.boa-submit { font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 18px 56px; cursor: pointer; transition: background .3s, border-color .3s; }
 .boa-submit:hover { background: var(--brand-deep); border-color: var(--brand-deep); }
-.boa-btn-outline { display: inline-block; font-family: var(--f-deco); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 16px 40px; text-decoration: none; transition: background .3s, color .3s; }
+.boa-btn-outline { display: inline-block; font-family: var(--f-jp); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 16px 40px; text-decoration: none; transition: background .3s, color .3s; }
 .boa-btn-outline:hover { background: var(--ink); color: #fff; }
 
 /* 完了画面 */
@@ -885,7 +885,7 @@
 .boa-radio input[type="radio"] { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--brand); }
 .boa-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .boa-section-divider { border: 0; border-top: 1px solid var(--border-soft); margin: 36px 0; }
-.boa-form-subhead { font-family: var(--f-deco); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--brand); margin: 0 0 20px; }
+.boa-form-subhead { font-family: var(--f-jp); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--brand); margin: 0 0 20px; }
 
 /* ===== モバイル：マッチングバナー3種の見出し階層を改善 =====
  * Artist / Issue / For Artists の全バナーで共通クラス（.match-banner-title /

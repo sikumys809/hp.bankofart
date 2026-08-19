@@ -22,7 +22,7 @@
   margin: 0 0 10px;
 }
 .legal-hero-ja {
-  font-family: var(--f-deco);
+  font-family: var(--f-jp);
   font-size: 13px;
   font-weight: var(--fw-medium);
   letter-spacing: var(--ls-3);
@@ -107,7 +107,7 @@
   text-align: center;
 }
 .legal-back a {
-  font-family: var(--f-deco);
+  font-family: var(--f-jp);
   font-size: 14px;
   font-weight: var(--fw-medium);
   letter-spacing: var(--ls-3);

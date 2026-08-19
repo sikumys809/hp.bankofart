@@ -15,7 +15,7 @@
 .match-hero-title { font-family: 'Cormorant SC', serif; font-size: 72px; font-weight: 400; letter-spacing: 3px; line-height: 1; color: var(--ink); margin-bottom: 14px; }
 .match-hero-ja { font-family: 'Shippori Mincho B1', serif; font-size: 16px; font-weight: 700; letter-spacing: 3px; color: var(--ink); margin-bottom: 36px; }
 .match-hero-lead { max-width: 640px; margin: 0 auto 48px; font-size: 15px; line-height: 2; color: var(--mid); letter-spacing: 1px; }
-.match-start-btn { display: inline-block; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 20px 56px; cursor: pointer; transition: background .3s, border-color .3s; }
+.match-start-btn { display: inline-block; font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: var(--brand); border: 1px solid var(--brand); padding: 20px 56px; cursor: pointer; transition: background .3s, border-color .3s; }
 .match-start-btn:hover { background: var(--brand-deep); border-color: var(--brand-deep); }
 
 /* ── 質問エリア ── */
@@ -52,7 +52,7 @@
 .result-main-cta a { display: inline-block; font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 14px 36px; text-decoration: none; transition: background .3s, color .3s; }
 .result-main-cta a:hover { background: var(--ink); color: #fff; }
 
-.result-sub-h { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 4px; color: var(--brand); text-transform: uppercase; text-align: center; margin-bottom: 24px; }
+.result-sub-h { font-family: var(--f-jp); font-size: 12px; letter-spacing: 4px; color: var(--brand); text-transform: uppercase; text-align: center; margin-bottom: 24px; }
 .result-sub-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 60px; }
 .result-sub-card { background: #fff; padding: 0; border: 1px solid var(--border-soft); text-align: center; transition: border-color .25s, transform .25s; overflow: hidden; display: block; text-decoration: none; }
 .result-sub-card:hover { border-color: var(--brand); transform: translateY(-4px); }
@@ -65,7 +65,7 @@
 .result-sub-card a { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; color: var(--brand); text-decoration: none; }
 
 .result-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.result-actions a, .result-actions button { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; padding: 16px 32px; text-decoration: none; cursor: pointer; transition: all .3s; background: transparent; }
+.result-actions a, .result-actions button { font-family: var(--f-jp); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; padding: 16px 32px; text-decoration: none; cursor: pointer; transition: all .3s; background: transparent; }
 .result-actions .is-secondary { color: var(--ink); border: 1px solid var(--ink); }
 .result-actions .is-secondary:hover { background: var(--ink); color: #fff; }
 .result-actions .is-primary { color: #fff; background: var(--brand); border: 1px solid var(--brand); }

@@ -29,7 +29,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .page-hero{padding:184px 40px 84px;background:var(--paper);text-align:center;}
 .page-hero-title{font-family:'Cormorant SC',serif;font-size:96px;font-weight:400;letter-spacing:3px;line-height:1;color:var(--ink);margin-bottom:16px;}
 @media(max-width:700px){.page-hero-title{font-size:60px;}}
-.page-hero-ja{font-family:'Cinzel',serif;font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--brand);margin-bottom:40px;}
+.page-hero-ja{font-family: var(--f-jp);font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--brand);margin-bottom:40px;}
 .page-statement{max-width:720px;margin:0 auto;font-family:'Shippori Mincho B1',serif;font-size:var(--fs-body);line-height:2.2;color:var(--ink);letter-spacing:1px;}
 .page-statement p+p{margin-top:26px;}
 .page-statement .mid{color:var(--mid);}
@@ -115,7 +115,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .recruit-cta-big-h { font-family: 'Shippori Mincho B1', serif; font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #fff; margin-bottom: 16px; line-height: 1.5; }
 .recruit-cta-big-sub { font-family: 'Shippori Mincho B1', serif; font-size: 15px; letter-spacing: 1px; color: rgba(255,255,255,.85); margin-bottom: 36px; }
 .recruit-cta-btns { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
-.recruit-cta-btn { display: inline-block; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px; padding: 18px 40px; text-decoration: none; transition: background .3s, color .3s, border-color .3s; cursor: pointer; }
+.recruit-cta-btn { display: inline-block; font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; padding: 18px 40px; text-decoration: none; transition: background .3s, color .3s, border-color .3s; cursor: pointer; }
 .recruit-cta-btn.is-primary { background: #fff; color: #01ae84; border: 1px solid #fff; }
 .recruit-cta-btn.is-primary:hover { background: #212121; color: #fff; border-color: #212121; }
 .recruit-cta-btn.is-secondary { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.6); }
@@ -161,12 +161,12 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 
 
 /* 応募資格セクション：詳しい募集要項ボタン */
-.recruit-guidelines-btn { display: inline-block; font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 16px 36px; text-decoration: none; transition: background .3s, color .3s; cursor: pointer; }
+.recruit-guidelines-btn { display: inline-block; font-family: var(--f-jp); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); padding: 16px 36px; text-decoration: none; transition: background .3s, color .3s; cursor: pointer; }
 .recruit-guidelines-btn:hover { background: var(--ink); color: #fff; }
 
 
 .future-card-icon { display: block; width: 96px; height: 96px; object-fit: contain; margin: 0 auto 28px; }
-.future-apply-btn { display: inline-block; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: #01ae84; border: 1px solid #01ae84; padding: 18px 48px; text-decoration: none; transition: background .3s, border-color .3s; cursor: pointer; }
+.future-apply-btn { display: inline-block; font-family: var(--f-jp); font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #fff; background: #01ae84; border: 1px solid #01ae84; padding: 18px 48px; text-decoration: none; transition: background .3s, border-color .3s; cursor: pointer; }
 .future-apply-btn:hover { background: #018c6a; border-color: #018c6a; }
 @media(max-width:700px){
   .future-card-icon { width: 80px; height: 80px; margin: 0 auto 22px; }

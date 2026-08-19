@@ -15,7 +15,7 @@
 /* .br-pc は base.css に一元化（PC表示・モバイル非表示） */
 
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: 1200px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); }
+.breadcrumb { max-width: 1200px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
@@ -77,7 +77,7 @@
 .as-block { margin-bottom: 72px; }
 .as-block:last-child { margin-bottom: 0; }
 .as-block-label { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); margin-bottom: 12px; }
-.as-block-title { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 32px; }
+.as-block-title { font-family: var(--f-jp); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 32px; }
 .as-block-lead { font-family: var(--f-jp); font-size: 22px; font-weight: var(--fw-bold); letter-spacing: var(--ls-1); line-height: 1.85; color: var(--ink); margin-bottom: 24px; }
 .as-block-text { font-family: var(--f-jp); font-size: var(--fs-body); letter-spacing: var(--ls-1); line-height: 2.15; color: var(--ink); }
 .as-block-text p + p { margin-top: 1.6em; }
@@ -110,7 +110,7 @@
 .as-article-inner { max-width: 1100px; margin: 0 auto; }
 .as-article-head { text-align: center; margin-bottom: 48px; }
 .as-article-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--white); margin-bottom: 8px; }
-.as-article-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.as-article-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .as-article-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px 32px; }
 .as-article-card { display: block; text-align: left; text-decoration: none; transition: transform .4s ease; }
 .as-article-card:hover { transform: translateY(-4px); }
@@ -126,11 +126,11 @@
 .match-banner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 48px; padding: 54px 64px; position: relative; overflow: hidden; background: var(--brand); text-align: left; }
 .match-banner-left { position: relative; z-index: 2; }
 .match-banner-label { font-family: var(--f-deco); font-size: 12px; font-weight: var(--fw-bold); letter-spacing: var(--ls-3); text-transform: uppercase; display: inline-block; padding: 7px 16px; margin-bottom: 22px; background: var(--white); color: var(--brand); }
-.match-banner-title { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.15; color: var(--white); margin-bottom: 14px; }
+.match-banner-title { font-family: var(--f-jp); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); line-height: 1.15; color: var(--white); margin-bottom: 14px; }
 .match-banner-sub { font-family: var(--f-jp); font-size: 22px; font-weight: var(--fw-bold); letter-spacing: var(--ls-2); line-height: 1.6; color: var(--white); margin-bottom: 14px; }
 .match-banner-body { font-family: var(--f-jp); font-size: var(--fs-body); font-weight: var(--fw-medium); letter-spacing: var(--ls-1); line-height: 1.9; color: rgba(255,255,255,.85); }
 .match-banner-right { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.match-banner-btn { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; padding: 20px 44px; display: inline-flex; align-items: center; gap: 14px; white-space: nowrap; transition: all .3s; background: var(--ink); color: var(--white); }
+.match-banner-btn { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; padding: 20px 44px; display: inline-flex; align-items: center; gap: 14px; white-space: nowrap; transition: all .3s; background: var(--ink); color: var(--white); }
 .match-banner-btn:hover { background: var(--white); color: var(--brand); }
 .match-banner-btn::after { content: ''; width: 8px; height: 8px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: rotate(45deg); }
 .match-banner-meta { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-2); text-transform: uppercase; color: rgba(255,255,255,.85); }
@@ -139,7 +139,7 @@
 /* ═══ BACK LINK ═══ */
 .as-back { background: var(--ink); padding: 0 40px 100px; text-align: center; }
 .as-back-inner { max-width: 1200px; margin: 0 auto; }
-.as-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--white); border: 1px solid rgba(255,255,255,.5); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
+.as-back a { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--white); border: 1px solid rgba(255,255,255,.5); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; }
 .as-back a:hover { background: var(--white); color: var(--ink); }
 .as-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 

@@ -13,7 +13,7 @@
 .boa-num { font-family: var(--f-jp); font-weight: var(--fw-medium); }
 
 /* ═══ BREADCRUMB ═══ */
-.breadcrumb { max-width: 820px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-deco); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
+.breadcrumb { max-width: 820px; margin: 0 auto; padding: 120px 40px 0; display: flex; gap: 10px; font-family: var(--f-jp); font-size: 13px; letter-spacing: var(--ls-2); text-transform: uppercase; color: var(--mid); flex-wrap: wrap; }
 .breadcrumb a { transition: color .2s; }
 .breadcrumb a:hover { color: var(--brand); }
 .breadcrumb .sep { color: var(--border); }
@@ -98,12 +98,12 @@
 .sn-related, .sn-more { max-width: 1280px; margin: 0 auto; padding: 96px 40px 0; }
 .sn-related-head { text-align: center; margin-bottom: 48px; }
 .sn-related-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
-.sn-related-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.sn-related-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
 .sn-more .news-list { max-width: 1000px; margin: 0 auto; }
 
 /* ═══ BACK LINK ═══ */
 .sn-back { max-width: 1280px; margin: 0 auto; padding: 96px 40px 100px; text-align: center; }
-.sn-back a { font-family: var(--f-deco); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
+.sn-back a { font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 18px 44px; display: inline-flex; align-items: center; gap: 12px; transition: all .25s; text-decoration: none; }
 .sn-back a:hover { background: var(--ink); color: var(--white); }
 .sn-back a::before { content: ''; width: 8px; height: 8px; border-left: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg); }
 

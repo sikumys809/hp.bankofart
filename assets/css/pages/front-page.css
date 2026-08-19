@@ -377,7 +377,7 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
 }
 .frame:hover .frame-label { transform: translateY(0); }
 .frame-label-no { font-family: var(--f-deco); font-size:9px; font-weight:700; letter-spacing: 3px; color:var(--brand); text-transform:uppercase; }
-.frame-label-name { font-family: var(--f-display); font-size:14px; font-weight:500; color:var(--white); line-height:1.3; margin-top:4px; letter-spacing: .04em; }
+.frame-label-name { font-family: var(--f-jp); font-size:14px; font-weight:500; color:var(--white); line-height:1.3; margin-top:4px; letter-spacing: .04em; }
 .frame-label-artist { font-family: var(--f-jp); font-size:11px; font-weight:600; letter-spacing:.12em; color:rgba(255,255,255,.7); margin-top:3px; }
 
 /* ART配置：4列×2行 */
@@ -1253,7 +1253,7 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
 .nt4 { background:linear-gradient(135deg,#405040 0%,#70a070 100%); }
 .news-body { padding:24px 24px 28px; }
 .news-cat {
-  font-family: var(--f-deco);
+  font-family: var(--f-jp);
   font-size:10px; font-weight:700;
   letter-spacing: 3px;
   color:var(--brand);
