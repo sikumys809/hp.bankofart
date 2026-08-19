@@ -79,10 +79,13 @@ function bankofart_handle_artist_application() {
 	// 9) GAS Web App へ POST（テキスト＋Base64画像）。成否は記録のみ（取りこぼしはメールで担保）。
 	$gas_ok = bankofart_artist_app_post_to_gas( $text, $images );
 
-	// 10) info@ へバックアップ通知メール（GAS成否に関わらず必ず送る）。
+	// 10) 申請者本人へ受付の自動返信（失敗しても申請は成立させる）。
+	bankofart_artist_app_send_user_mail( $text, $images );
+
+	// 11) info@ へバックアップ通知メール（GAS成否に関わらず必ず送る）。
 	bankofart_artist_app_send_backup_mail( $text, $images, $gas_ok );
 
-	// 11) 完了画面へ PRG リダイレクト（二重送信防止）。
+	// 12) 完了画面へ PRG リダイレクト（二重送信防止）。
 	$thanks_key = 'boa_aa_done_' . wp_generate_password( 12, false );
 	set_transient(
 		$thanks_key,
@@ -430,6 +433,69 @@ function bankofart_artist_app_post_to_gas( $text, $images ) {
 	// 成功判定は厳密に {"ok":true}。GAS のエラーHTML（HTTP 200）は失敗扱い。
 	$data = json_decode( $resp_body, true );
 	return ( is_array( $data ) && ! empty( $data['ok'] ) );
+}
+
+/**
+ * 申請者本人への自動返信メール。
+ *
+ * こちらは選考（画家応募）ではなく、公開プロフィールの登録申請なので、
+ * 「審査の合否」ではなく「内容確認のうえ担当者から連絡」という案内にする。
+ * 本名・住所・口座情報を預かるフォームなので、それらが公開されない点だけ明記する。
+ * 「掲載前に本人確認する」といった運用の約束は書かない（運用が縛られるため）。
+ *
+ * @param array $text   テキスト項目。
+ * @param array $images 画像（受領枚数の記載用）。
+ * @return bool 送信成功なら true。
+ */
+function bankofart_artist_app_send_user_mail( $text, $images ) {
+	$to = isset( $text['email'] ) ? trim( (string) $text['email'] ) : '';
+	if ( ! is_email( $to ) ) {
+		return false;
+	}
+
+	$headers = function_exists( 'bankofart_mail_headers' ) ? bankofart_mail_headers() : array( 'Content-Type: text/plain; charset=UTF-8' );
+	$subject = '【BANK OF ART】ご申請ありがとうございます';
+
+	$work_n = isset( $images['work'] ) ? count( (array) $images['work'] ) : 0;
+	$main_n = ! empty( $images['main'] ) ? 1 : 0;
+	$sym_n  = ! empty( $images['symbol'] ) ? 1 : 0;
+
+	$lines = array(
+		$text['name_sei'] . ' ' . $text['name_mei'] . ' 様',
+		'',
+		'このたびは BANK OF ART へ公認画家のご申請をいただき、誠にありがとうございます。',
+		'以下の内容で申請を受け付けいたしました。',
+		'',
+		'────────────────────────',
+		' 受付内容',
+		'────────────────────────',
+		'お名前　　：' . $text['name_sei'] . ' ' . $text['name_mei'],
+		'活動名　　：' . $text['artist_name'],
+		'メール　　：' . $text['email'],
+		'制作テーマ：' . $text['theme_short'],
+		'ご提出画像：メイン ' . $main_n . '点 ／ シンボル ' . $sym_n . '点 ／ 制作風景 ' . $work_n . '点',
+		'',
+		'────────────────────────',
+		' 今後の流れ',
+		'────────────────────────',
+		'いただいた内容を確認のうえ、担当者より2〜4週間程度を目安にご連絡いたします。',
+		'内容の確認や追加のご相談で、こちらからお伺いすることがあります。',
+		'',
+		'※ 本名・ご住所・口座情報などが公開されることはありません。',
+		'',
+		'※ 期間を過ぎても連絡が確認できない場合は、迷惑メールフォルダをご確認のうえ、',
+		'　 本メールへご返信ください。',
+		'',
+		'ご不明な点がございましたら、本メールへご返信ください。',
+		'',
+		'────────────────────────',
+		'BANK of ART　絵描きの明日を創出する。',
+		home_url( '/' ),
+		'株式会社シクミーズ',
+		'────────────────────────',
+	);
+
+	return wp_mail( $to, $subject, implode( "\n", $lines ), $headers );
 }
 
 /**

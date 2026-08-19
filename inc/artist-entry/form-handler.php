@@ -75,6 +75,9 @@ function bankofart_handle_artist_entry() {
 	// 応募用 GAS へ POST。
 	$gas_ok = bankofart_artist_entry_post_to_gas( $text, $pdf );
 
+	// 応募者本人へ受付の自動返信（失敗しても応募は成立させる）。
+	bankofart_artist_entry_send_user_mail( $text, $pdf );
+
 	// info@ へバックアップ通知（GAS成否に関わらず必ず送る）。
 	bankofart_artist_entry_send_backup_mail( $text, $pdf, $gas_ok );
 
@@ -317,6 +320,71 @@ function bankofart_artist_entry_post_to_gas( $text, $pdf ) {
 
 	$data = json_decode( $resp_body, true );
 	return ( is_array( $data ) && ! empty( $data['ok'] ) );
+}
+
+/**
+ * 応募者本人への自動返信メール。
+ *
+ * 募集要項（画家募集要項 v1.0）に沿った案内にする。
+ *   - 書類審査の結果は応募から2〜4週間程度、合否を問わず必ず連絡する
+ *   - 通知が届かない場合は迷惑メールフォルダを確認してもらう
+ *   - 選考フローは 応募 → 書類審査 → 面接 → BOA登録画家
+ * 受け付けた内容は控えとして要点のみ返す（ポートフォリオは添付し直さない）。
+ *
+ * @param array      $text テキスト項目。
+ * @param array|null $pdf  ポートフォリオPDF（受領の記載用）。
+ * @return bool 送信成功なら true。
+ */
+function bankofart_artist_entry_send_user_mail( $text, $pdf ) {
+	$to = isset( $text['email'] ) ? trim( (string) $text['email'] ) : '';
+	if ( ! is_email( $to ) ) {
+		return false;
+	}
+
+	$headers = function_exists( 'bankofart_mail_headers' ) ? bankofart_mail_headers() : array( 'Content-Type: text/plain; charset=UTF-8' );
+	$subject = '【BANK OF ART】ご応募ありがとうございます';
+
+	$lines = array(
+		$text['name'] . ' 様',
+		'',
+		'このたびは BANK OF ART の画家募集にご応募いただき、誠にありがとうございます。',
+		'以下の内容で応募を受け付けいたしました。',
+		'',
+		'────────────────────────',
+		' 受付内容',
+		'────────────────────────',
+		'お名前　　　：' . $text['name'],
+		'アーティスト名：' . $text['artist_name'],
+		'メール　　　：' . $text['email'],
+		'ポートフォリオ：' . ( $pdf ? '受領しました（' . $pdf['name'] . '）' : '未提出' ),
+		'',
+		'────────────────────────',
+		' 今後の流れ',
+		'────────────────────────',
+		'1. 書類審査（BANK OF ART による審査）',
+		'2. 面接（オンラインまたは対面／30〜60分程度）',
+		'3. BOA登録画家としてご活動開始',
+		'',
+		'書類審査の結果は、ご応募から2〜4週間程度を目安に、',
+		'合否を問わず必ずメールにてご連絡いたします。',
+		'今しばらくお待ちくださいますようお願いいたします。',
+		'',
+		'※ 期間を過ぎても通知が確認できない場合は、迷惑メールフォルダをご確認のうえ、',
+		'　 本メールへご返信ください。',
+		'',
+		'募集要項はこちらからご確認いただけます。',
+		bankofart_recruit_guidelines_pdf_url(),
+		'',
+		'ご不明な点がございましたら、本メールへご返信ください。',
+		'',
+		'────────────────────────',
+		'BANK of ART　絵描きの明日を創出する。',
+		home_url( '/' ),
+		'株式会社シクミーズ',
+		'────────────────────────',
+	);
+
+	return wp_mail( $to, $subject, implode( "\n", $lines ), $headers );
 }
 
 /**
