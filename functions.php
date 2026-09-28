@@ -65,6 +65,7 @@ $bankofart_includes = array(
 	'inc/collection-sync/artist-import.php', // コレクション同期：アーティストのWP取り込み
 	'inc/collection-sync/top-picks.php',     // コレクション同期：TOP表示作品の選択
 	'inc/collection-sync/admin.php',         // コレクション同期：管理画面・月1Cron
+	'inc/collection-sync/retire-art.php',    // WPのARTページ撤廃：collection へ転送
 );
 
 foreach ( $bankofart_includes as $bankofart_file ) {

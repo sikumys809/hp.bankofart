@@ -36,9 +36,11 @@ $bankofart_nav_items = array(
 		'url' => home_url( '/artist/' ),
 	),
 	array(
-		'en'  => 'ART',
-		'ja'  => '作品一覧',
-		'url' => home_url( '/art/' ),
+		'en'       => 'ART',
+		'ja'       => '作品一覧',
+		// 作品はコレクションサイトが正。別サイトなので新しいタブで開く。
+		'url'      => bankofart_collection_arts_url(),
+		'external' => true,
 	),
 	array(
 		'en'  => 'COLLECTOR',
@@ -84,7 +86,7 @@ $bankofart_nav_items = array(
 <nav class="h-drawer" id="drawer" aria-label="<?php esc_attr_e( 'グローバルナビゲーション', 'bankofart' ); ?>">
 	<div class="h-drawer-inner">
 		<?php foreach ( $bankofart_nav_items as $bankofart_item ) : ?>
-			<a href="<?php echo esc_url( $bankofart_item['url'] ); ?>">
+			<a href="<?php echo esc_url( $bankofart_item['url'] ); ?>"<?php echo empty( $bankofart_item['external'] ) ? '' : ' target="_blank" rel="noopener"'; ?>>
 				<span class="en"><?php echo esc_html( $bankofart_item['en'] ); ?></span>
 				<span class="ja"><?php echo esc_html( $bankofart_item['ja'] ); ?></span>
 			</a>

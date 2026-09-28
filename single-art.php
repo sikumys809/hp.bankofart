@@ -147,7 +147,7 @@ while ( have_posts() ) :
 	<nav class="breadcrumb" aria-label="breadcrumb">
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>">HOME</a>
 		<span class="sep">/</span>
-		<a href="<?php echo esc_url( get_post_type_archive_link( 'art' ) ); ?>">ART</a>
+		<a href="<?php echo esc_url( bankofart_collection_arts_url() ); ?>">ART</a>
 		<span class="sep">/</span>
 		<span><?php echo esc_html( $title ); ?></span>
 	</nav>
@@ -398,7 +398,7 @@ while ( have_posts() ) :
 	<!-- ════════ BACK LINK ════════ -->
 	<div class="aw-back">
 		<div class="aw-back-inner">
-			<a href="<?php echo esc_url( get_post_type_archive_link( 'art' ) ); ?>">作品一覧へ戻る</a>
+			<a href="<?php echo esc_url( bankofart_collection_arts_url() ); ?>">作品一覧へ戻る</a>
 		</div>
 	</div>
 

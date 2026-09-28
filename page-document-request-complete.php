@@ -25,7 +25,7 @@ if ( '' !== $token ) {
 }
 $download_url = $valid ? add_query_arg( 'boa_pdf_download', rawurlencode( $token ), home_url( '/' ) ) : '';
 $briefing_url = bankofart_briefing_url(); // 説明会予約（現状は外部URL。後で自前ページに差し替え予定）。
-$art_archive  = get_post_type_archive_link( 'art' );
+$art_archive  = bankofart_collection_arts_url();
 ?>
 
 <main id="main" class="site-main boa-form-page document-request-complete">
@@ -52,7 +52,7 @@ $art_archive  = get_post_type_archive_link( 'art' );
 			<div class="boa-form-actions">
 				<!-- 説明会予約ページは後で自前実装。現状は /online-briefing/（ヘルパー）への導線 -->
 				<a href="<?php echo esc_url( $briefing_url ); ?>" target="_blank" rel="noopener" class="boa-btn-outline">オンライン説明会を予約する</a>
-				<a href="<?php echo esc_url( $art_archive ); ?>" class="boa-btn-outline">作品一覧を見る</a>
+				<a href="<?php echo esc_url( $art_archive ); ?>" class="boa-btn-outline" target="_blank" rel="noopener">作品一覧を見る</a>
 			</div>
 
 			<p class="boa-note">ご不明点は、メールへのご返信またはお問い合わせフォームよりお気軽にどうぞ。</p>

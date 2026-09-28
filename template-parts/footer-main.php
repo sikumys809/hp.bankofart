@@ -55,8 +55,10 @@ $bankofart_foot_nav = array(
 		'url'   => home_url( '/artist/' ),
 	),
 	array(
-		'label' => '作品',
-		'url'   => home_url( '/art/' ),
+		'label'    => '作品',
+		// 作品はコレクションサイトが正。別サイトなので新しいタブで開く。
+		'url'      => bankofart_collection_arts_url(),
+		'external' => true,
 	),
 	array(
 		'label' => '画家応援企業',
@@ -91,7 +93,7 @@ $bankofart_foot_nav = array(
 			<div class="foot-col-t">NAVIGATION</div>
 			<ul class="foot-links">
 				<?php foreach ( $bankofart_foot_nav as $bankofart_link ) : ?>
-					<li><a href="<?php echo esc_url( $bankofart_link['url'] ); ?>"><?php echo esc_html( $bankofart_link['label'] ); ?></a></li>
+					<li><a href="<?php echo esc_url( $bankofart_link['url'] ); ?>"<?php echo empty( $bankofart_link['external'] ) ? '' : ' target="_blank" rel="noopener"'; ?>><?php echo esc_html( $bankofart_link['label'] ); ?></a></li>
 				<?php endforeach; ?>
 			</ul>
 		</div>

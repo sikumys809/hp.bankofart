@@ -486,3 +486,15 @@ function bankofart_collection_art_url( $collection_id ) {
 function bankofart_collection_artist_url( $slug ) {
 	return BANKOFART_COLLECTION_URL . '/?artist=' . rawurlencode( $slug );
 }
+
+/**
+ * 作品一覧のURLを返す。
+ *
+ * WPの /art/ アーカイブに代わる「作品を探す」の行き先。
+ * テンプレートからは必ずこれを呼ぶ（リンク先を1か所で変えられるようにするため）。
+ *
+ * @return string
+ */
+function bankofart_collection_arts_url() {
+	return BANKOFART_COLLECTION_URL . '/';
+}

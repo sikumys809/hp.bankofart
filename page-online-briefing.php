@@ -70,7 +70,7 @@ $recaptcha_key = defined( 'BANKOFART_RECAPTCHA_SITE_KEY' ) ? constant( 'BANKOFAR
 			</p>
 			<div class="boa-form-actions">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="boa-btn-outline">トップへ</a>
-				<a href="<?php echo esc_url( get_post_type_archive_link( 'art' ) ); ?>" class="boa-btn-outline">作品一覧を見る</a>
+				<a href="<?php echo esc_url( bankofart_collection_arts_url() ); ?>" class="boa-btn-outline" target="_blank" rel="noopener">作品一覧を見る</a>
 			</div>
 		</div>
 	</section>

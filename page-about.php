@@ -463,7 +463,7 @@ $client_logos = array(
 
 			<!-- ARTを探すCTAボタン -->
 			<div class="sim-cta-wrap rv">
-				<a href="<?php echo esc_url( get_post_type_archive_link( 'art' ) ); ?>" class="sim-cta-btn">ARTを探す</a>
+				<a href="<?php echo esc_url( bankofart_collection_arts_url() ); ?>" class="sim-cta-btn" target="_blank" rel="noopener">ARTを探す</a>
 			</div>
 
 			<!-- 免責 -->

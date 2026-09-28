@@ -44,7 +44,7 @@ $founder_okada_bg   = file_exists( $founder_okada_path )
 
 // アーカイブリンク。
 $artist_archive    = get_post_type_archive_link( 'artist' );
-$art_archive       = get_post_type_archive_link( 'art' );
+$art_archive       = bankofart_collection_arts_url();
 $collector_archive = get_post_type_archive_link( 'collector' );
 $news_archive      = get_post_type_archive_link( 'news' );
 
@@ -259,7 +259,7 @@ $front_news = get_posts(
 		<?php endif; ?>
 
 		<div class="art-cta rv">
-			<a href="<?php echo esc_url( $art_archive ); ?>" class="art-see-all">View All Works →</a>
+			<a href="<?php echo esc_url( $art_archive ); ?>" class="art-see-all" target="_blank" rel="noopener">View All Works →</a>
 		</div>
 	</section>
 

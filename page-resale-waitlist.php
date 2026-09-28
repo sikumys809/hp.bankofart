@@ -57,7 +57,7 @@ if ( ! empty( $err_values ) ) {
 $val = function ( $key ) use ( $err_values ) {
 	return isset( $err_values[ $key ] ) ? $err_values[ $key ] : '';
 };
-$art_archive   = get_post_type_archive_link( 'art' );
+$art_archive   = bankofart_collection_arts_url();
 $privacy_url   = home_url( '/privacy-policy/' );
 ?>
 
@@ -79,7 +79,7 @@ $privacy_url   = home_url( '/privacy-policy/' );
 				ご成約は対面でのご契約となります。
 			</p>
 			<div class="boa-form-actions">
-				<a href="<?php echo esc_url( $art_archive ); ?>" class="boa-btn-outline">作品一覧へ戻る</a>
+				<a href="<?php echo esc_url( $art_archive ); ?>" class="boa-btn-outline" target="_blank" rel="noopener">作品一覧へ戻る</a>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="boa-btn-outline">トップへ</a>
 			</div>
 		</div>
