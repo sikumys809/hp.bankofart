@@ -86,8 +86,25 @@ $bankofart_nav_items = array(
 <nav class="h-drawer" id="drawer" aria-label="<?php esc_attr_e( 'グローバルナビゲーション', 'bankofart' ); ?>">
 	<div class="h-drawer-inner">
 		<?php foreach ( $bankofart_nav_items as $bankofart_item ) : ?>
-			<a href="<?php echo esc_url( $bankofart_item['url'] ); ?>"<?php echo empty( $bankofart_item['external'] ) ? '' : ' target="_blank" rel="noopener"'; ?>>
-				<span class="en"><?php echo esc_html( $bankofart_item['en'] ); ?></span>
+			<?php $bankofart_is_ext = ! empty( $bankofart_item['external'] ); ?>
+			<a href="<?php echo esc_url( $bankofart_item['url'] ); ?>"<?php echo $bankofart_is_ext ? ' target="_blank" rel="noopener"' : ''; ?>>
+				<span class="en">
+					<?php echo esc_html( $bankofart_item['en'] ); ?>
+					<?php if ( $bankofart_is_ext ) : ?>
+						<?php
+						/*
+						 * 別サイト（コレクション）へ出る項目の印。
+						 * 読み上げ用の名前は <title> で持たせる（リンク名は上の文字のまま）。
+						 */
+						?>
+						<svg class="nav-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img">
+							<title><?php esc_html_e( '別タブで開きます', 'bankofart' ); ?></title>
+							<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+							<polyline points="15 3 21 3 21 9" />
+							<line x1="10" y1="14" x2="21" y2="3" />
+						</svg>
+					<?php endif; ?>
+				</span>
 				<span class="ja"><?php echo esc_html( $bankofart_item['ja'] ); ?></span>
 			</a>
 		<?php endforeach; ?>

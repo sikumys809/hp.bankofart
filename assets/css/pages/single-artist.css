@@ -111,7 +111,12 @@
 .as-article-head { text-align: center; margin-bottom: 48px; }
 .as-article-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--white); margin-bottom: 8px; }
 .as-article-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
-.as-article-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px 32px; }
+/* 記事は3列だが、1〜2本しか無い画家が多く左に寄って見える。
+   カード幅は3列のときと同じに保ったまま中央へ寄せたいので、グリッドではなく
+   横並びにして、1枚ぶんの幅を「列数」と「横の間隔」から出す。 */
+.as-article-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px 32px; }
+.as-article-grid > * { flex: 0 0 var(--as-article-w); min-width: 0; }
+.as-article-grid { --as-article-w: calc(33.3333% - 21.333px); } /* 3列・間隔32px */
 .as-article-card { display: block; text-align: left; text-decoration: none; transition: transform .4s ease; }
 .as-article-card:hover { transform: translateY(-4px); }
 .as-article-thumb { width: 100%; aspect-ratio: 3/2; background: var(--warm-gray); overflow: hidden; position: relative; margin-bottom: 18px; }
@@ -160,7 +165,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 
 /* ═══ レスポンシブ ═══ */
 @media (max-width: 900px) {
-	.as-article-grid { grid-template-columns: repeat(2,1fr); gap: 36px 24px; }
+	.as-article-grid { gap: 36px 24px; --as-article-w: calc(50% - 12px); } /* 2列・間隔24px */
 }
 @media (max-width: 860px) {
 	.as-hero { grid-template-columns: 1fr; gap: 40px; }
@@ -187,13 +192,14 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.as-record-list.has-year { column-gap: 10px; }
 }
 @media (max-width: 560px) {
-	.as-article-grid { grid-template-columns: repeat(2,1fr); gap: 28px 14px; }
+	.as-article-grid { gap: 28px 14px; --as-article-w: calc(50% - 7px); } /* 2列・間隔14px */
 }
 @media (max-width: 430px) {
 	.as-hero { grid-template-columns: 1fr; padding: 28px 16px 48px; }
 	.as-hero-thumbs { grid-template-columns: repeat(4,1fr); gap: 8px; }
 	.as-hero-name-ja { font-size: 30px; }
-	.as-works-grid, .as-article-grid { grid-template-columns: repeat(2,1fr); gap: 24px 12px; }
+	.as-works-grid { grid-template-columns: repeat(2,1fr); gap: 24px 12px; }
+	.as-article-grid { gap: 24px 12px; --as-article-w: calc(50% - 6px); } /* 2列・間隔12px */
 	.as-profile { padding: 56px 16px; }
 	.as-works { padding: 56px 16px 28px; }
 	.as-video-sec { padding: 0 16px 56px; }

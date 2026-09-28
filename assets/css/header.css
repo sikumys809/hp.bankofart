@@ -256,12 +256,30 @@ html {
 }
 
 .h-drawer a .en {
-	display: block;
+	/* 別サイトへ出る項目にアイコンを横へ並べるため flex にしている。
+	   アイコンが無い項目は、子がテキストだけなので見え方は block と変わらない。 */
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	font-family: var(--f-display);
 	font-size: clamp(18px, 1.6vw, 22px);
 	font-weight: var(--fw-medium);
 	letter-spacing: var(--ls-3);
 	text-transform: uppercase;
+}
+
+/* 別サイト（コレクション）へ出る印。文字色に追従させる。 */
+.h-drawer a .nav-ext {
+	flex: none;
+	width: 15px;
+	height: 15px;
+	opacity: .6;
+	transition: opacity .25s;
+}
+
+.h-drawer a:hover .nav-ext,
+.h-drawer a:focus-visible .nav-ext {
+	opacity: 1;
 }
 
 .h-drawer a .ja {
