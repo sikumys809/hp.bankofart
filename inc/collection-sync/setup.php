@@ -21,7 +21,7 @@ if ( ! defined( 'BANKOFART_COLLECTION_URL' ) ) {
 }
 
 /** DBスキーマのバージョン（変更時に上げると dbDelta が再実行される）。 */
-define( 'BANKOFART_COLLECTION_DB_VERSION', '1.2.0' );
+define( 'BANKOFART_COLLECTION_DB_VERSION', '1.3.0' );
 
 /**
  * 同期テーブル名を返す。
@@ -38,6 +38,12 @@ function bankofart_collection_table() {
  *
  * collection_id（BOA-2026-00661）を主キーにして、再取得時は同じ行を上書きする。
  * artist_slug に索引を張るのは、アーティストページ・診断で「この画家の作品」を引くため。
+ *
+ * 切り抜き関連の列は2系統ある。
+ *   crop_quad            … 手作業で指定された4点（自由変形）。これが本命で、
+ *                           これを使って作品を起こした画像を自前で生成する。
+ *   crop_left〜crop_height … 上記4点の外接長方形。collection の一覧カードが
+ *                           使っている簡易版で、GDが無い環境での控えとして残す。
  *
  * @return void
  */
@@ -62,6 +68,9 @@ function bankofart_collection_create_table() {
   crop_top DECIMAL(10,4) NULL,
   crop_width DECIMAL(10,4) NULL,
   crop_height DECIMAL(10,4) NULL,
+  source_url TEXT NULL,
+  crop_quad VARCHAR(200) NULL,
+  rect_key VARCHAR(32) NULL,
   sort_order INT NOT NULL DEFAULT 0,
   synced_at DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY  (collection_id),

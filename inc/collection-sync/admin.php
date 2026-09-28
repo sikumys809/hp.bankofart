@@ -92,6 +92,33 @@ function bankofart_collection_handle_sync() {
 add_action( 'admin_post_boa_collection_sync', 'bankofart_collection_handle_sync' );
 
 /**
+ * 切り抜き画像の生成を手で進める受け口。
+ *
+ * @return void
+ */
+function bankofart_collection_handle_rects() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( '権限がありません。', 'bankofart' ) );
+	}
+	check_admin_referer( 'boa_collection_rects' );
+
+	$r = bankofart_collection_build_pending( 40 );
+
+	wp_safe_redirect(
+		add_query_arg(
+			array(
+				'page'   => 'boa-collection-sync',
+				'built'  => (int) $r['built'],
+				'failed' => (int) $r['failed'],
+			),
+			admin_url( 'admin.php' )
+		)
+	);
+	exit;
+}
+add_action( 'admin_post_boa_collection_rects', 'bankofart_collection_handle_rects' );
+
+/**
  * 管理画面を描画する。
  *
  * @return void
@@ -121,6 +148,21 @@ function bankofart_collection_admin_page() {
 						esc_html__( '取得しました：アーティスト %1$d名 / 作品 %2$d点', 'bankofart' ),
 						(int) ( $_GET['artists'] ?? 0 ), // phpcs:ignore WordPress.Security.NonceVerification
 						(int) ( $_GET['arts'] ?? 0 ) // phpcs:ignore WordPress.Security.NonceVerification
+					);
+					?>
+				</p>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( isset( $_GET['built'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
+			<div class="notice notice-success is-dismissible">
+				<p>
+					<?php
+					printf(
+						/* translators: 1: built, 2: failed */
+						esc_html__( '切り抜き画像を %1$d 点 生成しました（失敗 %2$d 点）。', 'bankofart' ),
+						(int) ( $_GET['built'] ?? 0 ), // phpcs:ignore WordPress.Security.NonceVerification
+						(int) ( $_GET['failed'] ?? 0 ) // phpcs:ignore WordPress.Security.NonceVerification
 					);
 					?>
 				</p>
@@ -160,6 +202,34 @@ function bankofart_collection_admin_page() {
 					</td>
 				</tr>
 				<tr>
+					<th><?php esc_html_e( '切り抜き画像', 'bankofart' ); ?></th>
+					<td>
+						<?php
+						$rect = bankofart_collection_rect_status();
+						printf(
+							/* translators: 1: built, 2: total */
+							esc_html__( '%1$d / %2$d 点 生成済み', 'bankofart' ),
+							(int) ( $rect['total'] - $rect['pending'] ),
+							(int) $rect['total']
+						);
+						?>
+						<?php if ( $rect['pending'] > 0 ) : ?>
+							<span style="color:#b32d2e;margin-left:8px;">
+								<?php
+								printf(
+									/* translators: %d: pending count */
+									esc_html__( '未生成 %d 点', 'bankofart' ),
+									(int) $rect['pending']
+								);
+								?>
+							</span>
+						<?php endif; ?>
+						<p class="description" style="margin:4px 0 0;">
+							<?php esc_html_e( 'collection 側の手作業の切り抜き（四隅の指定）をもとに、作品だけを正面から見た形に起こした画像です。', 'bankofart' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
 					<th><?php esc_html_e( '次回の自動取得', 'bankofart' ); ?></th>
 					<td>
 						<?php
@@ -184,14 +254,25 @@ function bankofart_collection_admin_page() {
 			</div>
 		<?php endif; ?>
 
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:8px;">
 			<?php wp_nonce_field( 'boa_collection_sync' ); ?>
 			<input type="hidden" name="action" value="boa_collection_sync">
 			<?php submit_button( __( '今すぐ取得する', 'bankofart' ), 'primary', 'submit', false ); ?>
 			<span class="description" style="margin-left:10px;">
-				<?php esc_html_e( '20ページほど巡回するので、30秒前後かかります。', 'bankofart' ); ?>
+				<?php esc_html_e( '20ページほど巡回するので、30秒前後かかります。切り抜き画像も続けて生成します。', 'bankofart' ); ?>
 			</span>
 		</form>
+
+		<?php if ( $rect['pending'] > 0 ) : ?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<?php wp_nonce_field( 'boa_collection_rects' ); ?>
+				<input type="hidden" name="action" value="boa_collection_rects">
+				<?php submit_button( __( '切り抜き画像の続きを作る', 'bankofart' ), 'secondary', 'submit', false ); ?>
+				<span class="description" style="margin-left:10px;">
+					<?php esc_html_e( '1回で40秒ぶんだけ進みます。残りは5分おきに自動で進みます。', 'bankofart' ); ?>
+				</span>
+			</form>
+		<?php endif; ?>
 
 		<?php
 		/* ── TOPに出す作品の選択（3×2の6点）── */

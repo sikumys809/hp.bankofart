@@ -1441,7 +1441,6 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
     /* 作品のトリミングは「元写真を拡大してずらす」方式なので、
        上の全称セレクタの max-width:100% に潰されると絵が縦に潰れる。
        枠（.art-crop-frame）側で overflow:hidden しているため、はみ出しは外に出ない。 */
-    .art-crop-img { max-width: none !important; }
 }
 
 /* ═══ TOP：ART（3列×2段のカード）═══

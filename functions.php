@@ -61,6 +61,7 @@ $bankofart_includes = array(
 	'inc/artist-entry/form-handler.php',     // 画家応募（選考用）：送信処理（GAS連携＋バックアップメール）
 	'inc/collection-sync/setup.php',         // コレクション同期：テーブル/定数
 	'inc/collection-sync/sync.php',          // コレクション同期：取得・解析・参照ヘルパー
+	'inc/collection-sync/crop.php',          // コレクション同期：作品の切り抜き画像を生成
 	'inc/collection-sync/artist-import.php', // コレクション同期：アーティストのWP取り込み
 	'inc/collection-sync/top-picks.php',     // コレクション同期：TOP表示作品の選択
 	'inc/collection-sync/admin.php',         // コレクション同期：管理画面・月1Cron

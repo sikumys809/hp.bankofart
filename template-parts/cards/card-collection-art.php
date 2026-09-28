@@ -70,31 +70,24 @@ if ( '' !== $price ) {
 
 		<?php
 		/*
-		 * 作品の切り抜きは collection 側で手作業されており、切り抜き済み画像は配信されない。
-		 * 代わりに「枠の縦横比」と「元写真の拡大率・ずらし量」が数値で提供されるので、
-		 * それを同期時に取り込んである。ここで同じ指定を組み立てて、向こうと同じ絵を出す。
-		 * 数値が無い作品（構造変更などで拾えなかった場合）は、写真全体を収めて表示する。
+		 * 作品の切り抜きは collection 側で手作業されており、しかも自由変形
+		 * （四隅を別々に動かす）で指定されている。切り抜き済みの画像は配信されないので、
+		 * その4点を同期時に取り込み、こちらで作品を起こした画像を作って uploads に置いてある。
+		 * ここではその出来上がりを、作品本来の縦横比で並べるだけ。
+		 *
+		 * まだ生成できていない作品（同期直後・GDが無い等）は、写真全体を収めて表示する。
+		 * 切り抜き位置がずれた絵を出すより、そのままの写真を出したほうがましなため。
 		 */
-		$has_crop = ( null !== ( $art['crop_ratio'] ?? null ) && (float) $art['crop_ratio'] > 0 );
+		$rect  = bankofart_collection_rect_url( $art );
+		$ratio = (float) ( $art['crop_ratio'] ?? 0 );
 		?>
-		<?php if ( $has_crop && '' !== $image ) : ?>
+		<?php if ( '' !== $rect && $ratio > 0 ) : ?>
 			<?php
-			/*
-			 * 枠の大きさは、作品の形に応じて縦横どちらかを基準に決める。
-			 *   横長・正方形（比率>=1）… 幅を基準にして高さが決まる
-			 *   縦長（比率<1）        … 高さを基準にして幅が決まる
-			 * 両方を制限すると、はみ出した側が切り詰められて比率が崩れる
-			 * （横長の作品が横に潰れる）。基準を1つにすれば必ず内側に収まる。
-			 */
-			$crop_wide = ( (float) $art['crop_ratio'] >= 1 );
+			// 横長は幅を、縦長は高さを基準にする。基準を1つに決めれば比率は崩れない。
+			$crop_wide = ( $ratio >= 1 );
 			?>
-			<span class="art-crop-frame<?php echo $crop_wide ? ' is-wide' : ''; ?>" style="aspect-ratio:<?php echo esc_attr( (float) $art['crop_ratio'] ); ?>;">
-				<span class="art-crop-img" role="img" aria-label="<?php echo esc_attr( $title ); ?>"
-					style="background-image:url('<?php echo esc_url( $image ); ?>');
-						left:<?php echo esc_attr( (float) $art['crop_left'] ); ?>%;
-						top:<?php echo esc_attr( (float) $art['crop_top'] ); ?>%;
-						width:<?php echo esc_attr( (float) $art['crop_width'] ); ?>%;
-						height:<?php echo esc_attr( (float) $art['crop_height'] ); ?>%;"></span>
+			<span class="art-crop-frame<?php echo $crop_wide ? ' is-wide' : ''; ?>" style="aspect-ratio:<?php echo esc_attr( $ratio ); ?>;">
+				<img class="art-crop-img" src="<?php echo esc_url( $rect ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy" decoding="async">
 			</span>
 		<?php else : ?>
 			<span class="art-image-inner"<?php if ( '' !== $image ) : ?> style="background-image:url('<?php echo esc_url( $image ); ?>');" role="img" aria-label="<?php echo esc_attr( $title ); ?>"<?php endif; ?>></span>

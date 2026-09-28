@@ -58,6 +58,104 @@ function bankofart_collection_fetch_artists() {
 }
 
 /**
+ * ページに埋まっている切り抜き指定（4点）を、元写真のURLをキーにして取り出す。
+ *
+ * Next.js が書き出す受け渡しデータ（画面用のJSON）に、作品ごとに次の3つが入っている。
+ *   aspectRatio … 作品の実寸から来る縦横比。切り抜き後の長方形の形になる。
+ *   url         … 元写真そのもののURL（画面に出ている最適化済みURLとは別）。
+ *   crop.q      … 手作業で指定された4点。左上→右上→右下→左下の順、0〜1の割合。
+ *
+ * 見た目のHTMLに出ている left/top/width/height は、この4点の外接長方形でしかない。
+ * 作品を正面から見た形に起こすには4点のほうが要る。
+ *
+ * 作品によっては q が無く、長方形（x0/x1/y0/y1）だけのこともある。
+ * その場合はその長方形の四隅を4点として扱い、以降の処理を一本化する。
+ *
+ * @param string $html HTML。
+ * @return array 元写真URL => array( 'ratio' => float, 'quad' => array )。
+ */
+function bankofart_collection_parse_crops( $html ) {
+	$re = '~\\\\"aspectRatio\\\\":\\\\"([0-9.]+)\\\\".{0,600}?\\\\"url\\\\":\\\\"(https://[^\\\\"]+)\\\\".{0,300}?\\\\"crop\\\\":\{(.{0,400}?)\}~s';
+	if ( ! preg_match_all( $re, $html, $matches, PREG_SET_ORDER ) ) {
+		return array();
+	}
+
+	$crops = array();
+	foreach ( $matches as $m ) {
+		// 受け渡しデータはJS文字列の中にあるので、まず \" を " に戻してから読む。
+		$crop = json_decode( '{' . str_replace( '\\"', '"', $m[3] ) . '}', true );
+		if ( ! is_array( $crop ) ) {
+			continue;
+		}
+		$quad = bankofart_collection_crop_to_quad( $crop );
+		if ( ! $quad ) {
+			continue;
+		}
+		$crops[ $m[2] ] = array(
+			'ratio' => (float) $m[1],
+			'quad'  => $quad,
+		);
+	}
+	return $crops;
+}
+
+/**
+ * 切り抜き指定を、かならず4点の形にして返す。
+ *
+ * @param array $crop 受け渡しデータの crop オブジェクト。
+ * @return array|null 左上→右上→右下→左下の4点。読めなければ null。
+ */
+function bankofart_collection_crop_to_quad( array $crop ) {
+	// 自由変形（四隅を別々に指定）があればそれが本命。
+	if ( isset( $crop['q'] ) && is_array( $crop['q'] ) && 4 === count( $crop['q'] ) ) {
+		$quad = array();
+		foreach ( $crop['q'] as $point ) {
+			if ( ! is_array( $point ) || 2 !== count( $point ) || ! is_numeric( $point[0] ) || ! is_numeric( $point[1] ) ) {
+				return null;
+			}
+			$quad[] = array( (float) $point[0], (float) $point[1] );
+		}
+		return $quad;
+	}
+
+	// 長方形だけの作品は、その四隅を4点として扱う。
+	$keys = array( 'x0', 'x1', 'y0', 'y1' );
+	foreach ( $keys as $k ) {
+		if ( ! isset( $crop[ $k ] ) || ! is_numeric( $crop[ $k ] ) ) {
+			return null;
+		}
+	}
+	$x0 = (float) $crop['x0'];
+	$x1 = (float) $crop['x1'];
+	$y0 = (float) $crop['y0'];
+	$y1 = (float) $crop['y1'];
+	return array(
+		array( $x0, $y0 ),
+		array( $x1, $y0 ),
+		array( $x1, $y1 ),
+		array( $x0, $y1 ),
+	);
+}
+
+/**
+ * 画面用の画像URLから、元写真のURLを取り出す。
+ *
+ * 一覧の img は /_next/image?url=<元写真URL>&w=…&q=… という中継URLになっている。
+ *
+ * @param string $image_url 画面用のURL。
+ * @return string 取り出せなければ空文字。
+ */
+function bankofart_collection_source_url( $image_url ) {
+	$query = (string) wp_parse_url( $image_url, PHP_URL_QUERY );
+	if ( '' === $query ) {
+		return '';
+	}
+	parse_str( $query, $args );
+	$url = isset( $args['url'] ) ? (string) $args['url'] : '';
+	return ( 0 === strpos( $url, 'http' ) ) ? $url : '';
+}
+
+/**
  * アーティスト1人ぶんのページを解析して作品配列を返す。
  *
  * @param string $html HTML。
@@ -66,6 +164,9 @@ function bankofart_collection_fetch_artists() {
  */
 function bankofart_collection_parse_arts( $html, $slug ) {
 	preg_match_all( '~<a[^>]*href="/art/(BOA-\d{4}-\d{5})"[^>]*>(.*?)</a>~s', $html, $matches, PREG_SET_ORDER );
+
+	// 切り抜きの4点はページ末尾の受け渡しデータ側にあるので、先に全部拾っておく。
+	$crops = bankofart_collection_parse_crops( $html );
 
 	$arts = array();
 	$i    = 0;
@@ -150,6 +251,20 @@ function bankofart_collection_parse_arts( $html, $slug ) {
 			);
 		}
 
+		/*
+		 * 手作業の4点。元写真のURLで突き合わせる（作品名は重複しうるため）。
+		 * 比率もこちらの値を採る。実寸から計算された正確な値で、
+		 * 見た目のHTMLに出ている丸めた値より確か。
+		 */
+		$source = bankofart_collection_source_url( $image );
+		$quad   = null;
+		if ( '' !== $source && isset( $crops[ $source ] ) ) {
+			$quad = wp_json_encode( $crops[ $source ]['quad'] );
+			if ( $crops[ $source ]['ratio'] > 0 ) {
+				$crop['ratio'] = $crops[ $source ]['ratio'];
+			}
+		}
+
 		$arts[ $id ] = array(
 			'collection_id' => $id,
 			'artist_slug'   => $slug,
@@ -164,6 +279,8 @@ function bankofart_collection_parse_arts( $html, $slug ) {
 			'crop_top'      => $crop['top'],
 			'crop_width'    => $crop['width'],
 			'crop_height'   => $crop['height'],
+			'source_url'    => $source,
+			'crop_quad'     => $quad,
 			'sort_order'    => $i++,
 		);
 	}
@@ -214,7 +331,18 @@ function bankofart_collection_sync_all() {
 
 		foreach ( $arts as $a ) {
 			$a['synced_at'] = $now;
-			$wpdb->replace( $table, $a, array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%f', '%f', '%f', '%d', '%s' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			/*
+			 * REPLACE は行を消して入れ直すため、そのままだと生成済み画像の目印
+			 * （rect_key）が毎回消えて、全点を作り直すことになる。持ち越しておく。
+			 * 切り抜き指定が変わっていれば目印と合わなくなるので、そのときだけ作り直る。
+			 */
+			$a['rect_key'] = $wpdb->get_var( $wpdb->prepare( "SELECT rect_key FROM {$table} WHERE collection_id = %s", $a['collection_id'] ) ); // phpcs:ignore WordPress.DB
+
+			$wpdb->replace(
+				$table,
+				$a,
+				array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%f', '%f', '%f', '%s', '%s', '%d', '%s', '%s' )
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$seen[] = $a['collection_id'];
 			$count++;
 		}
@@ -227,6 +355,17 @@ function bankofart_collection_sync_all() {
 		$deleted = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE collection_id NOT IN ({$in})", $seen ) ); // phpcs:ignore WordPress.DB
 	}
 
+	// 消えた作品の生成画像も片付ける。
+	if ( $deleted > 0 ) {
+		bankofart_collection_purge_rects( $seen );
+	}
+
+	/*
+	 * 切り抜き画像を作る。1点あたり1〜2秒かかるので時間を区切り、
+	 * 残りは5分後の単発イベントで続きを進める（build_pending が予約する）。
+	 */
+	$rects = bankofart_collection_build_pending( 40 );
+
 	update_option(
 		'boa_collection_last_sync',
 		array(
@@ -234,7 +373,8 @@ function bankofart_collection_sync_all() {
 			'artists' => count( $slugs ) - count( $errors ),
 			'arts'    => $count,
 			'deleted' => $deleted,
-			'errors'  => $errors,
+			'errors'  => array_merge( $errors, $rects['errors'] ),
+			'rects'   => $rects,
 		),
 		false
 	);
@@ -244,7 +384,36 @@ function bankofart_collection_sync_all() {
 		'arts'    => $count,
 		'deleted' => $deleted,
 		'errors'  => $errors,
+		'rects'   => $rects,
 	);
+}
+
+/**
+ * 残っていない作品の生成画像を削除する。
+ *
+ * @param array $keep 残す collection_id の配列。
+ * @return int 削除した枚数。
+ */
+function bankofart_collection_purge_rects( array $keep ) {
+	$paths = bankofart_collection_rect_dir();
+	if ( is_wp_error( $paths ) ) {
+		return 0;
+	}
+	$files = glob( $paths['dir'] . '/*.jpg' );
+	if ( ! $files ) {
+		return 0;
+	}
+	$keep_files = array();
+	foreach ( $keep as $id ) {
+		$keep_files[ bankofart_collection_rect_filename( $id ) ] = true;
+	}
+	$removed = 0;
+	foreach ( $files as $file ) {
+		if ( ! isset( $keep_files[ basename( $file ) ] ) && unlink( $file ) ) {
+			$removed++;
+		}
+	}
+	return $removed;
 }
 
 /**

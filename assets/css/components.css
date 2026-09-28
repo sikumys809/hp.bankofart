@@ -957,9 +957,10 @@
 
 /* ═══ コレクションサイトの作品カード ═══
    collection.bankof-art.com が配信する写真は、壁に掛けた状態のまま
-   （作品だけを切り抜いた画像は無く、切り抜きは向こうで手作業のため流用できない）。
-   cover で枠いっぱいに敷くと壁ばかりが映るので、collection 本体と同じ
-   「額装のように内側に収める」見せ方に揃える。値は collection の実装から採った。 */
+   （作品だけを切り抜いた画像は無い。切り抜きは向こうで手作業・自由変形のため）。
+   そこで、向こうが持っている切り抜きの4点を取り込んで、作品を正面から見た形に
+   起こした画像をこちらで生成している（inc/collection-sync/crop.php）。
+   ここではその出来上がりを、額装のように内側へ収めて並べる。 */
 .art-card--collection .art-image {
 	aspect-ratio: 1 / 1;
 	background:
@@ -985,12 +986,12 @@
 	width: 78%;
 	height: auto;
 }
-/* 画像：元写真を拡大・移動して、枠の中に作品だけが収まるようにする。
-   left/top/width/height は collection の数値をそのまま出力している。 */
+/* 画像：作品だけを起こした生成画像。枠と同じ形なので、そのまま敷き詰める。 */
 .art-card--collection .art-crop-img {
-	position: absolute;
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: fill;
 }
 .art-card--collection:hover .art-crop-frame { transform: translate(-50%, -50%) scale(1.03); }
 
@@ -1004,8 +1005,3 @@
 	transition: transform .9s ease;
 }
 .art-card--collection:hover .art-image-inner { transform: scale(1.04); }
-
-/* 作品のトリミング画像は意図的に枠より大きく拡大している。
-   ページ別CSSにあるモバイル用の全称セレクタ（max-width:100% !important）に
-   潰されると絵が縦に潰れるため、ここでも明示的に解除しておく。 */
-.art-crop-img { max-width: none; }
