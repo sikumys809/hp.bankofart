@@ -33,7 +33,6 @@ $size    = (string) ( $art['size_label'] ?? '' );
 $price   = (string) ( $art['price'] ?? '' );
 $image   = (string) ( $art['image_url'] ?? '' );
 $is_sold = ! empty( $art['is_sold'] );
-$is_new  = ! empty( $art['is_new'] );
 $url     = bankofart_collection_art_url( $art['collection_id'] );
 
 // 画家名は WP のアーティスト投稿から引く（collection 側の表記ゆれに左右されないため）。
@@ -63,10 +62,6 @@ if ( '' !== $price ) {
 <a class="art-card art-card--collection art-card--<?php echo esc_attr( $context ); ?>" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener">
 	<div class="art-image">
 		<span class="art-status <?php echo $is_sold ? 'is-owned' : 'is-available'; ?>"><?php echo esc_html( $is_sold ? 'SOLD OUT' : 'AVAILABLE' ); ?></span>
-
-		<?php if ( $is_new && ! $is_sold ) : ?>
-			<span class="art-number"><?php esc_html_e( '新着', 'bankofart' ); ?></span>
-		<?php endif; ?>
 
 		<?php
 		/*
