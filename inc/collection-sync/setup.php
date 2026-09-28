@@ -21,7 +21,7 @@ if ( ! defined( 'BANKOFART_COLLECTION_URL' ) ) {
 }
 
 /** DBスキーマのバージョン（変更時に上げると dbDelta が再実行される）。 */
-define( 'BANKOFART_COLLECTION_DB_VERSION', '1.1.0' );
+define( 'BANKOFART_COLLECTION_DB_VERSION', '1.2.0' );
 
 /**
  * 同期テーブル名を返す。
@@ -57,6 +57,11 @@ function bankofart_collection_create_table() {
   image_url TEXT NULL,
   is_new TINYINT(1) NOT NULL DEFAULT 0,
   is_sold TINYINT(1) NOT NULL DEFAULT 0,
+  crop_ratio DECIMAL(10,6) NULL,
+  crop_left DECIMAL(10,4) NULL,
+  crop_top DECIMAL(10,4) NULL,
+  crop_width DECIMAL(10,4) NULL,
+  crop_height DECIMAL(10,4) NULL,
   sort_order INT NOT NULL DEFAULT 0,
   synced_at DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY  (collection_id),

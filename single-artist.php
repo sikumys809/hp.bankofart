@@ -51,7 +51,15 @@ while ( have_posts() ) :
 	$diag_terms = ( ! is_wp_error( $diag_terms ) && $diag_terms ) ? $diag_terms : array();
 
 	// ---- 取得（リレーション） ----
-	$works = bankofart_get_connected( 'artist_to_art', 'from', $artist_id );
+	/*
+	 * WORKS はコレクションサイト（collection.bankof-art.com）の作品を出す。
+	 * 対応づけはアーティストのスラッグのみ。作品名では突き合わせない
+	 * （WP側の作品名は正式名称ではなく、コレクション側が正のため）。
+	 * データは月1回の同期でDBに落としてあるので、表示時に外部通信はしない。
+	 */
+	$works = function_exists( 'bankofart_collection_get_arts_by_artist' )
+		? bankofart_collection_get_arts_by_artist( get_post_field( 'post_name', $artist_id ) )
+		: array();
 
 	$rel_news    = bankofart_get_connected( 'news_to_artist', 'to', $artist_id );
 	$rel_journal = bankofart_get_connected( 'journal_to_artist', 'to', $artist_id );
@@ -387,11 +395,12 @@ while ( have_posts() ) :
 					<?php
 					foreach ( $works as $work ) :
 						get_template_part(
-							'template-parts/cards/card-art',
+							'template-parts/cards/card-collection-art',
 							null,
 							array(
-								'art_id'  => $work->ID,
-								'context' => 'related',
+								'art'         => $work,
+								'context'     => 'related',
+								'show_artist' => false,
 							)
 						);
 					endforeach;
@@ -408,6 +417,21 @@ while ( have_posts() ) :
 					?>
 					<div class="as-works-more" id="asWorksMore">
 						<button type="button" class="archive-loadmore-btn" id="asWorksMoreBtn"><?php echo esc_html__( 'もっと見る', 'bankofart' ); ?></button>
+					</div>
+				<?php endif; ?>
+
+				<?php
+				/*
+				 * コレクションサイトのこの画家の一覧へ。
+				 * カード個別のリンクは作品ページへ飛ぶので、こちらは「全部見る」導線。
+				 */
+				$artist_slug = get_post_field( 'post_name', $artist_id );
+				if ( $artist_slug && function_exists( 'bankofart_collection_artist_url' ) ) :
+					?>
+					<div class="as-works-collection">
+						<a href="<?php echo esc_url( bankofart_collection_artist_url( $artist_slug ) ); ?>" class="as-works-collection-btn" target="_blank" rel="noopener">
+							<?php echo esc_html__( 'コレクションで作品を見る', 'bankofart' ); ?>
+						</a>
 					</div>
 				<?php endif; ?>
 			</div>

@@ -231,3 +231,21 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 .as-works-more { margin-top: 40px; padding-bottom: 24px; text-align: center; }
 .as-works-more .archive-loadmore-btn { color: var(--white); border-color: rgba(255,255,255,.4); }
 .as-works-more .archive-loadmore-btn:hover { background: var(--brand); border-color: var(--brand); color: var(--white); }
+
+/* ── コレクションサイトへの導線（WORKSの下）
+   WORKSセクションは背景が var(--ink) のダークなので、
+   .as-back a（同じくダーク上のボタン）と同じ白系の配色に揃える。 ── */
+.as-works-collection { margin-top: 48px; text-align: center; }
+.as-works-collection-btn {
+	display: inline-flex; align-items: center; gap: 12px;
+	font-family: var(--f-jp); font-size: 14px; font-weight: var(--fw-medium);
+	letter-spacing: var(--ls-3); color: var(--white);
+	border: 1px solid rgba(255, 255, 255, .5); padding: 18px 44px;
+	text-decoration: none; transition: all .25s;
+}
+.as-works-collection-btn::after {
+	content: ''; width: 8px; height: 8px;
+	border-top: 1px solid currentColor; border-right: 1px solid currentColor;
+	transform: rotate(45deg);
+}
+.as-works-collection-btn:hover { background: var(--white); color: var(--ink); border-color: var(--white); }

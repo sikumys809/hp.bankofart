@@ -120,6 +120,36 @@ function bankofart_collection_parse_arts( $html, $slug ) {
 			$image = BANKOFART_COLLECTION_URL . $image;
 		}
 
+		/*
+		 * トリミング情報。collection は作品を手作業で切り抜いており、その結果を
+		 * 「枠の縦横比」と「元写真を何%拡大してどれだけずらすか」という数値で
+		 * マークアップに埋め込んでいる。切り抜き済み画像は配信されないため、
+		 * この数値を取り込んで同じ指定を再現するのが、そのまま持ってくる唯一の方法。
+		 */
+		$crop = array(
+			'ratio'  => null,
+			'left'   => null,
+			'top'    => null,
+			'width'  => null,
+			'height' => null,
+		);
+		/*
+		 * 枠の指定は作品の形で2通りある。
+		 *   縦長 … aspect-ratio:0.85…;height:100%
+		 *   横長・正方形 … aspect-ratio:1;width:100%
+		 * 比率は「1」のように小数点が付かないこともあるので、どちらも拾う。
+		 */
+		if ( preg_match( '~aspect-ratio:([0-9]+(?:\.[0-9]+)?);(?:height|width):100%~', $inner, $ar )
+			&& preg_match( '~position:absolute;left:(-?[0-9.]+)%;top:(-?[0-9.]+)%;width:([0-9.]+)%;height:([0-9.]+)%~', $inner, $cp ) ) {
+			$crop = array(
+				'ratio'  => (float) $ar[1],
+				'left'   => (float) $cp[1],
+				'top'    => (float) $cp[2],
+				'width'  => (float) $cp[3],
+				'height' => (float) $cp[4],
+			);
+		}
+
 		$arts[ $id ] = array(
 			'collection_id' => $id,
 			'artist_slug'   => $slug,
@@ -129,6 +159,11 @@ function bankofart_collection_parse_arts( $html, $slug ) {
 			'image_url'     => $image,
 			'is_new'        => $is_new ? 1 : 0,
 			'is_sold'       => $is_sold ? 1 : 0,
+			'crop_ratio'    => $crop['ratio'],
+			'crop_left'     => $crop['left'],
+			'crop_top'      => $crop['top'],
+			'crop_width'    => $crop['width'],
+			'crop_height'   => $crop['height'],
 			'sort_order'    => $i++,
 		);
 	}
@@ -179,7 +214,7 @@ function bankofart_collection_sync_all() {
 
 		foreach ( $arts as $a ) {
 			$a['synced_at'] = $now;
-			$wpdb->replace( $table, $a, array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->replace( $table, $a, array( '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%f', '%f', '%f', '%d', '%s' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$seen[] = $a['collection_id'];
 			$count++;
 		}
