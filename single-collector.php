@@ -149,7 +149,7 @@ while ( have_posts() ) :
 	// 定番のあとに自由記述を追加する。
 	foreach ( array_filter( (array) rwmb_meta( 'collector_interview_qa' ) ) as $row ) {
 		$answer = isset( $row['qa_answer'] ) ? (string) $row['qa_answer'] : '';
-		if ( '' === trim( wp_strip_all_tags( $answer ) ) ) {
+		if ( bankofart_is_blank_html( $answer ) ) {
 			continue; // 回答が空の行は出さない。
 		}
 
@@ -174,7 +174,7 @@ while ( have_posts() ) :
 
 	$has_any_answer = false;
 	foreach ( $qa_blocks as $blk ) {
-		if ( '' !== trim( wp_strip_all_tags( (string) $blk['a'] ) ) ) {
+		if ( ! bankofart_is_blank_html( (string) $blk['a'] ) ) {
 			$has_any_answer = true;
 			break;
 		}
@@ -279,7 +279,7 @@ while ( have_posts() ) :
 
 				<?php
 				foreach ( $qa_blocks as $blk ) :
-					if ( '' === trim( wp_strip_all_tags( (string) $blk['a'] ) ) ) {
+					if ( bankofart_is_blank_html( (string) $blk['a'] ) ) {
 						continue; // 回答が空のQはブロックごとスキップ.
 					}
 					?>

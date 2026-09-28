@@ -150,7 +150,7 @@ while ( have_posts() ) :
 				$heading = isset( $sec['section_heading'] ) ? $sec['section_heading'] : '';
 				$body    = isset( $sec['section_body'] ) ? $sec['section_body'] : '';
 				$img_ids = ! empty( $sec['section_images'] ) ? (array) $sec['section_images'] : array();
-				if ( '' === trim( (string) $heading ) && '' === trim( wp_strip_all_tags( (string) $body ) ) && empty( $img_ids ) ) {
+				if ( '' === trim( (string) $heading ) && bankofart_is_blank_html( (string) $body ) && empty( $img_ids ) ) {
 					continue;
 				}
 				?>
@@ -159,7 +159,7 @@ while ( have_posts() ) :
 						<h2 class="sj-section-title"><?php echo esc_html( $heading ); ?></h2>
 					<?php endif; ?>
 
-					<?php if ( '' !== trim( wp_strip_all_tags( (string) $body ) ) ) : ?>
+					<?php if ( ! bankofart_is_blank_html( (string) $body ) ) : ?>
 						<div class="sj-section-body"><?php echo wp_kses_post( bankofart_richtext( $body ) ); ?></div>
 					<?php endif; ?>
 

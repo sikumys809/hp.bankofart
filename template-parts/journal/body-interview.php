@@ -153,7 +153,7 @@ if ( '' !== $speaker_name ) :
 					<p class="sj-iv-profile-catch"><?php echo esc_html( $profile_catch ); ?></p>
 				<?php endif; ?>
 
-				<?php if ( '' !== trim( wp_strip_all_tags( $profile_theme ) ) ) : ?>
+				<?php if ( ! bankofart_is_blank_html( $profile_theme ) ) : ?>
 					<p class="sj-iv-profile-bio"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $profile_theme ), 90, '…' ) ); ?></p>
 				<?php endif; ?>
 
@@ -174,7 +174,7 @@ if ( '' !== $speaker_name ) :
 		$img_ids  = ! empty( $row['qa_images'] ) ? (array) $row['qa_images'] : array();
 
 		$has_q = '' !== trim( $question );
-		$has_a = '' !== trim( wp_strip_all_tags( $answer ) );
+		$has_a = ! bankofart_is_blank_html( $answer );
 		if ( ! $has_q && ! $has_a && empty( $img_ids ) && '' === trim( $chapter ) ) {
 			continue;
 		}

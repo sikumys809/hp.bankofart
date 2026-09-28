@@ -98,7 +98,11 @@
 .as-works-head { text-align: center; margin-bottom: 56px; }
 .as-works-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--white); margin-bottom: 8px; }
 .as-works-ja { font-family: var(--f-deco); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
-.as-works-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 48px 32px; }
+/* 作品は3列だが、点数が少ない画家では左に寄って見える。記事一覧と同じく、
+   カード幅は3列のときと同じに保ったまま中央へ寄せる。 */
+.as-works-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 48px 32px; }
+.as-works-grid > * { flex: 0 0 var(--as-works-w); min-width: 0; }
+.as-works-grid { --as-works-w: calc(33.3333% - 21.333px); } /* 3列・間隔32px */
 /* card-art をダーク背景で読めるよう文字色を上書き */
 .as-works-sec .art-title { color: var(--white); }
 .as-works-sec .art-artist { color: rgba(255,255,255,.55); }
@@ -169,7 +173,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 }
 @media (max-width: 860px) {
 	.as-hero { grid-template-columns: 1fr; gap: 40px; }
-	.as-works-grid { grid-template-columns: repeat(2,1fr); }
+	.as-works-grid { --as-works-w: calc(50% - 16px); } /* 2列・間隔32px */
 }
 @media (max-width: 820px) {
 	.match-banner { grid-template-columns: 1fr; gap: 28px; padding: 44px 32px; text-align: center; }
@@ -198,7 +202,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.as-hero { grid-template-columns: 1fr; padding: 28px 16px 48px; }
 	.as-hero-thumbs { grid-template-columns: repeat(4,1fr); gap: 8px; }
 	.as-hero-name-ja { font-size: 30px; }
-	.as-works-grid { grid-template-columns: repeat(2,1fr); gap: 24px 12px; }
+	.as-works-grid { gap: 24px 12px; --as-works-w: calc(50% - 6px); } /* 2列・間隔12px */
 	.as-article-grid { gap: 24px 12px; --as-article-w: calc(50% - 6px); } /* 2列・間隔12px */
 	.as-profile { padding: 56px 16px; }
 	.as-works { padding: 56px 16px 28px; }

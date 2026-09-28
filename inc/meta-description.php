@@ -280,7 +280,7 @@ function bankofart_first_section_body( $post_id, $group_key ) {
 		}
 		$body = (string) $section['section_body'];
 		// タグ・空白を除いて中身があるセクションを採用。
-		if ( '' !== trim( wp_strip_all_tags( $body ) ) ) {
+		if ( ! bankofart_is_blank_html( $body ) ) {
 			return $body;
 		}
 	}

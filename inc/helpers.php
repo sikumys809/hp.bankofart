@@ -135,10 +135,35 @@ function bankofart_should_show_section( $switch_field_id, $data_to_check, $post_
 }
 
 /**
+ * wysiwyg の中身が「実質的に空」かを判定する。
+ *
+ * エディタで一度書いて消すと <p>&nbsp;</p> が残る。タグを外しただけでは
+ * 文字列 "&nbsp;" が残り、trim() では消えないため「入力あり」と誤判定して、
+ * 見出しだけのセクションや回答の無い質問が表示されてしまう。
+ * 実体参照を戻したうえで、空白とみなせる文字（半角・全角・NBSP・ゼロ幅）を
+ * すべて落としてから判定する。
+ *
+ * ※ タグを外して判定するので、画像だけの本文は「空」と扱われる。
+ *    この関数は本文の有無を見るところ専用で、出力の加工には使わない。
+ *
+ * @param string $html 判定対象のHTML。
+ * @return bool 実質的に空なら true。
+ */
+function bankofart_is_blank_html( $html ) {
+	$text = wp_strip_all_tags( (string) $html );
+	$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+	// 壊れた文字コードが混ざると preg_replace が null を返すので、そのときは素の trim に落とす。
+	$stripped = preg_replace( '/[\s\x{00A0}\x{3000}\x{200B}\x{FEFF}]+/u', '', $text );
+
+	return '' === ( null === $stripped ? trim( $text ) : $stripped );
+}
+
+/**
  * フィールド値が「実質的に空でない」かを型に応じて判定する。
  *
  * - 配列        : 要素が1つ以上ある
- * - 文字列      : タグ除去・トリム後に文字が残る（wysiwyg の空 <p></p> 対策）
+ * - 文字列      : タグ除去後に文字が残る（wysiwyg の空 <p>&nbsp;</p> 対策）
  * - 数値        : null でなければ true（0 も値として扱う）
  * - それ以外    : !empty()
  *
@@ -151,7 +176,7 @@ function bankofart_has_value( $value ) {
 	}
 
 	if ( is_string( $value ) ) {
-		return '' !== trim( wp_strip_all_tags( $value ) );
+		return ! bankofart_is_blank_html( $value );
 	}
 
 	if ( is_int( $value ) || is_float( $value ) ) {

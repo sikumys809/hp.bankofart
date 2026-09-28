@@ -131,7 +131,7 @@ while ( have_posts() ) :
 				$body    = isset( $sec['section_body'] ) ? $sec['section_body'] : '';
 				$img_ids = ! empty( $sec['section_images'] ) ? (array) $sec['section_images'] : array();
 				// 空セクション（見出し・本文・画像すべて無し）はスキップ。
-				if ( '' === trim( (string) $heading ) && '' === trim( wp_strip_all_tags( (string) $body ) ) && empty( $img_ids ) ) {
+				if ( '' === trim( (string) $heading ) && bankofart_is_blank_html( (string) $body ) && empty( $img_ids ) ) {
 					continue;
 				}
 				?>
@@ -140,7 +140,7 @@ while ( have_posts() ) :
 						<h2 class="sn-section-title"><?php echo esc_html( $heading ); ?></h2>
 					<?php endif; ?>
 
-					<?php if ( '' !== trim( wp_strip_all_tags( (string) $body ) ) ) : ?>
+					<?php if ( ! bankofart_is_blank_html( (string) $body ) ) : ?>
 						<div class="sn-section-body"><?php echo wp_kses_post( bankofart_richtext( $body ) ); ?></div>
 					<?php endif; ?>
 
