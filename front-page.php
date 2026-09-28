@@ -106,6 +106,30 @@ $front_arts = function_exists( 'bankofart_collection_get_top_arts' )
 	? bankofart_collection_get_top_arts()
 	: array();
 
+// COLLECTOR：画家応援企業の最新12社（ロゴグリッド）。
+$front_collectors = get_posts(
+	array(
+		'post_type'      => 'collector',
+		'post_status'    => 'publish',
+		'posts_per_page' => 12,
+		'orderby'        => array(
+			'menu_order' => 'ASC',
+			'date'       => 'DESC',
+		),
+	)
+);
+
+// NEWS：最新4件（公開日降順）。card-news を context='top'（縦カード）で出力。
+$front_news = get_posts(
+	array(
+		'post_type'      => 'news',
+		'post_status'    => 'publish',
+		'posts_per_page' => 4,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+	)
+);
+
 ?>
 
 <main id="main" class="front-page">
