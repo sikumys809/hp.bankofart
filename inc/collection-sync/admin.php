@@ -242,6 +242,18 @@ function bankofart_collection_admin_page() {
 			</tbody>
 		</table>
 
+		<?php if ( ! empty( $last['empty'] ) ) : ?>
+			<p class="description" style="max-width:720px;">
+				<?php
+				printf(
+					/* translators: %s: artist slugs */
+					esc_html__( '※ 作品を1点も出していない作家： %s（登録だけの状態。放置で問題ありません）', 'bankofart' ),
+					esc_html( implode( '、', (array) $last['empty'] ) )
+				);
+				?>
+			</p>
+		<?php endif; ?>
+
 		<?php if ( ! empty( $last['errors'] ) ) : ?>
 			<div class="notice notice-warning">
 				<p><strong><?php esc_html_e( '前回の取得で問題がありました', 'bankofart' ); ?></strong></p>

@@ -44,14 +44,29 @@ function bankofart_collection_fetch( $path ) {
 /**
  * コレクションサイトのアーティストスラッグ一覧を取得する。
  *
+ * アーティスト一覧ページ（/artist）の各プロフィールへのリンクから拾う。
+ * トップの作家アイコンから拾う方法も試したが、スラッグが入っていない作家がいて
+ * （href が "/?artist=" のまま）取りこぼすため、一覧ページを正とする。
+ * 一覧ページが取れなかったときだけ、トップから拾う方法に落とす。
+ *
  * @return array|WP_Error スラッグの配列。
  */
 function bankofart_collection_fetch_artists() {
+	$html = bankofart_collection_fetch( '/artist' );
+	if ( ! is_wp_error( $html ) ) {
+		preg_match_all( '~/artist/([A-Za-z0-9-]+)~', $html, $m );
+		$slugs = array_values( array_unique( array_filter( $m[1] ) ) );
+		if ( $slugs ) {
+			sort( $slugs );
+			return $slugs;
+		}
+	}
+
 	$html = bankofart_collection_fetch( '/' );
 	if ( is_wp_error( $html ) ) {
 		return $html;
 	}
-	preg_match_all( '~/\?artist=([a-z0-9-]+)~', $html, $m );
+	preg_match_all( '~/\?artist=([A-Za-z0-9-]+)~', $html, $m );
 	$slugs = array_values( array_unique( array_filter( $m[1] ) ) );
 	sort( $slugs );
 	return $slugs;
@@ -316,6 +331,8 @@ function bankofart_collection_sync_all() {
 	$seen   = array();
 	$count  = 0;
 
+	$empty = array();
+
 	foreach ( $slugs as $slug ) {
 		$html = bankofart_collection_fetch( '/?artist=' . rawurlencode( $slug ) );
 		if ( is_wp_error( $html ) ) {
@@ -324,8 +341,27 @@ function bankofart_collection_sync_all() {
 		}
 
 		$arts = bankofart_collection_parse_arts( $html, $slug );
+
+		/*
+		 * 作品一覧の絞り込み（/?artist=）が効かない作家がいる。
+		 * （スラッグがUUIDのまま等、向こうのデータの都合。森田さんがこれ）
+		 * そのときはプロフィールページから拾う。こちらは全員ぶん揃っている。
+		 * ただし「新着」バッジが出ない作りなので、絞り込みが効くならそちらを優先する。
+		 */
 		if ( ! $arts ) {
-			$errors[] = $slug . '： 作品が0点（ページ構造が変わった可能性）';
+			$profile = bankofart_collection_fetch( '/artist/' . rawurlencode( $slug ) );
+			if ( ! is_wp_error( $profile ) ) {
+				$arts = bankofart_collection_parse_arts( $profile, $slug );
+			}
+		}
+
+		/*
+		 * 作品を1点も出していない作家は普通にいる（登録だけの状態）。
+		 * これを失敗として数えると、消えた作品の削除が毎回止まってしまうので
+		 * エラーではなく「作品なし」として記録するにとどめる。
+		 */
+		if ( ! $arts ) {
+			$empty[] = $slug;
 			continue;
 		}
 
@@ -370,20 +406,22 @@ function bankofart_collection_sync_all() {
 		'boa_collection_last_sync',
 		array(
 			'at'      => $now,
-			'artists' => count( $slugs ) - count( $errors ),
+			'artists' => count( $slugs ) - count( $errors ) - count( $empty ),
 			'arts'    => $count,
 			'deleted' => $deleted,
 			'errors'  => array_merge( $errors, $rects['errors'] ),
+			'empty'   => $empty,
 			'rects'   => $rects,
 		),
 		false
 	);
 
 	return array(
-		'artists' => count( $slugs ) - count( $errors ),
+		'artists' => count( $slugs ) - count( $errors ) - count( $empty ),
 		'arts'    => $count,
 		'deleted' => $deleted,
 		'errors'  => $errors,
+		'empty'   => $empty,
 		'rects'   => $rects,
 	);
 }

@@ -1025,9 +1025,12 @@
    ここではその出来上がりを、額装のように内側へ収めて並べる。 */
 .art-card--collection .art-image {
 	aspect-ratio: 1 / 1;
-	background:
-		radial-gradient(ellipse 58% 62% at 50% -6%, rgba(255, 251, 242, .95) 0%, rgba(255, 251, 242, .55) 38%, rgba(255, 251, 242, 0) 72%),
-		linear-gradient(to bottom, #f2efe9 0%, #ebe7e0 100%);
+	/* 作品まわりは白。ベージュだと絵の色に干渉するため。 */
+	background: var(--white);
+}
+/* 「新着」は暗い背景向けの色なので、白地では読めない。文字色を入れ替える。 */
+.art-card--collection .art-number {
+	color: var(--mid);
 }
 /* 枠：collection から取り込んだ「作品そのものの縦横比」で内側に配置する。
    縦横の両方を制限すると、はみ出した側が切り詰められて比率が崩れるため
