@@ -1438,3 +1438,25 @@ body.reveal-ready .frame.flipped { opacity: 1; transform: translateY(0); }
   header, section, footer, .cta-strip, main, div { max-width: 100vw; }
   img, .art-collage, .carousel-wrap { max-width: 100%; }
 }
+
+/* ═══ TOP：ART（3列×2段のカード）═══
+   コレクションサイトの作品を6点並べる。カードは ARTIST ページの WORKS と
+   同じ card-collection-art を使うので、見せ方（額装の枠・トリミング）は共通。 */
+.art-grid-top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.art-grid-top .art-card { background: transparent; }
+
+/* タブレット：2列 */
+@media (max-width: 980px) {
+  .art-grid-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 0 24px; }
+}
+/* モバイル：2列のまま（3×2＝縦に3段）。1列にすると縦に長くなりすぎるため。 */
+@media (max-width: 700px) {
+  .art-grid-top { gap: 14px; padding: 0 16px; }
+}

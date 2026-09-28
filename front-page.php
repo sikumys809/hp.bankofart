@@ -96,82 +96,16 @@ usort(
 $front_artists = array_slice( $front_artists, 0, 5 );
 
 /*
- * ART：TOP表示ONの作品をコラージュ（上段3＋下段4＝最大7点）に流し込む。
- * 「TOPページに表示する（art_top_featured）」が ON の作品を取得し、
- * 「TOP表示順（art_top_order）」昇順で並べ、先頭7点だけ使う。
- *
- * 並び替えは PHP 側で行う。art_top_order を orderby の meta_key に使うと
- * 順序未設定の作品が INNER JOIN で除外されてしまうため、ここでは絞り込みだけ
- * クエリで行い、ソート＆7点打ち切りは usort + array_slice で安全に処理する。
- * featured 件数は実運用でも数点程度のため -1 取得でも軽い。
+ * ART：TOPに出す作品（3列×2段の6点）。
+ * コレクションサイト（collection.bankof-art.com）の作品から選ぶ。
+ * どれを出すかは 管理画面「コレクション同期」→「TOPページに出す作品」で指定し、
+ * 未指定の枠は新着（SOLD OUT を除く）で埋まる。
+ * 作品データ自体は月1回の同期でDBに入っているので、表示時に外部通信はしない。
  */
-$front_arts = get_posts(
-	array(
-		'post_type'      => 'art',
-		'post_status'    => 'publish',
-		'posts_per_page' => -1,
-		'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- TOP抜粋。featured のみで件数僅少。
-			array(
-				'key'     => 'art_top_featured',
-				'value'   => '1',
-				'compare' => '=',
-			),
-		),
-	)
-);
+$front_arts = function_exists( 'bankofart_collection_get_top_arts' )
+	? bankofart_collection_get_top_arts()
+	: array();
 
-// art_top_order 昇順で並べ替え（未設定は末尾、同値は公開日降順）。
-usort(
-	$front_arts,
-	static function ( $a, $b ) {
-		$oa = rwmb_meta( 'art_top_order', '', $a->ID );
-		$ob = rwmb_meta( 'art_top_order', '', $b->ID );
-		$oa = is_numeric( $oa ) ? (float) $oa : INF;
-		$ob = is_numeric( $ob ) ? (float) $ob : INF;
-		if ( $oa === $ob ) {
-			return strcmp( $b->post_date, $a->post_date ); // 同順位は新しい順。
-		}
-		return ( $oa < $ob ) ? -1 : 1;
-	}
-);
-
-// コラージュは最大7点（上段3＋下段4）。超過分は打ち切り（将来：2段以上に拡張余地）。
-$front_arts = array_slice( $front_arts, 0, 7 );
-
-// COLLECTOR：画家応援企業の最新12社（ロゴグリッド）。
-$front_collectors = get_posts(
-	array(
-		'post_type'      => 'collector',
-		'post_status'    => 'publish',
-		'posts_per_page' => 12,
-		'orderby'        => array(
-			'menu_order' => 'ASC',
-			'date'       => 'DESC',
-		),
-	)
-);
-
-// NEWS：最新4件（公開日降順）。card-news を context='top'（縦カード）で出力。
-$front_news = get_posts(
-	array(
-		'post_type'      => 'news',
-		'post_status'    => 'publish',
-		'posts_per_page' => 4,
-		'orderby'        => 'date',
-		'order'          => 'DESC',
-	)
-);
-
-// ART コラージュのフレーム比率。各作品の art_top_size を最優先で反映し、
-// 未設定の作品はこのモック既定の並び（上段 wide/tall/square、下段 tall/square/tall/wide）に
-// 位置でフォールバックする。
-$front_frame_types = array( 'type-wide', 'type-tall', 'type-square', 'type-tall', 'type-square', 'type-tall', 'type-wide' );
-// art_top_size の値 → frame の type-クラス対応。
-$front_top_size_map = array(
-	'wide'   => 'type-wide',
-	'tall'   => 'type-tall',
-	'square' => 'type-square',
-);
 ?>
 
 <main id="main" class="front-page">
@@ -282,66 +216,24 @@ $front_top_size_map = array(
 			<div class="head-rule"></div>
 		</div>
 		<?php if ( $front_arts ) : ?>
-			<?php
-			$rows  = array( array_slice( $front_arts, 0, 3 ), array_slice( $front_arts, 3, 4 ) );
-			$order = 0;
-			?>
-			<div class="art-collage" id="artCollage">
+			<div class="art-grid-top" id="artGridTop">
 				<?php
-				foreach ( $rows as $row ) :
-					if ( empty( $row ) ) {
-						continue;
-					}
-					?>
-					<div class="art-row">
-						<?php
-						foreach ( $row as $art ) :
-							$art_id2     = $art->ID;
-							// 表示サイズは作品の art_top_size を優先。未設定は位置でモック既定にフォールバック。
-							$art_top_size = (string) rwmb_meta( 'art_top_size', '', $art_id2 );
-							if ( isset( $front_top_size_map[ $art_top_size ] ) ) {
-								$type = $front_top_size_map[ $art_top_size ];
-							} elseif ( isset( $front_frame_types[ $order ] ) ) {
-								$type = $front_frame_types[ $order ];
-							} else {
-								$type = 'type-square';
-							}
-							$art_num     = (string) rwmb_meta( 'art_number', '', $art_id2 );
-							$art_img     = bankofart_get_art_top_image( $art_id2, 'large' );
-							$art_en      = (string) rwmb_meta( 'art_title_en', '', $art_id2 );
-							$art_disp    = '' !== trim( $art_en ) ? $art_en : get_the_title( $art_id2 );
-							$art_makers  = bankofart_get_connected( 'artist_to_art', 'to', $art_id2 );
-							$art_artist  = ! empty( $art_makers ) ? get_the_title( $art_makers[0]->ID ) : '';
-							$art_bg      = ! empty( $art_img['url'] ) ? ' style="background-image:url(\'' . esc_url( $art_img['url'] ) . '\');"' : '';
-							$art_num_dig = preg_replace( '/[^0-9]/', '', $art_num );
-							?>
-							<a href="<?php echo esc_url( get_permalink( $art_id2 ) ); ?>" class="frame <?php echo esc_attr( $type ); ?>" data-order="<?php echo esc_attr( $order ); ?>">
-								<?php if ( '' !== trim( $art_num ) ) : ?>
-									<div class="frame-num">#<?php echo esc_html( $art_num ); ?></div>
-								<?php endif; ?>
-								<div class="frame-inner">
-									<div class="frame-art"<?php echo $art_bg; // phpcs:ignore WordPress.Security.EscapeOutput -- URLは esc_url 済み ?>></div>
-									<div class="frame-label">
-										<?php if ( '' !== $art_num_dig ) : ?>
-											<div class="frame-label-no">No. <?php echo esc_html( str_pad( $art_num_dig, 4, '0', STR_PAD_LEFT ) ); ?></div>
-										<?php endif; ?>
-										<div class="frame-label-name"><?php echo esc_html( $art_disp ); ?></div>
-										<?php if ( '' !== trim( (string) $art_artist ) ) : ?>
-											<div class="frame-label-artist"><?php echo esc_html( $art_artist ); ?></div>
-										<?php endif; ?>
-									</div>
-								</div>
-							</a>
-							<?php
-							$order++;
-						endforeach;
-						?>
-					</div>
-				<?php endforeach; ?>
+				foreach ( $front_arts as $front_art ) :
+					get_template_part(
+						'template-parts/cards/card-collection-art',
+						null,
+						array(
+							'art'     => $front_art,
+							'context' => 'top',
+						)
+					);
+				endforeach;
+				?>
 			</div>
 		<?php else : ?>
 			<div class="front-empty-wrap"><p class="front-empty">作品を準備中です。</p></div>
 		<?php endif; ?>
+
 		<div class="art-cta rv">
 			<a href="<?php echo esc_url( $art_archive ); ?>" class="art-see-all">View All Works →</a>
 		</div>

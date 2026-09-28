@@ -108,7 +108,11 @@ function bankofart_collection_admin_page() {
 	<div class="wrap">
 		<h1><?php esc_html_e( 'コレクション同期', 'bankofart' ); ?></h1>
 
-		<?php if ( ! empty( $_GET['synced'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
+		<?php if ( isset( $_GET["picked"] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
+			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( "TOPに出す作品を保存しました。", "bankofart" ); ?></p></div>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $_GET["synced"] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 			<div class="notice notice-success is-dismissible">
 				<p>
 					<?php
@@ -188,6 +192,58 @@ function bankofart_collection_admin_page() {
 				<?php esc_html_e( '20ページほど巡回するので、30秒前後かかります。', 'bankofart' ); ?>
 			</span>
 		</form>
+
+		<?php
+		/* ── TOPに出す作品の選択（3×2の6点）── */
+		$picks   = bankofart_collection_get_top_picks();
+		$options = function_exists( 'bankofart_collection_pick_options' ) ? bankofart_collection_pick_options() : array();
+		if ( $options ) :
+			?>
+			<h2 style="margin-top:40px;"><?php esc_html_e( 'TOPページに出す作品', 'bankofart' ); ?></h2>
+			<p class="description" style="margin-bottom:12px;">
+				<?php esc_html_e( 'TOPページのART欄に3列×2段で並びます。上の枠から順に配置されます。選ばなかった枠は新着作品で埋まります。', 'bankofart' ); ?>
+			</p>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<?php wp_nonce_field( 'boa_collection_top_picks' ); ?>
+				<input type="hidden" name="action" value="boa_collection_top_picks">
+
+				<table class="widefat striped" style="max-width:820px;">
+					<tbody>
+						<?php for ( $i = 0; $i < BANKOFART_TOP_PICK_COUNT; $i++ ) : ?>
+							<?php $current = $picks[ $i ] ?? ''; ?>
+							<tr>
+								<th style="width:110px;">
+									<?php
+									printf(
+										/* translators: %d: slot number */
+										esc_html__( '%d枠目', 'bankofart' ),
+										(int) $i + 1
+									);
+									?>
+								</th>
+								<td>
+									<select name="pick_<?php echo esc_attr( $i ); ?>" style="width:100%;max-width:620px;">
+										<option value=""><?php esc_html_e( '— 選択しない（新着で埋める）—', 'bankofart' ); ?></option>
+										<?php foreach ( $options as $artist_name => $items ) : ?>
+											<optgroup label="<?php echo esc_attr( $artist_name ); ?>">
+												<?php foreach ( $items as $cid => $label ) : ?>
+													<option value="<?php echo esc_attr( $cid ); ?>"<?php selected( $current, $cid ); ?>>
+														<?php echo esc_html( $label ); ?>
+													</option>
+												<?php endforeach; ?>
+											</optgroup>
+										<?php endforeach; ?>
+									</select>
+								</td>
+							</tr>
+						<?php endfor; ?>
+					</tbody>
+				</table>
+
+				<?php submit_button( __( 'TOPの作品を保存', 'bankofart' ) ); ?>
+			</form>
+		<?php endif; ?>
 
 		<?php if ( $by_art ) : ?>
 			<h2 style="margin-top:32px;"><?php esc_html_e( 'アーティスト別の作品数', 'bankofart' ); ?></h2>
