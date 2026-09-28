@@ -997,3 +997,8 @@
 	transition: transform .9s ease;
 }
 .art-card--collection:hover .art-image-inner { transform: scale(1.04); }
+
+/* 作品のトリミング画像は意図的に枠より大きく拡大している。
+   ページ別CSSにあるモバイル用の全称セレクタ（max-width:100% !important）に
+   潰されると絵が縦に潰れるため、ここでも明示的に解除しておく。 */
+.art-crop-img { max-width: none; }
