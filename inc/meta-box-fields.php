@@ -697,12 +697,31 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'tab'  => 'basic',
 				'desc' => 'YouTube等（任意）。',
 			),
+			/*
+			 * コレクトした作品は、コレクションサイトの作品IDで持つ。
+			 * WPの art 投稿ではなく collection 側が作品データの正になったため
+			 * （作品名も向こうが正式名称）、そちらを直接指す。
+			 * 選択肢は月1同期で取り込んだ一覧から作る。同期前は空になる。
+			 */
+			array(
+				'id'          => 'collector_collection_arts',
+				'name'        => 'コレクトした作品',
+				'type'        => 'select_advanced',
+				'tab'         => 'basic',
+				'multiple'    => true,
+				'ajax'        => false,
+				'placeholder' => '画家名・作品名で検索できます',
+				'options'     => function_exists( 'bankofart_collection_is_editing' ) && bankofart_collection_is_editing( 'collector' )
+					? bankofart_collection_art_labels()
+					: array(),
+				'desc'        => 'コレクションサイトの作品から選ぶ。選んだ順に「この企業が迎えた作品」へ並ぶ。',
+			),
 			array(
 				'id'   => 'collector_introduced_artwork_text',
 				'name' => 'コレクト作品名（テキスト）',
 				'type' => 'text',
 				'tab'  => 'basic',
-				'desc' => 'art リレーション未投入時の暫定テキスト。',
+				'desc' => '上の選択ができない作品（コレクション未掲載など）のための予備テキスト。',
 			),
 			// 「業界（表示用テキスト）」「設置場所（自由記述）」は廃止。
 			// 業界は下の「業種」タクソノミー（13種＋その他）に一本化、設置場所も

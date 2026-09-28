@@ -72,10 +72,10 @@ function bankofart_collection_pick_options() {
 	$table = bankofart_collection_table();
 	$rows  = $wpdb->get_results( "SELECT collection_id, artist_slug, title, size_label, is_sold FROM {$table} ORDER BY artist_slug, sort_order", ARRAY_A ); // phpcs:ignore WordPress.DB
 
+	$names   = bankofart_collection_artist_names();
 	$grouped = array();
 	foreach ( $rows as $r ) {
-		$artist_post = get_page_by_path( $r['artist_slug'], OBJECT, 'artist' );
-		$artist_name = $artist_post ? get_the_title( $artist_post ) : $r['artist_slug'];
+		$artist_name = $names[ $r['artist_slug'] ] ?? $r['artist_slug'];
 
 		$label = $r['title'];
 		if ( '' !== (string) $r['size_label'] ) {

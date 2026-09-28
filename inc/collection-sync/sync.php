@@ -488,6 +488,94 @@ function bankofart_collection_artist_url( $slug ) {
 }
 
 /**
+ * アーティストのスラッグ → WPでの表示名 の対応表を返す。
+ *
+ * 作品1点ずつ get_page_by_path() を呼ぶと件数ぶんクエリが出るので、1回でまとめて引く。
+ * WPに投稿が無い画家はスラッグをそのまま名前として扱う。
+ *
+ * @return array スラッグ => 表示名。
+ */
+function bankofart_collection_artist_names() {
+	static $names = null;
+	if ( null !== $names ) {
+		return $names;
+	}
+
+	$names   = array();
+	$artists = get_posts(
+		array(
+			'post_type'        => 'artist',
+			'post_status'      => array( 'publish', 'draft', 'private' ),
+			'numberposts'      => -1,
+			'suppress_filters' => false,
+		)
+	);
+	foreach ( $artists as $a ) {
+		$names[ $a->post_name ] = $a->post_title;
+	}
+	return $names;
+}
+
+/**
+ * いま開いているのが指定の投稿タイプの編集画面かを判定する。
+ *
+ * Meta Box のフィールド定義は init（全リクエスト）で組み立てられるため、
+ * 作品135点ぶんの選択肢をそこで毎回作ると、フロントにも管理画面の他の画面にも
+ * 無駄なクエリが出る。必要な編集画面のときだけ作るために使う。
+ *
+ * @param string $post_type 投稿タイプ。
+ * @return bool
+ */
+function bankofart_collection_is_editing( $post_type ) {
+	global $pagenow;
+	if ( ! is_admin() ) {
+		return false;
+	}
+	if ( 'post-new.php' === $pagenow ) {
+		// phpcs:ignore WordPress.Security.NonceVerification
+		return isset( $_GET['post_type'] ) && $post_type === sanitize_key( wp_unslash( $_GET['post_type'] ) );
+	}
+	if ( 'post.php' === $pagenow ) {
+		// 表示時は GET の post、保存時は POST の post_ID に入る。
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$id = isset( $_GET['post'] ) ? (int) $_GET['post'] : (int) ( $_POST['post_ID'] ?? 0 );
+		return $id > 0 && $post_type === get_post_type( $id );
+	}
+	return false;
+}
+
+/**
+ * 管理画面で作品を選ぶための「ID => ラベル」一覧を返す。
+ *
+ * ラベルは「画家 ／ 作品名（号数）」。SOLD OUT は末尾に付ける。
+ * select2 の検索にかかるよう、画家名も作品名も1行に入れてある。
+ *
+ * @return array collection_id => ラベル。
+ */
+function bankofart_collection_art_labels() {
+	global $wpdb;
+	$table = bankofart_collection_table();
+	$rows  = $wpdb->get_results( "SELECT collection_id, artist_slug, title, size_label, is_sold FROM {$table} ORDER BY artist_slug, sort_order", ARRAY_A ); // phpcs:ignore WordPress.DB
+	if ( ! $rows ) {
+		return array();
+	}
+
+	$names  = bankofart_collection_artist_names();
+	$labels = array();
+	foreach ( $rows as $r ) {
+		$label = ( $names[ $r['artist_slug'] ] ?? $r['artist_slug'] ) . ' ／ ' . $r['title'];
+		if ( '' !== (string) $r['size_label'] ) {
+			$label .= '（' . $r['size_label'] . '）';
+		}
+		if ( ! empty( $r['is_sold'] ) ) {
+			$label .= ' ※SOLD OUT';
+		}
+		$labels[ $r['collection_id'] ] = $label;
+	}
+	return $labels;
+}
+
+/**
  * 作品一覧のURLを返す。
  *
  * WPの /art/ アーカイブに代わる「作品を探す」の行き先。

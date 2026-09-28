@@ -60,15 +60,29 @@ while ( have_posts() ) :
 	$industry_term = bankofart_get_first_term_name( $cid, 'collector_industry' );
 	$place_label   = $tax_join( $cid, 'collector_placement' );
 
-	// ---- 所有作品（art_to_owner 逆引き） ----
-	$owned_arts = bankofart_get_connected( 'art_to_owner', 'to', $cid );
+	/*
+	 * ---- コレクトした作品 ----
+	 * 作品データの正はコレクションサイトなので、まずそちらの作品IDで引く。
+	 * 旧来の art_to_owner（WPの作品投稿との関連付け）も、まだ入っている企業のために
+	 * 残しておき、コレクション側の指定が無いときだけ使う。
+	 */
+	$coll_ids   = array_filter( array_map( 'strval', (array) rwmb_meta( 'collector_collection_arts', '', $cid ) ), 'strlen' );
+	$coll_arts  = $coll_ids ? bankofart_collection_get_arts_by_ids( $coll_ids ) : array();
+	$owned_arts = $coll_arts ? array() : bankofart_get_connected( 'art_to_owner', 'to', $cid );
+	$has_work   = ( $coll_arts || $owned_arts );
 
-	// Q3 用の作品画像（先頭の所有作品メイン画像）。
+	// Q3 用の作品画像（先頭の作品）。
 	$q3_img = array(
 		'url' => '',
 		'alt' => '',
 	);
-	if ( ! empty( $owned_arts ) ) {
+	if ( $coll_arts ) {
+		$q3_url = bankofart_collection_rect_url( $coll_arts[0] );
+		$q3_img = array(
+			'url' => $q3_url ? $q3_url : (string) $coll_arts[0]['image_url'],
+			'alt' => (string) $coll_arts[0]['title'],
+		);
+	} elseif ( $owned_arts ) {
 		$q3_img = bankofart_get_image( 'art_main_image', $owned_arts[0]->ID, 'large' );
 	}
 
@@ -192,7 +206,7 @@ while ( have_posts() ) :
 
 	// ---- セクション可視性 ----
 	$show_interview = bankofart_should_show_section( 'collector_show_interview', $has_any_answer, $cid );
-	$show_work      = bankofart_should_show_section( 'collector_show_introduced_work', $owned_arts, $cid );
+	$show_work      = bankofart_should_show_section( 'collector_show_introduced_work', $has_work, $cid );
 	$show_same      = bankofart_should_show_section( 'collector_show_same_issue', $same_collectors, $cid );
 	$show_matching  = bankofart_issue_matching_enabled() && bankofart_should_show_section( 'collector_show_matching', true, $cid );
 	$show_cta       = bankofart_should_show_section( 'collector_show_cta', true, $cid );
@@ -306,6 +320,31 @@ while ( have_posts() ) :
 				<div class="cs-work-ja rv d1">この企業が迎えた作品</div>
 			</div>
 			<?php
+			/* コレクションサイトの作品。画像は切り抜き済みの生成画像を使う。 */
+			foreach ( $coll_arts as $c_art ) :
+				$c_img    = bankofart_collection_rect_url( $c_art );
+				$c_artist = bankofart_collection_artist_names()[ $c_art['artist_slug'] ] ?? '';
+				$c_meta   = array_filter( array( (string) $c_art['size_label'], '' !== (string) $c_art['price'] ? '¥' . $c_art['price'] : '' ) );
+				?>
+				<div class="cs-work-card rv">
+					<div class="cs-work-image">
+						<span class="cs-work-image-inner"<?php if ( '' !== $c_img || '' !== (string) $c_art['image_url'] ) : ?> style="background-image:url('<?php echo esc_url( $c_img ? $c_img : $c_art['image_url'] ); ?>');" role="img" aria-label="<?php echo esc_attr( $c_art['title'] ); ?>"<?php endif; ?>></span>
+					</div>
+					<div class="cs-work-info">
+						<?php if ( '' !== $c_artist ) : ?>
+							<p class="cs-work-artist"><?php echo esc_html( $c_artist ); ?></p>
+						<?php endif; ?>
+						<h3 class="cs-work-title"><?php echo esc_html( $c_art['title'] ); ?></h3>
+						<?php if ( $c_meta ) : ?>
+							<p class="cs-work-meta"><?php echo esc_html( implode( ' / ', $c_meta ) ); ?></p>
+						<?php endif; ?>
+						<a href="<?php echo esc_url( bankofart_collection_art_url( $c_art['collection_id'] ) ); ?>" class="cs-work-link" target="_blank" rel="noopener">作品を見る</a>
+					</div>
+				</div>
+			<?php endforeach; ?>
+
+			<?php
+			/* コレクション側の指定が無い企業は、従来のWP作品投稿で出す。 */
 			foreach ( $owned_arts as $art ) :
 				$art_id      = $art->ID;
 				$art_img     = bankofart_get_image( 'art_main_image', $art_id, 'large' );
@@ -328,7 +367,7 @@ while ( have_posts() ) :
 						<?php if ( ! empty( $meta_parts ) ) : ?>
 							<p class="cs-work-meta"><?php echo esc_html( implode( ' / ', $meta_parts ) ); ?></p>
 						<?php endif; ?>
-						<a href="<?php echo esc_url( get_permalink( $art_id ) ); ?>" class="cs-work-link">作品を見る</a>
+						<a href="<?php echo esc_url( bankofart_art_redirect_target( $art_id ) ); ?>" class="cs-work-link" target="_blank" rel="noopener">作品を見る</a>
 					</div>
 				</div>
 			<?php endforeach; ?>
