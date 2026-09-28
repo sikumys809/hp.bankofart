@@ -78,7 +78,17 @@ if ( '' !== $price ) {
 		$has_crop = ( null !== ( $art['crop_ratio'] ?? null ) && (float) $art['crop_ratio'] > 0 );
 		?>
 		<?php if ( $has_crop && '' !== $image ) : ?>
-			<span class="art-crop-frame" style="aspect-ratio:<?php echo esc_attr( (float) $art['crop_ratio'] ); ?>;">
+			<?php
+			/*
+			 * 枠の大きさは、作品の形に応じて縦横どちらかを基準に決める。
+			 *   横長・正方形（比率>=1）… 幅を基準にして高さが決まる
+			 *   縦長（比率<1）        … 高さを基準にして幅が決まる
+			 * 両方を制限すると、はみ出した側が切り詰められて比率が崩れる
+			 * （横長の作品が横に潰れる）。基準を1つにすれば必ず内側に収まる。
+			 */
+			$crop_wide = ( (float) $art['crop_ratio'] >= 1 );
+			?>
+			<span class="art-crop-frame<?php echo $crop_wide ? ' is-wide' : ''; ?>" style="aspect-ratio:<?php echo esc_attr( (float) $art['crop_ratio'] ); ?>;">
 				<span class="art-crop-img" role="img" aria-label="<?php echo esc_attr( $title ); ?>"
 					style="background-image:url('<?php echo esc_url( $image ); ?>');
 						left:<?php echo esc_attr( (float) $art['crop_left'] ); ?>%;

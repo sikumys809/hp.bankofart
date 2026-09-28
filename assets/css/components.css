@@ -966,17 +966,24 @@
 		radial-gradient(ellipse 58% 62% at 50% -6%, rgba(255, 251, 242, .95) 0%, rgba(255, 251, 242, .55) 38%, rgba(255, 251, 242, 0) 72%),
 		linear-gradient(to bottom, #f2efe9 0%, #ebe7e0 100%);
 }
-/* 枠：collection から取り込んだ「作品そのものの縦横比」で内側に配置する。 */
+/* 枠：collection から取り込んだ「作品そのものの縦横比」で内側に配置する。
+   縦横の両方を制限すると、はみ出した側が切り詰められて比率が崩れるため
+   （横長の作品が横に潰れる）、基準にする辺を作品の形で1つに決める。 */
 .art-card--collection .art-crop-frame {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	max-width: 78%;
-	max-height: 78%;
-	height: 78%;
 	overflow: hidden;
 	transition: transform .9s ease;
+	/* 縦長（既定）：高さを基準に、幅は比率から決まる。 */
+	height: 78%;
+	width: auto;
+}
+/* 横長・正方形：幅を基準に、高さは比率から決まる。 */
+.art-card--collection .art-crop-frame.is-wide {
+	width: 78%;
+	height: auto;
 }
 /* 画像：元写真を拡大・移動して、枠の中に作品だけが収まるようにする。
    left/top/width/height は collection の数値をそのまま出力している。 */
