@@ -65,7 +65,8 @@ $matching_url = home_url( '/matching-issue/' );
 		</div>
 	</section>
 
-	<!-- Issue Matching バナー（課題逆引き診断は Phase 2-E。リンク先は仮） -->
+	<!-- Issue Matching バナー（課題診断。いったん非公開＝bankofart_issue_matching_enabled）-->
+	<?php if ( bankofart_issue_matching_enabled() ) : ?>
 	<section class="match-banner-sec">
 		<div class="match-banner rv">
 			<div class="match-banner-left">
@@ -80,6 +81,7 @@ $matching_url = home_url( '/matching-issue/' );
 			</div>
 		</div>
 	</section>
+	<?php endif; ?>
 
 	<section class="collector-section">
 		<div class="section-head">

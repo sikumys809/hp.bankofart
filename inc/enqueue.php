@@ -383,7 +383,7 @@ function bankofart_enqueue_assets() {
 	}
 
 	// ページ別アセット：MATCHING ISSUE 課題逆引き診断（スラッグ matching-issue または テンプレート）。
-	if ( is_page( 'matching-issue' ) || is_page_template( 'page-matching-issue.php' ) ) {
+	if ( bankofart_issue_matching_enabled() && ( is_page( 'matching-issue' ) || is_page_template( 'page-matching-issue.php' ) ) ) {
 		wp_enqueue_style(
 			'bankofart-page-matching-issue',
 			"{$theme_uri}/assets/css/pages/page-matching-issue.css",

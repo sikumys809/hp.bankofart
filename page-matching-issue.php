@@ -19,6 +19,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/*
+ * 課題診断はいったん非公開（bankofart_issue_matching_enabled）。
+ * 入口のバナーは消してあるが、URLを直接開かれることはある。
+ * 「消した」のではなく「今は出していない」状態なので、404 ではなく
+ * 画家応援企業の一覧へ 302（一時的な転送）で送る。
+ * 復活させたら転送も自動的に止まり、元のURLがそのまま使える。
+ */
+if ( ! bankofart_issue_matching_enabled() ) {
+	wp_safe_redirect( get_post_type_archive_link( 'collector' ), 302 );
+	exit;
+}
+
 get_header();
 
 $briefing_url = bankofart_briefing_url(); // 結果画面「お問い合わせ」。

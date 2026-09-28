@@ -556,3 +556,25 @@ function bankofart_enlarge_content_images( $html ) {
 		$html
 	);
 }
+
+/**
+ * 「企業課題 × アート」診断を公開するかどうか。
+ *
+ * コレクションサイト側に作品単位のタクソノミー（色・技法・ジャンル）が無く、
+ * 課題から作品を推薦する精度が保てないため、いったん非公開にしている。
+ * 復活させるときは、この関数が true を返すようにするだけでよい
+ * （入口のバナー・ページ本体・アセット読み込みが、すべてここを見ている）。
+ *
+ * 併存する「企業理念 × アーティスト」診断（matching-purpose）は画家単位の
+ * 推薦なので影響を受けず、そのまま公開を続ける。
+ *
+ * @return bool
+ */
+function bankofart_issue_matching_enabled() {
+	/**
+	 * 課題診断の公開可否を切り替える。
+	 *
+	 * @param bool $enabled 既定は false（非公開）。
+	 */
+	return (bool) apply_filters( 'bankofart_issue_matching_enabled', false );
+}

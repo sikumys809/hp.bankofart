@@ -194,7 +194,7 @@ while ( have_posts() ) :
 	$show_interview = bankofart_should_show_section( 'collector_show_interview', $has_any_answer, $cid );
 	$show_work      = bankofart_should_show_section( 'collector_show_introduced_work', $owned_arts, $cid );
 	$show_same      = bankofart_should_show_section( 'collector_show_same_issue', $same_collectors, $cid );
-	$show_matching  = bankofart_should_show_section( 'collector_show_matching', true, $cid );
+	$show_matching  = bankofart_issue_matching_enabled() && bankofart_should_show_section( 'collector_show_matching', true, $cid );
 	$show_cta       = bankofart_should_show_section( 'collector_show_cta', true, $cid );
 	?>
 
