@@ -27,11 +27,20 @@ while ( have_posts() ) :
 	$ext_url  = rwmb_meta( 'news_external_url' );
 	$ext_lbl  = rwmb_meta( 'news_external_label' );
 
-	// 外部リンクが YouTube の場合は埋め込み再生用URLを生成（ABOUT/Artist の動画と同じ作法）。
-	// 通常の動画URL・短縮URL・shorts に対応。YouTube 以外は通常の外部リンク扱い。
+	/*
+	 * 動画は2通りある。
+	 *   1. 動画欄（news_video_url）… 位置も選べる新しい方。入っていればこちらを使う。
+	 *   2. 外部リンクURLがYouTubeだったとき … 以前からの挙動。アイキャッチの代わりに出る。
+	 * 両方入っている記事で2回出ないよう、1が入っていれば2は使わない。
+	 */
+	$has_own_video = ( '' !== bankofart_video_embed_url( (string) rwmb_meta( 'news_video_url', '', $nid ) ) );
+
 	$video_embed = '';
-	if ( ! empty( $ext_url ) && preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|v/|shorts/))([\w-]{11})~', $ext_url, $m ) ) {
-		$video_embed = 'https://www.youtube.com/embed/' . $m[1];
+	if ( ! $has_own_video && ! empty( $ext_url ) ) {
+		$maybe = bankofart_video_embed_url( $ext_url );
+		if ( $maybe !== $ext_url ) { // YouTube と判定されたときだけ埋め込む。
+			$video_embed = $maybe;
+		}
 	}
 
 	// アイキャッチ：news_main_image（Meta Box）優先、無ければ投稿サムネイル。
@@ -124,6 +133,8 @@ while ( have_posts() ) :
 			<p class="sn-lead rv"><?php echo esc_html( $summary ); ?></p>
 		<?php endif; ?>
 
+		<?php bankofart_render_article_video( 'news', 'lead', $nid ); ?>
+
 		<?php if ( $show_body ) : ?>
 			<?php
 			foreach ( $sections as $sec ) :
@@ -169,6 +180,8 @@ while ( have_posts() ) :
 			<?php endforeach; ?>
 		<?php endif; ?>
 
+		<?php bankofart_render_article_video( 'news', 'body', $nid ); ?>
+
 		<?php if ( empty( $video_embed ) && ! empty( $ext_url ) ) : ?>
 			<div class="sn-external rv">
 				<a href="<?php echo esc_url( $ext_url ); ?>" class="sn-external-btn" target="_blank" rel="noopener">
@@ -176,6 +189,8 @@ while ( have_posts() ) :
 				</a>
 			</div>
 		<?php endif; ?>
+
+		<?php bankofart_render_article_ctas( 'news', $nid ); ?>
 	</article>
 
 	<!-- ════════ 関連アーティスト ════════ -->

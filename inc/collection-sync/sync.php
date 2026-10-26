@@ -42,34 +42,57 @@ function bankofart_collection_fetch( $path ) {
 }
 
 /**
- * コレクションサイトのアーティストスラッグ一覧を取得する。
+ * アーティスト一覧ページ（/artist）から、画家ごとの点数を取り出す。
  *
- * アーティスト一覧ページ（/artist）の各プロフィールへのリンクから拾う。
- * トップの作家アイコンから拾う方法も試したが、スラッグが入っていない作家がいて
- * （href が "/?artist=" のまま）取りこぼすため、一覧ページを正とする。
- * 一覧ページが取れなかったときだけ、トップから拾う方法に落とす。
+ * 一覧ページのカードは次の形で、スラッグ・表示名・公開点数がそろっている。
+ *   <a href="/artist/{スラッグ}"> … <img alt="{表示名}"> … 公開中の作品 N点 … </a>
+ * この N点は SOLD OUT も含めた総数で、各画家ページの実数と一致することを確認済み。
+ *
+ * これを使うと「前回から点数が変わった画家」だけを回れるので、
+ * 毎回20ページ以上巡回する必要がなくなる。
+ *
+ * @return array|WP_Error スラッグ => array( 'name' => 表示名, 'count' => 点数 )。
+ */
+function bankofart_collection_fetch_artist_index() {
+	$html = bankofart_collection_fetch( '/artist' );
+	if ( is_wp_error( $html ) ) {
+		return $html;
+	}
+
+	preg_match_all( '~<a[^>]*href="/artist/([A-Za-z0-9-]+)"[^>]*>(.*?)</a>~s', $html, $matches, PREG_SET_ORDER );
+	if ( ! $matches ) {
+		return new WP_Error( 'boa_collection_index', 'アーティスト一覧の構造が変わった可能性があります。' );
+	}
+
+	$index = array();
+	foreach ( $matches as $m ) {
+		$slug = $m[1];
+		if ( isset( $index[ $slug ] ) ) {
+			continue;
+		}
+		preg_match( '~<img[^>]*alt="([^"]*)"~', $m[2], $alt );
+		$count = preg_match( '~公開中の作品\s*(\d+)\s*点~u', $m[2], $c ) ? (int) $c[1] : 0;
+
+		$index[ $slug ] = array(
+			'name'  => isset( $alt[1] ) ? html_entity_decode( $alt[1], ENT_QUOTES, 'UTF-8' ) : '',
+			'count' => $count,
+		);
+	}
+	ksort( $index );
+	return $index;
+}
+
+/**
+ * コレクションサイトのアーティストスラッグ一覧を取得する。
  *
  * @return array|WP_Error スラッグの配列。
  */
 function bankofart_collection_fetch_artists() {
-	$html = bankofart_collection_fetch( '/artist' );
-	if ( ! is_wp_error( $html ) ) {
-		preg_match_all( '~/artist/([A-Za-z0-9-]+)~', $html, $m );
-		$slugs = array_values( array_unique( array_filter( $m[1] ) ) );
-		if ( $slugs ) {
-			sort( $slugs );
-			return $slugs;
-		}
+	$index = bankofart_collection_fetch_artist_index();
+	if ( is_wp_error( $index ) ) {
+		return $index;
 	}
-
-	$html = bankofart_collection_fetch( '/' );
-	if ( is_wp_error( $html ) ) {
-		return $html;
-	}
-	preg_match_all( '~/\?artist=([A-Za-z0-9-]+)~', $html, $m );
-	$slugs = array_values( array_unique( array_filter( $m[1] ) ) );
-	sort( $slugs );
-	return $slugs;
+	return array_keys( $index );
 }
 
 /**
@@ -304,37 +327,72 @@ function bankofart_collection_parse_arts( $html, $slug ) {
 }
 
 /**
- * コレクションサイト全体を巡回してDBへ保存する。
+ * コレクションサイトを巡回してDBへ保存する。
+ *
+ * まずアーティスト一覧ページを1枚だけ取り、画家ごとの点数を見る。
+ * 前回保存した点数と変わっている画家だけを実際に回るので、
+ * 作品の増減が無い月は「一覧ページ1枚」で終わる。
+ *
+ * ※ 点数が変わらない変化（SOLD OUT になった・価格が変わった）は、この方式では
+ *    拾えない。そのため3か月に1回は全画家を回す（下の $force 判定）。
+ *    管理画面の「全件を取り直す」からも全巡回できる。
  *
  * 失敗した画家があってもそこだけ飛ばし、取得できたぶんは保存する。
- * 全画家ぶん取得できたときだけ、今回見つからなかった作品を削除する
- * （途中で落ちたときに既存データを消してしまわないため）。
+ * 削除は「今回実際に回った画家」の作品だけを対象にする
+ * （回っていない画家の作品を消してしまわないため）。
  *
- * @return array 結果サマリ array( 'artists', 'arts', 'errors', 'deleted' )。
+ * @param bool $force true なら点数に関係なく全画家を回す。
+ * @return array 結果サマリ。
  */
-function bankofart_collection_sync_all() {
+function bankofart_collection_sync_all( $force = false ) {
 	global $wpdb;
 	$table = bankofart_collection_table();
 	$now   = current_time( 'mysql' );
 
-	$slugs = bankofart_collection_fetch_artists();
-	if ( is_wp_error( $slugs ) ) {
+	$index = bankofart_collection_fetch_artist_index();
+	if ( is_wp_error( $index ) ) {
 		return array(
 			'artists' => 0,
 			'arts'    => 0,
 			'deleted' => 0,
-			'errors'  => array( 'アーティスト一覧の取得に失敗： ' . $slugs->get_error_message() ),
+			'errors'  => array( 'アーティスト一覧の取得に失敗： ' . $index->get_error_message() ),
 		);
 	}
+	$slugs = array_keys( $index );
 
-	$errors = array();
-	$seen   = array();
-	$count  = 0;
+	// 3か月に1回は、点数が変わらない変化（SOLD化・価格改定）を拾うために全部回す。
+	$runs  = (int) get_option( 'boa_collection_sync_runs', 0 );
+	$force = $force || ( 0 === $runs % 3 );
+	update_option( 'boa_collection_sync_runs', $runs + 1, false );
 
-	$empty = array();
+	// 保存済みの画家別点数。これと一覧ページの点数を突き合わせる。
+	$stored = array();
+	foreach ( $wpdb->get_results( "SELECT artist_slug, COUNT(*) c FROM {$table} GROUP BY artist_slug", ARRAY_A ) as $r ) { // phpcs:ignore WordPress.DB
+		$stored[ $r['artist_slug'] ] = (int) $r['c'];
+	}
+
+	$errors  = array();
+	$seen    = array();
+	$count   = 0;
+	$empty   = array();
+	$visited = array();
+	$skipped = array();
 
 	foreach ( $slugs as $slug ) {
-		$html = bankofart_collection_fetch( '/?artist=' . rawurlencode( $slug ) );
+		$want = (int) $index[ $slug ]['count'];
+		$have = isset( $stored[ $slug ] ) ? $stored[ $slug ] : 0;
+
+		// 点数が同じ画家は回らない。既存の行はそのまま残す。
+		if ( ! $force && $want === $have ) {
+			$skipped[] = $slug;
+			if ( 0 === $want ) {
+				$empty[] = $slug;
+			}
+			continue;
+		}
+
+		$visited[] = $slug;
+		$html      = bankofart_collection_fetch( '/?artist=' . rawurlencode( $slug ) );
 		if ( is_wp_error( $html ) ) {
 			$errors[] = $slug . '： ' . $html->get_error_message();
 			continue;
@@ -384,16 +442,31 @@ function bankofart_collection_sync_all() {
 		}
 	}
 
-	// 全画家ぶん問題なく取れたときだけ、消えた作品を削除する。
+	/*
+	 * 消えた作品を削除する。
+	 *
+	 * 対象は「今回実際に回った画家」の作品だけ。回らなかった画家の作品まで
+	 * 消さないようにするため、画家で絞ってから比較する。
+	 * あわせて、一覧ページから居なくなった画家の作品もまとめて消す
+	 * （向こうでスラッグが変わった場合など）。
+	 */
 	$deleted = 0;
-	if ( ! $errors && $seen ) {
-		$in      = implode( ',', array_fill( 0, count( $seen ), '%s' ) );
-		$deleted = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE collection_id NOT IN ({$in})", $seen ) ); // phpcs:ignore WordPress.DB
+	if ( ! $errors ) {
+		if ( $visited && $seen ) {
+			$in_v    = implode( ',', array_fill( 0, count( $visited ), '%s' ) );
+			$in_s    = implode( ',', array_fill( 0, count( $seen ), '%s' ) );
+			$deleted = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE artist_slug IN ({$in_v}) AND collection_id NOT IN ({$in_s})", array_merge( $visited, $seen ) ) ); // phpcs:ignore WordPress.DB
+		}
+		if ( $slugs ) {
+			$in_a     = implode( ',', array_fill( 0, count( $slugs ), '%s' ) );
+			$deleted += (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE artist_slug NOT IN ({$in_a})", $slugs ) ); // phpcs:ignore WordPress.DB
+		}
 	}
 
-	// 消えた作品の生成画像も片付ける。
+	// 消えた作品の生成画像も片付ける（DBに残っているIDを正とする）。
 	if ( $deleted > 0 ) {
-		bankofart_collection_purge_rects( $seen );
+		$keep = $wpdb->get_col( "SELECT collection_id FROM {$table}" ); // phpcs:ignore WordPress.DB
+		bankofart_collection_purge_rects( (array) $keep );
 	}
 
 	/*
@@ -402,28 +475,27 @@ function bankofart_collection_sync_all() {
 	 */
 	$rects = bankofart_collection_build_pending( 40 );
 
-	update_option(
-		'boa_collection_last_sync',
-		array(
-			'at'      => $now,
-			'artists' => count( $slugs ) - count( $errors ) - count( $empty ),
-			'arts'    => $count,
-			'deleted' => $deleted,
-			'errors'  => array_merge( $errors, $rects['errors'] ),
-			'empty'   => $empty,
-			'rects'   => $rects,
-		),
-		false
-	);
-
-	return array(
+	$summary = array(
+		'at'      => $now,
 		'artists' => count( $slugs ) - count( $errors ) - count( $empty ),
 		'arts'    => $count,
 		'deleted' => $deleted,
 		'errors'  => $errors,
 		'empty'   => $empty,
 		'rects'   => $rects,
+		// 巡回の内訳。管理画面で「何ページ見たか」を出すために持つ。
+		'visited' => $visited,
+		'skipped' => $skipped,
+		'pages'   => 1 + count( $visited ),
+		'full'    => (bool) $force,
+		'total'   => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ), // phpcs:ignore WordPress.DB
 	);
+
+	$stored_summary           = $summary;
+	$stored_summary['errors'] = array_merge( $errors, $rects['errors'] );
+	update_option( 'boa_collection_last_sync', $stored_summary, false );
+
+	return $summary;
 }
 
 /**

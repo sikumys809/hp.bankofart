@@ -132,6 +132,8 @@ while ( have_posts() ) :
 			<p class="sj-lead rv"><?php echo esc_html( $summary ); ?></p>
 		<?php endif; ?>
 
+		<?php bankofart_render_article_video( 'journal', 'lead', $jid ); ?>
+
 		<?php if ( $show_body && 'interview' === $layout ) : ?>
 			<?php
 			// インタビュー：アイコン＋吹き出しのQ&A。
@@ -188,9 +190,13 @@ while ( have_posts() ) :
 			<?php endforeach; ?>
 		<?php endif; ?>
 
+		<?php bankofart_render_article_video( 'journal', 'body', $jid ); ?>
+
 		<?php if ( ! empty( $author ) ) : ?>
 			<p class="sj-author-foot"><?php echo esc_html( $byline_label ); ?> ／ <?php echo esc_html( $author ); ?></p>
 		<?php endif; ?>
+
+		<?php bankofart_render_article_ctas( 'journal', $jid ); ?>
 	</article>
 
 	<!-- ════════ 関連アーティスト ════════ -->

@@ -74,7 +74,9 @@ function bankofart_collection_handle_sync() {
 	}
 	check_admin_referer( 'boa_collection_sync' );
 
-	$r = bankofart_collection_sync_all();
+	// 「全件を取り直す」から来たときは、点数が同じ画家も回す。
+	$force = ! empty( $_POST['boa_full'] ); // phpcs:ignore WordPress.Security.NonceVerification
+	$r     = bankofart_collection_sync_all( $force );
 
 	wp_safe_redirect(
 		add_query_arg(
@@ -83,6 +85,8 @@ function bankofart_collection_handle_sync() {
 				'synced'  => 1,
 				'arts'    => (int) $r['arts'],
 				'artists' => (int) $r['artists'],
+				'pages'   => (int) $r['pages'],
+				'total'   => (int) $r['total'],
 			),
 			admin_url( 'admin.php' )
 		)
@@ -144,10 +148,11 @@ function bankofart_collection_admin_page() {
 				<p>
 					<?php
 					printf(
-						/* translators: 1: artists, 2: artworks */
-						esc_html__( '取得しました：アーティスト %1$d名 / 作品 %2$d点', 'bankofart' ),
-						(int) ( $_GET['artists'] ?? 0 ), // phpcs:ignore WordPress.Security.NonceVerification
-						(int) ( $_GET['arts'] ?? 0 ) // phpcs:ignore WordPress.Security.NonceVerification
+						/* translators: 1: pages fetched, 2: artworks updated, 3: total stored */
+						esc_html__( '取得しました：%1$dページ巡回 / 更新 %2$d点 / 保存済み %3$d点', 'bankofart' ),
+						(int) ( $_GET['pages'] ?? 0 ), // phpcs:ignore WordPress.Security.NonceVerification
+						(int) ( $_GET['arts'] ?? 0 ), // phpcs:ignore WordPress.Security.NonceVerification
+						(int) ( $_GET['total'] ?? 0 ) // phpcs:ignore WordPress.Security.NonceVerification
 					);
 					?>
 				</p>
@@ -190,12 +195,28 @@ function bankofart_collection_admin_page() {
 					<td>
 						<?php if ( ! empty( $last['at'] ) ) : ?>
 							<?php echo esc_html( $last['at'] ); ?>
-							（アーティスト <?php echo esc_html( (int) $last['artists'] ); ?>名 /
-							作品 <?php echo esc_html( (int) $last['arts'] ); ?>点<?php
+							（<?php echo esc_html( isset( $last['pages'] ) ? (int) $last['pages'] : 0 ); ?>ページ巡回 /
+							更新 <?php echo esc_html( (int) $last['arts'] ); ?>点<?php
 							if ( ! empty( $last['deleted'] ) ) {
 								echo ' / 削除 ' . esc_html( (int) $last['deleted'] ) . '点';
 							}
+							echo empty( $last['full'] ) ? '' : ' / 全件';
 							?>）
+							<?php if ( ! empty( $last['visited'] ) ) : ?>
+								<p class="description" style="margin:4px 0 0;">
+									<?php
+									printf(
+										/* translators: %s: artist slugs */
+										esc_html__( '変化があった画家： %s', 'bankofart' ),
+										esc_html( implode( '、', (array) $last['visited'] ) )
+									);
+									?>
+								</p>
+							<?php elseif ( isset( $last['visited'] ) ) : ?>
+								<p class="description" style="margin:4px 0 0;">
+									<?php esc_html_e( '変化なし（一覧ページだけ見て終了）', 'bankofart' ); ?>
+								</p>
+							<?php endif; ?>
 						<?php else : ?>
 							<em><?php esc_html_e( 'まだ取得していません', 'bankofart' ); ?></em>
 						<?php endif; ?>
@@ -271,7 +292,17 @@ function bankofart_collection_admin_page() {
 			<input type="hidden" name="action" value="boa_collection_sync">
 			<?php submit_button( __( '今すぐ取得する', 'bankofart' ), 'primary', 'submit', false ); ?>
 			<span class="description" style="margin-left:10px;">
-				<?php esc_html_e( '20ページほど巡回するので、30秒前後かかります。切り抜き画像も続けて生成します。', 'bankofart' ); ?>
+				<?php esc_html_e( 'まず一覧ページを1枚だけ見て、点数が変わった画家のページだけを取りに行きます。変化が無ければ数秒で終わります。', 'bankofart' ); ?>
+			</span>
+		</form>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-bottom:8px;">
+			<?php wp_nonce_field( 'boa_collection_sync' ); ?>
+			<input type="hidden" name="action" value="boa_collection_sync">
+			<input type="hidden" name="boa_full" value="1">
+			<?php submit_button( __( '全件を取り直す', 'bankofart' ), 'secondary', 'submit', false ); ?>
+			<span class="description" style="margin-left:10px;">
+				<?php esc_html_e( '全画家を回って、SOLD OUT や価格の変更も取り直します（30秒前後）。3か月に1回は自動でこちらが走ります。', 'bankofart' ); ?>
 			</span>
 		</form>
 

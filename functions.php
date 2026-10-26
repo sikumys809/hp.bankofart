@@ -45,6 +45,7 @@ $bankofart_includes = array(
 	'inc/resale-waitlist.php',  // リセール待機リスト（テーブル/フォーム送信/管理画面）
 	'inc/diagnosis-data.php',   // マッチング診断データ（PHP配列）
 	'inc/helpers.php',          // テンプレート用ヘルパー（セクション可視性判定等）
+	'inc/article-blocks.php',   // 記事（JOURNAL/NEWS）の動画・CTA（取り込みが触らない後付け部品）
 	'inc/art-top-crop.php',     // TOPコラージュ用：作品写真から絵だけを自動トリミング
 	'inc/document-request/setup.php',        // 資料請求：テーブル/定数
 	'inc/document-request/helpers.php',      // 資料請求：トークン/レート/検証/挿入

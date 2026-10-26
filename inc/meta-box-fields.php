@@ -1001,6 +1001,13 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 					),
 				),
 			),
+			/*
+			 * --- 動画・CTA ---
+			 * 本文セクションの外に置いている。JSON取り込みは news_sections を
+			 * 丸ごと入れ替えるため、中に入れると取り込みのたびに消えてしまう。
+			 */
+			...bankofart_article_video_fields( 'news', 'body' ),
+			...bankofart_cta_fields( 'news', 'body' ),
 			// --- セクション表示設定（4 switch）---
 			bankofart_section_switch( 'news_show_related_artist', 'Related Artist（関連アーティスト）セクション' ),
 			bankofart_section_switch( 'news_show_related_art', 'Related Art（関連作品）セクション' ),
@@ -1116,6 +1123,14 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 					),
 				),
 			),
+			/*
+			 * --- 動画・CTA ---
+			 * 本文セクションの外に置いている。JSON取り込みは journal_sections を
+			 * 丸ごと入れ替えるため、中に入れると取り込みのたびに消えてしまう。
+			 * コラム形式・インタビュー形式のどちらでも出る。
+			 */
+			...bankofart_article_video_fields( 'journal', 'body' ),
+			...bankofart_cta_fields( 'journal', 'body' ),
 			// --- インタビュー（話し手・聞き手 ＋ Q&A リピーター）---
 			array(
 				'id'   => 'journal_interview_intro',

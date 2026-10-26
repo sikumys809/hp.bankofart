@@ -326,6 +326,30 @@ function bankofart_briefing_url() {
 }
 
 /**
+ * 動画URLを埋め込み用のURLに変換する。
+ *
+ * YouTube は通常URL・短縮URL・ショート動画のいずれでも受ける。
+ *   https://www.youtube.com/watch?v=XXXXXXXXXXX
+ *   https://youtu.be/XXXXXXXXXXX
+ *   https://www.youtube.com/shorts/XXXXXXXXXXX
+ *   https://www.youtube.com/embed/XXXXXXXXXXX
+ * YouTube 以外のURLはそのまま返す（Vimeo の埋め込みURL等をそのまま貼れるように）。
+ *
+ * @param string $url 入力されたURL。
+ * @return string 埋め込みURL。空ならそのまま空文字。
+ */
+function bankofart_video_embed_url( $url ) {
+	$url = trim( (string) $url );
+	if ( '' === $url ) {
+		return '';
+	}
+	if ( preg_match( '~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|shorts/|v/))([\w-]{11})~', $url, $m ) ) {
+		return 'https://www.youtube.com/embed/' . $m[1];
+	}
+	return $url;
+}
+
+/**
  * JOURNAL 記事のデザイン形式を判定する。
  *
  * 管理画面の「記事デザイン」が auto（既定）なら、カテゴリー（journal_category）が
