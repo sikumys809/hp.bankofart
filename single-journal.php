@@ -133,6 +133,7 @@ while ( have_posts() ) :
 		<?php endif; ?>
 
 		<?php bankofart_render_article_video( 'journal', 'lead', $jid ); ?>
+		<?php bankofart_render_article_ctas( 'journal', $jid, 'lead' ); ?>
 
 		<?php if ( $show_body && 'interview' === $layout ) : ?>
 			<?php
@@ -148,7 +149,7 @@ while ( have_posts() ) :
 			?>
 		<?php elseif ( $show_body ) : ?>
 			<?php
-			foreach ( $sections as $sec ) :
+			foreach ( $sections as $sec_index => $sec ) :
 				$heading = isset( $sec['section_heading'] ) ? $sec['section_heading'] : '';
 				$body    = isset( $sec['section_body'] ) ? $sec['section_body'] : '';
 				$img_ids = ! empty( $sec['section_images'] ) ? (array) $sec['section_images'] : array();
@@ -187,16 +188,20 @@ while ( have_posts() ) :
 						</div>
 					<?php endif; ?>
 				</section>
+
+				<?php /* この見出しに差し込むCTA。 */ ?>
+				<?php bankofart_render_article_video( 'journal', 'section:' . $sec_index, $jid ); ?>
+				<?php bankofart_render_article_ctas( 'journal', $jid, 'section:' . $sec_index ); ?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 
-		<?php bankofart_render_article_video( 'journal', 'body', $jid ); ?>
+		<?php bankofart_render_article_video( 'journal', 'end', $jid ); ?>
 
 		<?php if ( ! empty( $author ) ) : ?>
 			<p class="sj-author-foot"><?php echo esc_html( $byline_label ); ?> ／ <?php echo esc_html( $author ); ?></p>
 		<?php endif; ?>
 
-		<?php bankofart_render_article_ctas( 'journal', $jid ); ?>
+		<?php bankofart_render_article_ctas( 'journal', $jid, 'end' ); ?>
 	</article>
 
 	<!-- ════════ 関連アーティスト ════════ -->

@@ -935,6 +935,10 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 				'label' => '本文セクション',
 				'icon'  => 'dashicons-edit',
 			),
+			'extras'          => array(
+				'label' => '動画・CTA',
+				'icon'  => 'dashicons-video-alt3',
+			),
 			'section_display' => array(
 				'label' => 'セクション表示設定',
 				'icon'  => 'dashicons-visibility',
@@ -1006,8 +1010,8 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 			 * 本文セクションの外に置いている。JSON取り込みは news_sections を
 			 * 丸ごと入れ替えるため、中に入れると取り込みのたびに消えてしまう。
 			 */
-			...bankofart_article_video_fields( 'news', 'body' ),
-			...bankofart_cta_fields( 'news', 'body' ),
+			...bankofart_article_video_fields( 'news', 'extras' ),
+			...bankofart_cta_fields( 'news', 'extras' ),
 			// --- セクション表示設定（4 switch）---
 			bankofart_section_switch( 'news_show_related_artist', 'Related Artist（関連アーティスト）セクション' ),
 			bankofart_section_switch( 'news_show_related_art', 'Related Art（関連作品）セクション' ),
@@ -1043,6 +1047,10 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 			'interview'       => array(
 				'label' => 'インタビュー',
 				'icon'  => 'dashicons-format-chat',
+			),
+			'extras'          => array(
+				'label' => '動画・CTA',
+				'icon'  => 'dashicons-video-alt3',
 			),
 			'section_display' => array(
 				'label' => 'セクション表示設定',
@@ -1129,8 +1137,8 @@ function bankofart_register_meta_boxes( $meta_boxes ) {
 			 * 丸ごと入れ替えるため、中に入れると取り込みのたびに消えてしまう。
 			 * コラム形式・インタビュー形式のどちらでも出る。
 			 */
-			...bankofart_article_video_fields( 'journal', 'body' ),
-			...bankofart_cta_fields( 'journal', 'body' ),
+			...bankofart_article_video_fields( 'journal', 'extras' ),
+			...bankofart_cta_fields( 'journal', 'extras' ),
 			// --- インタビュー（話し手・聞き手 ＋ Q&A リピーター）---
 			array(
 				'id'   => 'journal_interview_intro',

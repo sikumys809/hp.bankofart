@@ -113,28 +113,57 @@ function bankofart_collection_fetch_artists() {
  * @return array 元写真URL => array( 'ratio' => float, 'quad' => array )。
  */
 function bankofart_collection_parse_crops( $html ) {
-	$re = '~\\\\"aspectRatio\\\\":\\\\"([0-9.]+)\\\\".{0,600}?\\\\"url\\\\":\\\\"(https://[^\\\\"]+)\\\\".{0,300}?\\\\"crop\\\\":\{(.{0,400}?)\}~s';
-	if ( ! preg_match_all( $re, $html, $matches, PREG_SET_ORDER ) ) {
-		return array();
+	/*
+	 * 並び順が2通りある（向こうの実装変更に追従するため両方見る）。
+	 *   新：… "url":"…","alt":"…","crop":{…},"ratio":0.858…
+	 *   旧：… "aspectRatio":"0.858…", … "url":"…", … "crop":{…}
+	 * 新しい方を先に試し、1件も取れないときだけ旧い方を使う。
+	 * $url は「元写真URL」、$ratio は「作品の実寸から来る縦横比」、$body は crop の中身。
+	 */
+	$patterns = array(
+		// 新：url → crop → ratio の順。
+		array(
+			're'    => '~\\\\"url\\\\":\\\\"(https://[^\\\\"]+)\\\\".{0,400}?\\\\"crop\\\\":\{(.{0,400}?)\},\\\\"ratio\\\\":([0-9.]+)~s',
+			'url'   => 1,
+			'body'  => 2,
+			'ratio' => 3,
+		),
+		// 旧：aspectRatio → url → crop の順。
+		array(
+			're'    => '~\\\\"aspectRatio\\\\":\\\\"([0-9.]+)\\\\".{0,600}?\\\\"url\\\\":\\\\"(https://[^\\\\"]+)\\\\".{0,300}?\\\\"crop\\\\":\{(.{0,400}?)\}~s',
+			'url'   => 2,
+			'body'  => 3,
+			'ratio' => 1,
+		),
+	);
+
+	foreach ( $patterns as $p ) {
+		if ( ! preg_match_all( $p['re'], $html, $matches, PREG_SET_ORDER ) ) {
+			continue;
+		}
+
+		$crops = array();
+		foreach ( $matches as $m ) {
+			// 受け渡しデータはJS文字列の中にあるので、まず \" を " に戻してから読む。
+			$crop = json_decode( '{' . str_replace( '\\"', '"', $m[ $p['body'] ] ) . '}', true );
+			if ( ! is_array( $crop ) ) {
+				continue;
+			}
+			$quad = bankofart_collection_crop_to_quad( $crop );
+			if ( ! $quad ) {
+				continue;
+			}
+			$crops[ $m[ $p['url'] ] ] = array(
+				'ratio' => (float) $m[ $p['ratio'] ],
+				'quad'  => $quad,
+			);
+		}
+		if ( $crops ) {
+			return $crops;
+		}
 	}
 
-	$crops = array();
-	foreach ( $matches as $m ) {
-		// 受け渡しデータはJS文字列の中にあるので、まず \" を " に戻してから読む。
-		$crop = json_decode( '{' . str_replace( '\\"', '"', $m[3] ) . '}', true );
-		if ( ! is_array( $crop ) ) {
-			continue;
-		}
-		$quad = bankofart_collection_crop_to_quad( $crop );
-		if ( ! $quad ) {
-			continue;
-		}
-		$crops[ $m[2] ] = array(
-			'ratio' => (float) $m[1],
-			'quad'  => $quad,
-		);
-	}
-	return $crops;
+	return array();
 }
 
 /**

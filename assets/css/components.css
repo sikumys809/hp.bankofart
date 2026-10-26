@@ -1192,3 +1192,15 @@
 		margin: 36px 0;
 	}
 }
+
+/* 記事の途中（見出しの後）に差し込んだCTAは、区切り線と余白を控えめにする。 */
+.article-cta--inline {
+	margin: 40px 0;
+	padding-top: 0;
+	border-top: 0;
+}
+
+.article-cta--inline .article-cta-head {
+	font-size: 17px;
+	margin-bottom: 20px;
+}

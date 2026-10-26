@@ -134,10 +134,11 @@ while ( have_posts() ) :
 		<?php endif; ?>
 
 		<?php bankofart_render_article_video( 'news', 'lead', $nid ); ?>
+		<?php bankofart_render_article_ctas( 'news', $nid, 'lead' ); ?>
 
 		<?php if ( $show_body ) : ?>
 			<?php
-			foreach ( $sections as $sec ) :
+			foreach ( $sections as $sec_index => $sec ) :
 				$heading = isset( $sec['section_heading'] ) ? $sec['section_heading'] : '';
 				$body    = isset( $sec['section_body'] ) ? $sec['section_body'] : '';
 				$img_ids = ! empty( $sec['section_images'] ) ? (array) $sec['section_images'] : array();
@@ -177,10 +178,14 @@ while ( have_posts() ) :
 						</div>
 					<?php endif; ?>
 				</section>
+
+				<?php /* この見出しに差し込むCTA。 */ ?>
+				<?php bankofart_render_article_video( 'news', 'section:' . $sec_index, $nid ); ?>
+				<?php bankofart_render_article_ctas( 'news', $nid, 'section:' . $sec_index ); ?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 
-		<?php bankofart_render_article_video( 'news', 'body', $nid ); ?>
+		<?php bankofart_render_article_video( 'news', 'end', $nid ); ?>
 
 		<?php if ( empty( $video_embed ) && ! empty( $ext_url ) ) : ?>
 			<div class="sn-external rv">
@@ -190,7 +195,7 @@ while ( have_posts() ) :
 			</div>
 		<?php endif; ?>
 
-		<?php bankofart_render_article_ctas( 'news', $nid ); ?>
+		<?php bankofart_render_article_ctas( 'news', $nid, 'end' ); ?>
 	</article>
 
 	<!-- ════════ 関連アーティスト ════════ -->

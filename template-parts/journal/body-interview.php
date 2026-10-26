@@ -167,7 +167,7 @@ if ( '' !== $speaker_name ) :
 
 <div class="sj-iv-thread">
 	<?php
-	foreach ( $qa_rows as $row ) :
+	foreach ( $qa_rows as $qa_index => $row ) :
 		$question = isset( $row['qa_question'] ) ? (string) $row['qa_question'] : '';
 		$answer   = isset( $row['qa_answer'] ) ? (string) $row['qa_answer'] : '';
 		$chapter  = isset( $row['qa_chapter'] ) ? (string) $row['qa_chapter'] : '';
@@ -225,6 +225,10 @@ if ( '' !== $speaker_name ) :
 				</div>
 			</div>
 		<?php endif; ?>
+
+		<?php /* このQ&Aに差し込むCTA。 */ ?>
+		<?php bankofart_render_article_video( 'journal', 'qa:' . $qa_index, $jid ); ?>
+		<?php bankofart_render_article_ctas( 'journal', $jid, 'qa:' . $qa_index ); ?>
 
 	<?php endforeach; ?>
 </div>
