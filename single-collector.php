@@ -268,6 +268,28 @@ while ( have_posts() ) :
 		</div>
 	<?php endif; ?>
 
+	<!-- ════════ MOVIE ════════ -->
+	<?php
+	/*
+	 * 動画URL（collector_video_url）は入力欄だけあって、どこにも出ていなかった。
+	 * インタビューの前に置く。URLが未入力なら何も出さない。
+	 */
+	$video_embed = bankofart_video_embed_url( (string) rwmb_meta( 'collector_video_url', '', $cid ) );
+	?>
+	<?php if ( '' !== $video_embed ) : ?>
+		<section class="cs-video-sec">
+			<div class="cs-video">
+				<div class="cs-video-head">
+					<div class="cs-video-en rv">MOVIE</div>
+					<div class="cs-video-ja rv d1">導入企業の動画</div>
+				</div>
+				<div class="cs-video-frame rv">
+					<iframe src="<?php echo esc_url( $video_embed ); ?>" title="<?php echo esc_attr( $title ); ?>" loading="lazy" allowfullscreen></iframe>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<!-- ════════ INTERVIEW ════════ -->
 	<?php if ( $show_interview ) : ?>
 		<section class="cs-interview-sec">

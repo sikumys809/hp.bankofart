@@ -39,6 +39,15 @@
 .cs-visual-thumb:hover .cs-visual-thumb-inner { transform: scale(1.08); }
 
 /* ═══ INTERVIEW ═══ */
+/* 動画（インタビューの前）。背景と横幅はインタビューに合わせる。 */
+.cs-video-sec { background: var(--paper); }
+.cs-video { max-width: 780px; margin: 0 auto; padding: 0 40px 88px; }
+.cs-video-head { text-align: center; margin-bottom: 40px; }
+.cs-video-en { font-family: var(--f-display); font-size: var(--fs-heading); font-weight: var(--fw-regular); letter-spacing: var(--ls-3); color: var(--ink); margin-bottom: 8px; }
+.cs-video-ja { font-family: var(--f-jp); font-size: 13px; font-weight: var(--fw-medium); letter-spacing: var(--ls-3); text-transform: uppercase; color: var(--brand); }
+.cs-video-frame { position: relative; width: 100%; aspect-ratio: 16/9; background: var(--ink); overflow: hidden; }
+.cs-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
 .cs-interview-sec { background: var(--paper); }
 .cs-interview { max-width: 780px; margin: 0 auto; padding: 0 40px 100px; }
 .cs-iv-head { text-align: center; margin-bottom: 56px; }
@@ -161,6 +170,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.cs-visual { padding: 0 20px; margin-bottom: 64px; }
 	.cs-visual-thumbs { gap: 8px; }
 	.cs-interview { padding: 0 20px 72px; }
+	.cs-video { padding: 0 20px 64px; }
 	.cs-iv-q-avatar { width: 44px; height: 44px; }
 	.cs-iv-q-bubble { font-size: 15px; padding: 13px 16px; }
 	.cs-work-sec { padding: 64px 20px; }
@@ -178,6 +188,7 @@ body.reveal-ready .rv.on { opacity: 1; transform: translateY(0); }
 	.cs-hero { padding: 28px 16px 48px; }
 	.cs-visual { padding: 0 16px; }
 	.cs-interview { padding: 0 16px 56px; }
+	.cs-video { padding: 0 16px 48px; }
 	.cs-work-sec, .cs-related { padding: 56px 16px; }
 	.cs-back { padding: 56px 16px; }
 	.match-banner { padding: 32px 20px; }
