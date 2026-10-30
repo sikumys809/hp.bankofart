@@ -156,7 +156,12 @@ function bankofart_article_position_normalize( $stored, array $valid ) {
  * @return array Meta Box のフィールド定義（2件）。
  */
 function bankofart_cta_fields( $prefix, $tab ) {
-	$choices = array();
+	/*
+	 * 先頭は空の選択肢にして、既定値も空にしてある。
+	 * リピーターは行を全部消しても空の行が1つ残ることがあり、
+	 * 既定が「作品を見る」のままだと、消したはずのボタンが出てしまうため。
+	 */
+	$choices = array( '' => '— 出さない —' );
 	foreach ( bankofart_cta_types() as $key => $t ) {
 		$choices[ $key ] = $t['admin'];
 	}
@@ -165,6 +170,12 @@ function bankofart_cta_fields( $prefix, $tab ) {
 	$positions = $editing ? bankofart_article_positions( $prefix, $editing ) : array( 'end' => '記事の最後' );
 
 	return array(
+		/*
+		 * この記事ではCTAを一切出さないためのスイッチ。
+		 * 行を消しても何かの拍子に残ってしまうことがあるので、
+		 * 「出す／出さない」を1か所で決められるようにしておく。
+		 */
+		bankofart_section_switch( $prefix . '_show_article_ctas', 'この記事でCTAを表示する', $tab ),
 		array(
 			'id'   => $prefix . '_cta_heading',
 			'name' => 'CTAの見出し',
@@ -189,7 +200,8 @@ function bankofart_cta_fields( $prefix, $tab ) {
 					'name'    => '種類',
 					'type'    => 'select',
 					'options' => $choices,
-					'std'     => 'collection',
+					'std'     => '',
+					'desc'    => '「— 出さない —」のままだと、この行は表示されません。',
 				),
 				array(
 					'id'      => 'cta_position',
@@ -340,8 +352,9 @@ function bankofart_render_article_video( $prefix, $position, $post_id = null ) {
  */
 function bankofart_cta_resolve( array $row, $post_id ) {
 	$types = bankofart_cta_types();
-	$type  = isset( $row['cta_type'] ) ? (string) $row['cta_type'] : 'collection';
-	if ( ! isset( $types[ $type ] ) ) {
+	// 種類が空の行（＝消した行の残骸・未選択）は出さない。
+	$type = isset( $row['cta_type'] ) ? trim( (string) $row['cta_type'] ) : '';
+	if ( '' === $type || ! isset( $types[ $type ] ) ) {
 		return null;
 	}
 
@@ -428,6 +441,15 @@ function bankofart_cta_resolve( array $row, $post_id ) {
  */
 function bankofart_render_article_ctas( $prefix, $post_id = null, $position = 'end' ) {
 	$post_id = $post_id ? $post_id : get_the_ID();
+
+	/*
+	 * 記事ごとの「CTAを表示する」スイッチ。明示的にOFFなら、行が残っていても何も出さない。
+	 * 未設定はONとして扱う（既存記事の表示を変えないため。
+	 * 編集画面を開いた時点で inc/section-display-guard.php が '1' を補完する）。
+	 */
+	if ( '0' === (string) rwmb_meta( $prefix . '_show_article_ctas', '', $post_id ) ) {
+		return;
+	}
 
 	$rows = array_filter( (array) rwmb_meta( $prefix . '_ctas', '', $post_id ) );
 	if ( ! $rows ) {

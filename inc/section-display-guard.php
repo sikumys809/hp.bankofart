@@ -62,12 +62,14 @@ function bankofart_section_display_switch_map() {
 			'collector_show_cta',
 		),
 		'news'      => array(
+			'news_show_article_ctas',
 			'news_show_related_artist',
 			'news_show_related_art',
 			'news_show_more_news',
 			'news_show_cta',
 		),
 		'journal'   => array(
+			'journal_show_article_ctas',
 			'journal_show_related_artist',
 			'journal_show_related_art',
 			'journal_show_more_journal',
